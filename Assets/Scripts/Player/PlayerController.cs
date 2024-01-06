@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("Health")]
     [SerializeField] private int maxHealth;
-    [SerializeField] private int health;
+    private int health;
 
     [Header("Death")]
     [SerializeField] private ParticleSystem deathEffect;

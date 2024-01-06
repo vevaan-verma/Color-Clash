@@ -356,7 +356,6 @@ GameObject:
   - component: {fileID: 90319426}
   - component: {fileID: 90319434}
   - component: {fileID: 90319430}
-  - component: {fileID: 90319432}
   - component: {fileID: 90319433}
   m_Layer: 7
   m_Name: Player
@@ -499,27 +498,10 @@ MonoBehaviour:
     multiplier: 2
   colorCycleCooldown: 2
   maxHealth: 100
-  health: 0
   deathEffect: {fileID: 8961104740163596906, guid: 4f35fb8934391ed46be3d10586c62f53, type: 3}
   jumpKey: 32
   colorSwitchKey: 306
   reloadKey: 114
---- !u!114 &90319432
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 90319424}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ea67e98ba3822147941d2e26651fa74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelManager: {fileID: 0}
-  maxHealth: 100
-  health: 0
-  deathEffect: {fileID: 8961104740163596906, guid: 4f35fb8934391ed46be3d10586c62f53, type: 3}
 --- !u!95 &90319433
 Animator:
   serializedVersion: 5
@@ -649,8 +631,10 @@ GameObject:
   m_Component:
   - component: {fileID: 251352575}
   - component: {fileID: 251352574}
+  - component: {fileID: 251352578}
   - component: {fileID: 251352577}
   - component: {fileID: 251352576}
+  - component: {fileID: 251352579}
   m_Layer: 8
   m_Name: Enemy
   m_TagString: Untagged
@@ -719,7 +703,7 @@ Transform:
   m_GameObject: {fileID: 251352573}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7, y: 1, z: 0}
+  m_LocalPosition: {x: 5, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -738,6 +722,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cbecb8f77ae0134b844297896224177, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 2
   starterGun: {fileID: -6807907351907170449, guid: e45a4f862c9e5fe4088f657da1eb804b, type: 3}
   gunSlot: {fileID: 521785584}
   playerMask:
@@ -746,8 +731,11 @@ MonoBehaviour:
   shootableMask:
     serializedVersion: 2
     m_Bits: 247
+  pointA: {fileID: 1000935990}
+  pointB: {fileID: 271022509}
+  maxPointDistance: 0.5
+  destinationWaitDuration: 2
   maxHealth: 100
-  health: 0
   deathEffect: {fileID: 8961104740163596906, guid: 62da63b4e5387444ea74188e6039d814, type: 3}
 --- !u!60 &251352577
 PolygonCollider2D:
@@ -816,6 +804,54 @@ PolygonCollider2D:
       - {x: 0.25, y: 0.4375}
       - {x: 0.25, y: 0.5}
   m_UseDelaunayMesh: 0
+--- !u!50 &251352578
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 251352573}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 6200000, guid: f8a0459fedcdfdb43bd4be6bdff6eca1, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 1
+  m_SleepingMode: 0
+  m_CollisionDetection: 1
+  m_Constraints: 4
+--- !u!95 &251352579
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 251352573}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d1e3345fbde3a3e4abe8033666b2048a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &271022508
 GameObject:
   m_ObjectHideFlags: 0
@@ -828,7 +864,7 @@ GameObject:
   m_Layer: 0
   m_Name: PointB
   m_TagString: Untagged
-  m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -841,7 +877,7 @@ Transform:
   m_GameObject: {fileID: 271022508}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9, y: 0, z: 0}
+  m_LocalPosition: {x: 9, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1742,7 +1778,7 @@ GameObject:
   m_Layer: 0
   m_Name: PointA
   m_TagString: Untagged
-  m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -1755,7 +1791,7 @@ Transform:
   m_GameObject: {fileID: 1000935989}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalPosition: {x: 5, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2191,7 +2227,7 @@ Transform:
   m_GameObject: {fileID: 2050818157}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.18990602, y: 1.2705911, z: -0.048122212}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
