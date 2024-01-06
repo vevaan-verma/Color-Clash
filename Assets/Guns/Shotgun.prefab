@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5263902748500601797}
   - component: {fileID: 2342899002434063154}
   - component: {fileID: -7252344389506710391}
+  - component: {fileID: 1869404700849576018}
   m_Layer: 7
   m_Name: Shotgun
   m_TagString: Untagged
@@ -81,7 +82,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.16, y: 0.16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -99,9 +100,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39cfe4624d6e0be43b8fc0f2b625948f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gunData: {fileID: 11400000, guid: 84f1e4518c3737c428fe09cb8821361b, type: 2}
   muzzle: {fileID: 7526626872172580836}
+  bullet: {fileID: 250590204637249295, guid: 437c23eddbd465a45ae8ebe32682dcc3, type: 3}
   bulletTracer: {fileID: 4432008646729289866}
+  bulletTracerDisplayDuration: 0.02
   impactEffect: {fileID: 2066180300524992171, guid: f25a3225b657042489bbae36fa5e402a, type: 3}
+--- !u!95 &1869404700849576018
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064197040667058673}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2b263b2f84849814292514d4aff01d6f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6272595080825707583
 GameObject:
   m_ObjectHideFlags: 0

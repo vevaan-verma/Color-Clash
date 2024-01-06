@@ -4,24 +4,41 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour {
 
+    [Header("Shooting")]
+    [SerializeField] private Gun starterGun; // DON'T USE THIS GUN, IT ISN'T INSTANTIATED
+    [SerializeField] private Transform gunSlot;
+    [SerializeField] private LayerMask playerMask;
+    [SerializeField] private LayerMask shootableMask; // just to avoid bullet collisions
+    private Gun gun;
+
     [Header("Health")]
     [SerializeField] private int maxHealth;
-    private int currHealth;
+    [SerializeField] private int health;
 
     [Header("Death")]
     [SerializeField] private ParticleSystem deathEffect;
 
     private void Start() {
 
-        currHealth = maxHealth;
+        health = maxHealth;
+
+        gun = Instantiate(starterGun, gunSlot);
+        gun.Initialize(GetComponent<Collider2D>());
+
+    }
+
+    private void Update() {
+
+        StartCoroutine(gun.Shoot(shootableMask, ShooterType.Enemy));
+        gun.InstantReload();
 
     }
 
     public void TakeDamage(int damage) {
 
-        currHealth -= damage;
+        health -= damage;
 
-        if (currHealth <= 0f)
+        if (health <= 0f)
             Die();
 
     }

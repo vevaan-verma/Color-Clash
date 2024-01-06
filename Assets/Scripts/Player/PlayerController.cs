@@ -6,8 +6,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     [Header("References")]
-    private LevelManager levelManager;
-    private GunController gunController;
+    private new Collider2D collider;
+    private PlayerHealth playerHealth;
+    private UIController uiController;
     private Rigidbody2D rb;
 
     [Header("Movement")]
@@ -19,10 +20,11 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float jumpForce;
 
     [Header("Guns")]
-    [SerializeField] private Gun[] guns;
+    [SerializeField] private List<Gun> starterGuns; // DON'T USE GUNS FROM THIS, THEY AREN'T INSTANTIATED
     [SerializeField] private Transform gunSlot;
+    [SerializeField] private LayerMask shootableMask; // just to avoid player and bullet collisions
+    private List<Gun> guns; // contains the actual instantiated guns
     private int currGunIndex;
-    private GunModel currGunModel;
 
     [Header("Ground Check")]
     [SerializeField] private Transform leftFoot;
@@ -31,32 +33,43 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float groundCheckRadius;
     private bool isGrounded;
 
-    [Header("Colors")]
+    [Header("Color Cycling")]
     [SerializeField] private PlayerSprite[] playerSprites;
+    [SerializeField] private float colorCycleCooldown;
     private int currSpriteIndex;
     private SpriteRenderer spriteRenderer;
+    private bool canColorCycle;
 
     [Header("Keybinds")]
     [SerializeField] private KeyCode jumpKey;
     [SerializeField] private KeyCode colorSwitchKey;
+    [SerializeField] private KeyCode reloadKey;
 
     [Header("Quitting")]
     private bool quitting;
 
     private void Start() {
 
-        levelManager = FindObjectOfType<LevelManager>();
-        gunController = GetComponent<GunController>();
+        collider = GetComponent<Collider2D>();
+        playerHealth = GetComponent<PlayerHealth>();
+        uiController = FindObjectOfType<UIController>();
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         currSpriteIndex = 0;
         spriteRenderer.sprite = playerSprites[currSpriteIndex].GetSprite();
 
+        guns = new List<Gun>();
+
+        foreach (Gun gun in starterGuns)
+            AddGun(gun);
+
         currGunIndex = 0;
-        UpdateGunVisual();
+        UpdateGunVisual(); // update visuals
+        uiController.UpdateGunHUD(guns[currGunIndex]); // update ui
 
         isFacingRight = true;
+        canColorCycle = true;
 
     }
 
@@ -81,8 +94,12 @@ public class PlayerController : MonoBehaviour {
             CycleColor();
 
         // guns
-        if (Input.GetMouseButton(0))
-            StartCoroutine(gunController.Shoot(guns[currGunIndex], currGunModel));
+        if (Input.GetMouseButton(0)) {
+
+            StartCoroutine(guns[currGunIndex].Shoot(shootableMask, ShooterType.Player));
+            uiController.UpdateGunHUD(guns[currGunIndex]);
+
+        }
 
         // gun cycling
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -111,6 +128,10 @@ public class PlayerController : MonoBehaviour {
         else if (scrollInput < 0f)
             CyclePreviousGun();
 
+        // gun reloading
+        if (Input.GetKeyDown(reloadKey))
+            StartCoroutine(guns[currGunIndex].Reload());
+
     }
 
     private void FixedUpdate() {
@@ -137,7 +158,7 @@ public class PlayerController : MonoBehaviour {
         if (quitting) return; // to prevent error
 
         // player falls out of screen
-        Die();
+        playerHealth.TakeDamage(playerHealth.GetHealth());
 
     }
 
@@ -146,7 +167,7 @@ public class PlayerController : MonoBehaviour {
         if (isFacingRight && horizontalInput < 0f || !isFacingRight && horizontalInput > 0f) {
 
             transform.Rotate(0f, 180f, 0f);
-            isFacingRight = !isFacingRight;
+            isFacingRight = !isFacingRight; // breaks when there are errors
 
         }
     }
@@ -158,6 +179,8 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void CycleColor() {
+
+        if (!canColorCycle) return;
 
         currSpriteIndex++;
 
@@ -176,6 +199,24 @@ public class PlayerController : MonoBehaviour {
         if (rightCollider != null)
             rightCollider.GetComponent<Claimable>()?.FadeColor(playerSprites[currSpriteIndex].GetMaterial().color);
 
+        // start cooldown
+        canColorCycle = false;
+        Invoke("ColorCycleCooldownComplete", colorCycleCooldown);
+
+    }
+
+    private void ColorCycleCooldownComplete() {
+
+        canColorCycle = true;
+
+    }
+
+    private void AddGun(Gun gun) {
+
+        Gun newGun = Instantiate(gun, gunSlot); // add gun under gunSlot
+        newGun.Initialize(collider);
+        guns.Add(newGun);
+
     }
 
     private void CyclePreviousGun() {
@@ -184,20 +225,22 @@ public class PlayerController : MonoBehaviour {
 
         // cycle the guns in loop
         if (currGunIndex < 0)
-            currGunIndex = guns.Length - 1;
+            currGunIndex = guns.Count - 1;
 
-        UpdateGunVisual();
+        UpdateGunVisual(); // update visuals
+        uiController.UpdateGunHUD(guns[currGunIndex]); // update ui
 
     }
 
     private void CycleToGun(int gunIndex) {
 
-        if (gunIndex < 0 || gunIndex >= guns.Length)
+        if (gunIndex < 0 || gunIndex >= guns.Count)
             return;
 
         currGunIndex = gunIndex;
 
-        UpdateGunVisual();
+        UpdateGunVisual(); // update visuals
+        uiController.UpdateGunHUD(guns[currGunIndex]); // update ui
 
     }
 
@@ -206,26 +249,21 @@ public class PlayerController : MonoBehaviour {
         currGunIndex++;
 
         // cycle the guns in loop
-        if (currGunIndex >= guns.Length)
+        if (currGunIndex >= guns.Count)
             currGunIndex = 0;
 
-        UpdateGunVisual();
+        UpdateGunVisual(); // update visuals
+        uiController.UpdateGunHUD(guns[currGunIndex]); // update ui
 
     }
 
     private void UpdateGunVisual() {
 
-        // remove all gun slot children before adding new gun
+        // make all gun slot children invisible before cycling gun
         for (int i = 0; i < gunSlot.childCount; i++)
-            Destroy(gunSlot.GetChild(i).gameObject);
+            gunSlot.GetChild(i).gameObject.SetActive(false);
 
-        currGunModel = Instantiate(guns[currGunIndex].GetModel(), gunSlot); // add new gun as child
-
-    }
-
-    private void Die() {
-
-        transform.position = levelManager.GetSpawn();
+        guns[currGunIndex].gameObject.SetActive(true); // make current gun visible
 
     }
 }
@@ -233,10 +271,25 @@ public class PlayerController : MonoBehaviour {
 [Serializable]
 public class PlayerSprite {
 
+    [SerializeField] private PlayerColor playerColor;
     [SerializeField] private Sprite sprite;
     [SerializeField] private Material material;
+    [SerializeField] private float multiplier;
 
+    public PlayerColor GetPlayerColor() { return playerColor; }
     public Sprite GetSprite() { return sprite; }
     public Material GetMaterial() { return material; }
+
+}
+
+public enum PlayerColor {
+
+    /*
+    GUIDE:
+        - Red: Attack Multiplier
+        - Blue: Defense Multiplier
+    */
+
+    Red, Blue
 
 }

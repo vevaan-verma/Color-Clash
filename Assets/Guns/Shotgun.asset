@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50cd8df37b7d5e243bf455dc0977aae2, type: 3}
   m_Name: Shotgun
   m_EditorClassIdentifier: 
-  gunModel: {fileID: -7252344389506710391, guid: ea128f21d0afba14f9371e2ce5316cef, type: 3}
   name: Shotgun
   damage: 80
+  magazineSize: 5
   fireRate: 1
-  maxFireRange: 3
-  reloadTime: 2
+  maxRange: 3
+  reloadTime: 1.5
+  useRaycastShooting: 1

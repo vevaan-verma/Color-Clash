@@ -1,23 +1,136 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu]
-public class Gun : ScriptableObject {
+public class Gun : MonoBehaviour {
 
-    [SerializeField] private GunModel gunModel;
-    [SerializeField] private new string name;
-    [SerializeField] private int damage;
-    [SerializeField] private float fireRate;
-    [SerializeField] private float maxFireRange;
-    [SerializeField] private float reloadTime;
+    [Header("References")]
+    [SerializeField] private GunData gunData;
+    [SerializeField] private LayerMask bulletMask;
+    private Animator animator;
+    private UIController uiController;
 
-    public GunModel GetModel() { return gunModel; }
-    public string GetName() { return name; }
-    public int GetDamage() { return damage; }
-    public float GetFireRate() { return fireRate; }
-    public float GetMaxFireRange() { return maxFireRange; }
-    public float GetReloadTime() { return reloadTime; }
+    [Header("Shooting")]
+    [SerializeField] private Transform muzzle;
+    [SerializeField] private Bullet bullet;
+    private int currAmmo;
+    private bool isReloading;
+    private bool shotReady;
+
+    [Header("Tracer")]
+    [SerializeField] private LineRenderer bulletTracer;
+    [SerializeField] private float bulletTracerDisplayDuration;
+
+    [Header("Impact")]
+    [SerializeField] private GameObject impactEffect;
+    [SerializeField] private new Collider2D collider;
+
+    // IMPORTANT: RELOAD ANIMATION MUST BE 1 SECOND LONG FOR SCALING TO WORK
+
+    public void Initialize(Collider2D collider) {
+
+        animator = GetComponent<Animator>();
+        uiController = FindObjectOfType<UIController>();
+
+        this.collider = collider;
+
+        currAmmo = gunData.GetMagazineSize();
+        shotReady = true;
+
+    }
+
+    public IEnumerator Shoot(LayerMask shootableMask, ShooterType shooterType) {
+
+        if (!CanShoot()) yield break;
+
+        shotReady = false;
+
+        if (gunData.UsesRaycastShooting()) {
+
+            RaycastHit2D hitInfo = Physics2D.Raycast(muzzle.position, muzzle.right, gunData.GetMaxRange(), shootableMask);
+
+            if (hitInfo) {
+
+                // damage enemy if hit
+                hitInfo.transform.GetComponent<Enemy>()?.TakeDamage(gunData.GetDamage());
+
+                // damage player if hit
+                hitInfo.transform.GetComponent<PlayerHealth>()?.TakeDamage(gunData.GetDamage());
+
+                // instantiate impact effect
+                Instantiate(impactEffect, hitInfo.point, Quaternion.identity);
+
+                // set bullet tracer points
+                bulletTracer.SetPosition(0, muzzle.position);
+                bulletTracer.SetPosition(1, hitInfo.point);
+
+            } else {
+
+                // set bullet tracer points
+                bulletTracer.SetPosition(0, muzzle.position);
+                bulletTracer.SetPosition(1, muzzle.position + muzzle.right * gunData.GetMaxRange());
+                // bulletTracer.SetPosition(1, muzzle.position + muzzle.right * 100f); // illusion for infinite length tracer when missed
+
+            }
+
+            // display bullet tracer
+            bulletTracer.enabled = true;
+            yield return new WaitForSeconds(bulletTracerDisplayDuration);
+            bulletTracer.enabled = false;
+
+        } else {
+
+            Instantiate(bullet, muzzle.position, muzzle.rotation).Initialize(shooterType, gunData.GetDamage(), muzzle.position, gunData.GetMaxRange(), collider); // instantiate bullet
+
+        }
+
+        currAmmo--;
+
+        yield return new WaitForSeconds(1 / gunData.GetFireRate()); // use fire rate to prevent shooting
+        shotReady = true;
+
+    }
+
+    private bool CanReload() {
+
+        return currAmmo < gunData.GetMagazineSize() && !isReloading;
+
+    }
+
+    public IEnumerator Reload() {
+
+        if (!CanReload()) yield break;
+
+        // uiController.SetAmmoReloadingText(); // for notifying player of reload
+
+        animator.SetTrigger("reload"); // trigger animation
+
+        isReloading = true;
+        yield return new WaitForEndOfFrame(); // wait for end of frame so animation starts playing
+        animator.speed = 1f / gunData.GetReloadTime(); // scale animation speed by reload time
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for reload time
+        currAmmo = GetMagazineSize(); // reload gun
+        isReloading = false;
+
+        uiController.UpdateGunHUD(this); // update ui
+
+    }
+
+    public void InstantReload() {
+
+        if (!CanReload()) return;
+
+        currAmmo = GetMagazineSize(); // reload gun
+
+    }
+
+    private bool CanShoot() {
+
+        return !isReloading && currAmmo > 0 && shotReady;
+
+    }
+
+    public int GetCurrentAmmo() { return currAmmo; }
+    public int GetMagazineSize() { return gunData.GetMagazineSize(); }
 
 }
