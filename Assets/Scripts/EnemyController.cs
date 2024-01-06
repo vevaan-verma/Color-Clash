@@ -2,7 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour {
+public class EnemyController : MonoBehaviour {
+
+    [Header("References")]
+    private SpriteRenderer spriteRenderer;
 
     [Header("Shooting")]
     [SerializeField] private Gun starterGun; // DON'T USE THIS GUN, IT ISN'T INSTANTIATED
@@ -19,6 +22,8 @@ public class Enemy : MonoBehaviour {
     [SerializeField] private ParticleSystem deathEffect;
 
     private void Start() {
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
         health = maxHealth;
 
@@ -46,7 +51,8 @@ public class Enemy : MonoBehaviour {
     private void Die() {
 
         Destroy(gameObject);
-        Instantiate(deathEffect, transform.position, Quaternion.identity);
+        ParticleSystem.MainModule pm = Instantiate(deathEffect, transform.position, Quaternion.identity).main;
+        pm.startColor = spriteRenderer.color; // change particle color based on enemy color
 
     }
 }

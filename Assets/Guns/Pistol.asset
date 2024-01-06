@@ -18,4 +18,4 @@ MonoBehaviour:
   fireRate: 4
   maxRange: 10
   reloadTime: 0.5
-  useRaycastShooting: 0
+  useRaycastShooting: 1

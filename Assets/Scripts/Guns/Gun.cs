@@ -52,10 +52,10 @@ public class Gun : MonoBehaviour {
             if (hitInfo) {
 
                 // damage enemy if hit
-                hitInfo.transform.GetComponent<Enemy>()?.TakeDamage(gunData.GetDamage());
+                hitInfo.transform.GetComponent<EnemyController>()?.TakeDamage(gunData.GetDamage());
 
                 // damage player if hit
-                hitInfo.transform.GetComponent<PlayerHealth>()?.TakeDamage(gunData.GetDamage());
+                hitInfo.transform.GetComponent<PlayerController>()?.TakeDamage(gunData.GetDamage());
 
                 // instantiate impact effect
                 Instantiate(impactEffect, hitInfo.point, Quaternion.identity);
@@ -101,18 +101,21 @@ public class Gun : MonoBehaviour {
 
         if (!CanReload()) yield break;
 
+        isReloading = true;
+
         // uiController.SetAmmoReloadingText(); // for notifying player of reload
 
         animator.SetTrigger("reload"); // trigger animation
 
-        isReloading = true;
         yield return new WaitForEndOfFrame(); // wait for end of frame so animation starts playing
         animator.speed = 1f / gunData.GetReloadTime(); // scale animation speed by reload time
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); // wait for reload time
+        yield return new WaitForSeconds(gunData.GetReloadTime()); // wait for reload time
         currAmmo = GetMagazineSize(); // reload gun
-        isReloading = false;
 
         uiController.UpdateGunHUD(this); // update ui
+
+        isReloading = false;
+        shotReady = true; // reset fire rate cooldown
 
     }
 
@@ -132,5 +135,6 @@ public class Gun : MonoBehaviour {
 
     public int GetCurrentAmmo() { return currAmmo; }
     public int GetMagazineSize() { return gunData.GetMagazineSize(); }
+    public bool IsReloading() { return isReloading; }
 
 }

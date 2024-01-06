@@ -237,11 +237,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gunData: {fileID: 11400000, guid: fdb634dd326e3a244b6370156930de92, type: 2}
+  bulletMask:
+    serializedVersion: 2
+    m_Bits: 0
   muzzle: {fileID: 131927286974019375}
   bullet: {fileID: 250590204637249295, guid: 437c23eddbd465a45ae8ebe32682dcc3, type: 3}
   bulletTracer: {fileID: 5596897179430548651}
   bulletTracerDisplayDuration: 0.02
   impactEffect: {fileID: 2066180300524992171, guid: f25a3225b657042489bbae36fa5e402a, type: 3}
+  collider: {fileID: 0}
 --- !u!95 &437762834327030632
 Animator:
   serializedVersion: 5

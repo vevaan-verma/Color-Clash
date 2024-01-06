@@ -6,8 +6,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     [Header("References")]
+    private LevelManager levelManager;
+    private Animator animator;
     private new Collider2D collider;
-    private PlayerHealth playerHealth;
     private UIController uiController;
     private Rigidbody2D rb;
 
@@ -34,11 +35,19 @@ public class PlayerController : MonoBehaviour {
     private bool isGrounded;
 
     [Header("Color Cycling")]
-    [SerializeField] private PlayerSprite[] playerSprites;
+    [SerializeField] private PlayerColor[] playerColors;
     [SerializeField] private float colorCycleCooldown;
-    private int currSpriteIndex;
+    private PlayerColor playerColor;
+    private int currColorIndex;
     private SpriteRenderer spriteRenderer;
     private bool canColorCycle;
+
+    [Header("Health")]
+    [SerializeField] private int maxHealth;
+    [SerializeField] private int health;
+
+    [Header("Death")]
+    [SerializeField] private ParticleSystem deathEffect;
 
     [Header("Keybinds")]
     [SerializeField] private KeyCode jumpKey;
@@ -50,14 +59,15 @@ public class PlayerController : MonoBehaviour {
 
     private void Start() {
 
+        levelManager = FindObjectOfType<LevelManager>();
+        animator = GetComponent<Animator>();
         collider = GetComponent<Collider2D>();
-        playerHealth = GetComponent<PlayerHealth>();
         uiController = FindObjectOfType<UIController>();
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        currSpriteIndex = 0;
-        spriteRenderer.sprite = playerSprites[currSpriteIndex].GetSprite();
+        currColorIndex = 0;
+        spriteRenderer.color = playerColors[currColorIndex].GetSpriteColor();
 
         guns = new List<Gun>();
 
@@ -67,6 +77,8 @@ public class PlayerController : MonoBehaviour {
         currGunIndex = 0;
         UpdateGunVisual(); // update visuals
         uiController.UpdateGunHUD(guns[currGunIndex]); // update ui
+
+        health = maxHealth; // set health
 
         isFacingRight = true;
         canColorCycle = true;
@@ -138,12 +150,17 @@ public class PlayerController : MonoBehaviour {
 
         rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
 
+        if (horizontalInput != 0f && isGrounded) // player is moving on ground
+            animator.SetBool("isRunning", true);
+        else
+            animator.SetBool("isRunning", false);
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
 
         // claim claimable tiles when player collides with them
-        collision.transform.GetComponent<Claimable>()?.FadeColor(playerSprites[currSpriteIndex].GetMaterial().color);
+        collision.transform.GetComponent<Claimable>()?.FadeColor(playerColors[currColorIndex].GetClaimColor());
 
     }
 
@@ -158,7 +175,7 @@ public class PlayerController : MonoBehaviour {
         if (quitting) return; // to prevent error
 
         // player falls out of screen
-        playerHealth.TakeDamage(playerHealth.GetHealth());
+        TakeDamage(health); // kill player
 
     }
 
@@ -182,22 +199,22 @@ public class PlayerController : MonoBehaviour {
 
         if (!canColorCycle) return;
 
-        currSpriteIndex++;
+        currColorIndex++;
 
         // loop sprite colors
-        if (currSpriteIndex >= playerSprites.Length)
-            currSpriteIndex = 0;
+        if (currColorIndex >= playerColors.Length)
+            currColorIndex = 0;
 
-        spriteRenderer.sprite = playerSprites[currSpriteIndex].GetSprite();
+        spriteRenderer.color = playerColors[currColorIndex].GetSpriteColor();
 
         // if player is standing on something, claim it
         Collider2D leftCollider = Physics2D.OverlapCircle(leftFoot.position, groundCheckRadius, environmentMask);
         Collider2D rightCollider = Physics2D.OverlapCircle(rightFoot.position, groundCheckRadius, environmentMask);
 
         if (leftCollider != null)
-            leftCollider.GetComponent<Claimable>()?.FadeColor(playerSprites[currSpriteIndex].GetMaterial().color);
+            leftCollider.GetComponent<Claimable>()?.FadeColor(playerColors[currColorIndex].GetClaimColor());
         if (rightCollider != null)
-            rightCollider.GetComponent<Claimable>()?.FadeColor(playerSprites[currSpriteIndex].GetMaterial().color);
+            rightCollider.GetComponent<Claimable>()?.FadeColor(playerColors[currColorIndex].GetClaimColor());
 
         // start cooldown
         canColorCycle = false;
@@ -221,6 +238,8 @@ public class PlayerController : MonoBehaviour {
 
     private void CyclePreviousGun() {
 
+        if (guns[currGunIndex].IsReloading()) return; // deny swap if gun is reloading
+
         currGunIndex--;
 
         // cycle the guns in loop
@@ -234,6 +253,8 @@ public class PlayerController : MonoBehaviour {
 
     private void CycleToGun(int gunIndex) {
 
+        if (guns[currGunIndex].IsReloading()) return; // deny swap if gun is reloading
+
         if (gunIndex < 0 || gunIndex >= guns.Count)
             return;
 
@@ -245,6 +266,8 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void CycleNextGun() {
+
+        if (guns[currGunIndex].IsReloading()) return; // deny swap if gun is reloading
 
         currGunIndex++;
 
@@ -266,30 +289,37 @@ public class PlayerController : MonoBehaviour {
         guns[currGunIndex].gameObject.SetActive(true); // make current gun visible
 
     }
+
+    public void TakeDamage(int damage) {
+
+        health -= damage;
+
+        if (health <= 0f)
+            Die();
+
+    }
+
+    private void Die() {
+
+        ParticleSystem.MainModule pm = Instantiate(deathEffect, transform.position, Quaternion.identity).main; // instantiate death effect where player died
+        pm.startColor = spriteRenderer.color; // change particle color based on enemy color
+        transform.position = levelManager.GetSpawn(); // respawn at level spawn
+        health = maxHealth; // restore health
+
+    }
+
+    public int GetHealth() { return health; }
+
 }
 
 [Serializable]
-public class PlayerSprite {
+public class PlayerColor {
 
-    [SerializeField] private PlayerColor playerColor;
-    [SerializeField] private Sprite sprite;
-    [SerializeField] private Material material;
+    [SerializeField] private Color spriteColor;
+    [SerializeField] private Color claimColor;
     [SerializeField] private float multiplier;
 
-    public PlayerColor GetPlayerColor() { return playerColor; }
-    public Sprite GetSprite() { return sprite; }
-    public Material GetMaterial() { return material; }
-
-}
-
-public enum PlayerColor {
-
-    /*
-    GUIDE:
-        - Red: Attack Multiplier
-        - Blue: Defense Multiplier
-    */
-
-    Red, Blue
+    public Color GetSpriteColor() { return spriteColor; }
+    public Color GetClaimColor() { return claimColor; }
 
 }

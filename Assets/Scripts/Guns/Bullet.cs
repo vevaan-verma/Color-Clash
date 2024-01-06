@@ -44,9 +44,9 @@ public class Bullet : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D collision) {
 
         if (shooterType == ShooterType.Player)
-            collision.transform.GetComponent<Enemy>()?.TakeDamage(damage);
+            collision.transform.GetComponent<EnemyController>()?.TakeDamage(damage);
         else if (shooterType == ShooterType.Enemy)
-            collision.transform.GetComponent<PlayerHealth>()?.TakeDamage(damage);
+            collision.transform.GetComponent<PlayerController>()?.TakeDamage(damage);
 
         SelfDestruct();
 
