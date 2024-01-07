@@ -8,11 +8,11 @@ public class Bullet : MonoBehaviour {
     private Rigidbody2D rb;
 
     [Header("Shooting")]
-    private ShooterType shooterType;
+    private EntityType shooterType;
 
     [Header("Movement")]
     [SerializeField] private float speed;
-    private int damage;
+    private float damage;
 
     [Header("Impact")]
     [SerializeField] private GameObject impactEffect;
@@ -21,7 +21,8 @@ public class Bullet : MonoBehaviour {
     private float maxRange;
     private Vector3 spawnPos;
 
-    public void Initialize(ShooterType shooterType, int damage, Vector3 spawnPos, float maxRange, Collider2D shooterCollider) {
+    // start function
+    public void Initialize(EntityType shooterType, float damage, Vector3 spawnPos, float maxRange, Collider2D shooterCollider) {
 
         rb = GetComponent<Rigidbody2D>();
         rb.velocity = transform.right * speed;
@@ -45,9 +46,9 @@ public class Bullet : MonoBehaviour {
 
         bool? deathCaused = false; // to prevent impact effect when something dies (for better looking gfx)
 
-        if (shooterType == ShooterType.Player)
+        if (shooterType == EntityType.Player)
             deathCaused = collision.transform.GetComponent<EnemyController>()?.TakeDamage(damage); // damage enemy if player is shooter
-        else if (shooterType == ShooterType.Enemy)
+        else if (shooterType == EntityType.Enemy)
             deathCaused = collision.transform.GetComponent<PlayerController>()?.TakeDamage(damage); // damage player if enemy is shooter
 
         if (deathCaused != null && !(bool) deathCaused)
@@ -57,15 +58,8 @@ public class Bullet : MonoBehaviour {
 
     private void SelfDestruct() {
 
-        print("instantiate");
         Instantiate(impactEffect, transform.position, transform.rotation);
         Destroy(gameObject);
 
     }
-}
-
-public enum ShooterType {
-
-    Player, Enemy
-
 }

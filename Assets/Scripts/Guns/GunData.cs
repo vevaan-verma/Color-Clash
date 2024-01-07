@@ -9,7 +9,7 @@ public class GunData : ScriptableObject {
 
     [SerializeField] private new string name;
     [SerializeField] private Sprite icon;
-    [SerializeField] private int damage;
+    [SerializeField] private float damage;
     [SerializeField] private int magazineSize;
     [SerializeField] private float fireRate;
     [SerializeField] private float maxRange;
@@ -18,7 +18,7 @@ public class GunData : ScriptableObject {
 
     public string GetName() { return name; }
     public Sprite GetIcon() { return icon; }
-    public int GetDamage() { return damage; }
+    public float GetDamage() { return damage; }
     public int GetMagazineSize() { return magazineSize; }
     public float GetFireRate() { return fireRate; }
     public float GetMaxRange() { return maxRange; }

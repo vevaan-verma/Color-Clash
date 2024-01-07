@@ -41,9 +41,12 @@ public class PlayerController : MonoBehaviour {
     private SpriteRenderer spriteRenderer;
     private bool canColorCycle;
 
+    [Header("Effects")]
+    private Dictionary<EffectType, float> effectMultipliers;
+
     [Header("Health")]
     [SerializeField] private int maxHealth;
-    private int health;
+    private float health;
 
     [Header("Regeneration")]
     [SerializeField] private int regenAmount;
@@ -77,6 +80,7 @@ public class PlayerController : MonoBehaviour {
         currColorIndex = 0;
         spriteRenderer.color = playerColors[currColorIndex].GetSpriteColor();
 
+        // guns
         guns = new List<Gun>();
 
         foreach (Gun gun in starterGuns)
@@ -84,6 +88,14 @@ public class PlayerController : MonoBehaviour {
 
         currGunIndex = 0;
         UpdateGunVisual(); // update visuals
+
+        // effects
+        effectMultipliers = new Dictionary<EffectType, float>();
+        Array effects = Enum.GetValues(typeof(EffectType)); // get all effect type values
+
+        // auto populate dictionary with all effect types
+        foreach (EffectType effectType in effects)
+            effectMultipliers.Add(effectType, 1f); // add with default value of 1 because that's the default multiplier
 
         SetHealth(maxHealth); // set health
         StartCoroutine(HandleRegeneration()); // start regeneration
@@ -116,7 +128,7 @@ public class PlayerController : MonoBehaviour {
         // guns
         if (Input.GetMouseButton(0)) {
 
-            StartCoroutine(guns[currGunIndex].Shoot(shootableMask, ShooterType.Player));
+            StartCoroutine(guns[currGunIndex].Shoot(shootableMask, EntityType.Player, playerColors[currColorIndex].GetEffectType() == EffectType.Damage ? effectMultipliers[EffectType.Damage] : 1f)); // if player has the damage color equipped, add multiplier
             uiController.UpdateGunHUD(guns[currGunIndex], currGunIndex);
 
         }
@@ -152,6 +164,15 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKeyDown(reloadKey))
             StartCoroutine(guns[currGunIndex].Reload());
 
+        // if player is standing on something, claim it
+        Collider2D leftCollider = Physics2D.OverlapCircle(leftFoot.position, groundCheckRadius, environmentMask);
+        Collider2D rightCollider = Physics2D.OverlapCircle(rightFoot.position, groundCheckRadius, environmentMask);
+
+        if (leftCollider != null)
+            leftCollider.GetComponent<Claimable>()?.Claim(EntityType.Player, playerColors[currColorIndex].GetClaimColor(), playerColors[currColorIndex].GetEffectType());
+        if (rightCollider != null)
+            rightCollider.GetComponent<Claimable>()?.Claim(EntityType.Player, playerColors[currColorIndex].GetClaimColor(), playerColors[currColorIndex].GetEffectType());
+
     }
 
     private void FixedUpdate() {
@@ -168,7 +189,7 @@ public class PlayerController : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D collision) {
 
         // claim claimable tiles when player collides with them
-        collision.transform.GetComponent<Claimable>()?.FadeColor(playerColors[currColorIndex].GetClaimColor());
+        collision.transform.GetComponent<Claimable>()?.Claim(EntityType.Player, playerColors[currColorIndex].GetClaimColor(), playerColors[currColorIndex].GetEffectType());
 
     }
 
@@ -183,7 +204,7 @@ public class PlayerController : MonoBehaviour {
         if (quitting) return; // to prevent error
 
         // player falls out of screen
-        TakeDamage(health); // kill player
+        Die(); // kill player
 
     }
 
@@ -215,15 +236,6 @@ public class PlayerController : MonoBehaviour {
 
         spriteRenderer.color = playerColors[currColorIndex].GetSpriteColor();
 
-        // if player is standing on something, claim it
-        Collider2D leftCollider = Physics2D.OverlapCircle(leftFoot.position, groundCheckRadius, environmentMask);
-        Collider2D rightCollider = Physics2D.OverlapCircle(rightFoot.position, groundCheckRadius, environmentMask);
-
-        if (leftCollider != null)
-            leftCollider.GetComponent<Claimable>()?.FadeColor(playerColors[currColorIndex].GetClaimColor());
-        if (rightCollider != null)
-            rightCollider.GetComponent<Claimable>()?.FadeColor(playerColors[currColorIndex].GetClaimColor());
-
         // start cooldown
         canColorCycle = false;
         Invoke("ColorCycleCooldownComplete", colorCycleCooldown);
@@ -233,6 +245,18 @@ public class PlayerController : MonoBehaviour {
     private void ColorCycleCooldownComplete() {
 
         canColorCycle = true;
+
+    }
+
+    public void AddEffect(EffectType effectType, float addedMultiplier) {
+
+        effectMultipliers[effectType] += addedMultiplier; // add multiplier to previous multiplier
+
+    }
+
+    public void RemoveEffect(EffectType effectType, float addedMultiplier) {
+
+        effectMultipliers[effectType] -= addedMultiplier;
 
     }
 
@@ -297,9 +321,9 @@ public class PlayerController : MonoBehaviour {
     }
 
     // returns if player dies
-    public bool TakeDamage(int damage) {
+    public bool TakeDamage(float damage) {
 
-        RemoveHealth(damage);
+        RemoveHealth(damage * (playerColors[currColorIndex].GetEffectType() == EffectType.Defense ? (1 / effectMultipliers[EffectType.Defense]) : 1f));  // if player has the defense color equipped, add multiplier
 
         if (health <= 0f) {
 
@@ -315,6 +339,8 @@ public class PlayerController : MonoBehaviour {
 
     private void Die() {
 
+        health = 0f;
+
         ParticleSystem.MainModule pm = Instantiate(deathEffect, transform.position, Quaternion.identity).main; // instantiate death effect where player died
         pm.startColor = spriteRenderer.color; // change particle color based on enemy color
         transform.position = levelManager.GetSpawn(); // respawn at level spawn
@@ -322,21 +348,21 @@ public class PlayerController : MonoBehaviour {
 
     }
 
-    private void SetHealth(int health) {
+    private void SetHealth(float health) {
 
         this.health = health;
         uiController.UpdateHealth(this.health);
 
     }
 
-    private void AddHealth(int health) {
+    private void AddHealth(float health) {
 
         this.health += health;
         uiController.UpdateHealth(this.health);
 
     }
 
-    private void RemoveHealth(int health) {
+    private void RemoveHealth(float health) {
 
         this.health -= health;
         uiController.UpdateHealth(this.health);
@@ -349,7 +375,7 @@ public class PlayerController : MonoBehaviour {
 
             if (health < maxHealth) {
 
-                AddHealth(regenAmount);
+                AddHealth(regenAmount * (playerColors[currColorIndex].GetEffectType() == EffectType.Regeneration ? effectMultipliers[EffectType.Regeneration] : 1f)); // if player has the regeneration color equipped, add multiplier
                 yield return new WaitForSeconds(regenWaitDuration);
 
             }
@@ -361,18 +387,7 @@ public class PlayerController : MonoBehaviour {
 
     public List<Gun> GetGuns() { return guns; }
 
-}
-
-[Serializable]
-public class PlayerColor {
-
-    [SerializeField] private Color spriteColor;
-    [SerializeField] private Color claimColor;
-    [SerializeField] private EffectType effectType;
-    [SerializeField] private float multiplier;
-
-    public Color GetSpriteColor() { return spriteColor; }
-    public Color GetClaimColor() { return claimColor; }
+    public int GetMaxHealth() { return maxHealth; }
 
 }
 

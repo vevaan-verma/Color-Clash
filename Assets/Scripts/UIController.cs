@@ -34,6 +34,10 @@ public class UIController : MonoBehaviour {
 
         playerController = FindObjectOfType<PlayerController>();
 
+        // set health slider values
+        healthSlider.maxValue = playerController.GetMaxHealth();
+        healthSlider.value = healthSlider.maxValue;
+
         //Cursor.visible = false;
 
     }
@@ -46,7 +50,7 @@ public class UIController : MonoBehaviour {
 
     }
 
-    public void UpdateHealth(int health) {
+    public void UpdateHealth(float health) {
 
         if (healthLerpCoroutine != null)
             StopCoroutine(healthLerpCoroutine);
@@ -76,7 +80,7 @@ public class UIController : MonoBehaviour {
 
     public void UpdateGunHUD(Gun gun, int currGunIndex) {
 
-        ammoText.text = gun.GetCurrentAmmo() + " / " + gun.GetMagazineSize();
+        ammoText.text = gun.GetCurrentAmmo() + "/" + gun.GetMagazineSize();
         UpdateGunCycle(currGunIndex);
 
     }

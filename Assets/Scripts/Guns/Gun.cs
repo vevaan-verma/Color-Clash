@@ -30,6 +30,7 @@ public class Gun : MonoBehaviour {
         - IMPORTANT: RELOAD ANIMATION MUST BE 1 SECOND LONG FOR SCALING TO WORK
     */
 
+    // start function
     public void Initialize(Collider2D collider, int gunIndex) {
 
         animator = GetComponent<Animator>();
@@ -43,7 +44,7 @@ public class Gun : MonoBehaviour {
 
     }
 
-    public IEnumerator Shoot(LayerMask shootableMask, ShooterType shooterType) {
+    public IEnumerator Shoot(LayerMask shootableMask, EntityType shooterType, float multiplier = 1f) {
 
         if (!CanShoot()) yield break;
 
@@ -57,10 +58,11 @@ public class Gun : MonoBehaviour {
 
                 bool? deathCaused = false; // to prevent impact effect when something dies (for better looking gfx)
 
-                if (shooterType == ShooterType.Player)
-                    deathCaused = hitInfo.transform.GetComponent<EnemyController>()?.TakeDamage(gunData.GetDamage()); // damage enemy if player is shooter
-                else if (shooterType == ShooterType.Enemy)
-                    deathCaused = hitInfo.transform.GetComponent<PlayerController>()?.TakeDamage(gunData.GetDamage());  // damage player if enemy is shooter
+                print(gunData.GetDamage() * multiplier);
+                if (shooterType == EntityType.Player)
+                    deathCaused = hitInfo.transform.GetComponent<EnemyController>()?.TakeDamage(gunData.GetDamage() * multiplier); // damage enemy if player is shooter
+                else if (shooterType == EntityType.Enemy)
+                    deathCaused = hitInfo.transform.GetComponent<PlayerController>()?.TakeDamage(gunData.GetDamage() * multiplier);  // damage player if enemy is shooter
 
                 if (deathCaused != null && !(bool) deathCaused)
                     Instantiate(impactEffect, hitInfo.point, Quaternion.identity); // instantiate impact effect
@@ -85,7 +87,7 @@ public class Gun : MonoBehaviour {
 
         } else {
 
-            Instantiate(bullet, muzzle.position, muzzle.rotation).Initialize(shooterType, gunData.GetDamage(), muzzle.position, gunData.GetMaxRange(), collider); // instantiate bullet
+            Instantiate(bullet, muzzle.position, muzzle.rotation).Initialize(shooterType, gunData.GetDamage() * multiplier, muzzle.position, gunData.GetMaxRange(), collider); // instantiate bullet
 
         }
 

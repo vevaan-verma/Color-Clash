@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Device;
 using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour {
@@ -49,7 +48,16 @@ public class EnemyController : MonoBehaviour {
     [SerializeField] private float healthLerpDuration;
     [SerializeField] private Gradient healthGradient;
     private Coroutine healthLerpCoroutine;
-    private int health;
+    private float health;
+
+    [Header("Ground Check")]
+    [SerializeField] private Transform leftFoot;
+    [SerializeField] private Transform rightFoot;
+    [SerializeField] private LayerMask environmentMask;
+    [SerializeField] private float groundCheckRadius;
+
+    [Header("Color")]
+    [SerializeField] private EnemyColor enemyColor;
 
     [Header("Death")]
     [SerializeField] private ParticleSystem deathEffect;
@@ -72,7 +80,10 @@ public class EnemyController : MonoBehaviour {
         visionCollider.size = visionSize;
         visionCollider.isTrigger = true;
 
+        // set health & health slider values
         health = maxHealth;
+        healthSlider.maxValue = health;
+        healthSlider.value = healthSlider.maxValue;
 
         gun = Instantiate(starterGun, gunSlot);
         gun.Initialize(GetComponent<Collider2D>(), 0);
@@ -88,6 +99,9 @@ public class EnemyController : MonoBehaviour {
         // attacking
         StartCoroutine(Attack());
 
+        // color
+        spriteRenderer.color = enemyColor.GetSpriteColor();
+
         isFacingRight = true;
 
     }
@@ -98,6 +112,22 @@ public class EnemyController : MonoBehaviour {
             enemyState = EnemyState.Attack;
         else
             enemyState = EnemyState.Patrol;
+
+        // if enemy is standing on something, claim it
+        Collider2D leftCollider = Physics2D.OverlapCircle(leftFoot.position, groundCheckRadius, environmentMask);
+        Collider2D rightCollider = Physics2D.OverlapCircle(rightFoot.position, groundCheckRadius, environmentMask);
+
+        if (leftCollider != null)
+            leftCollider.GetComponent<Claimable>()?.Claim(EntityType.Enemy, enemyColor.GetClaimColor());
+        if (rightCollider != null)
+            rightCollider.GetComponent<Claimable>()?.Claim(EntityType.Enemy, enemyColor.GetClaimColor());
+
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision) {
+
+        // claim claimable tiles when enemy collides with them
+        collision.transform.GetComponent<Claimable>()?.Claim(EntityType.Enemy, enemyColor.GetClaimColor());
 
     }
 
@@ -172,7 +202,7 @@ public class EnemyController : MonoBehaviour {
                 rb.velocity = Vector2.zero;
 
                 // gun shooting & reloading
-                StartCoroutine(gun.Shoot(shootableMask, ShooterType.Enemy));
+                StartCoroutine(gun.Shoot(shootableMask, EntityType.Enemy));
                 gun.InstantReload();
 
             }
@@ -198,7 +228,7 @@ public class EnemyController : MonoBehaviour {
     }
 
     // returns if enemy dies
-    public bool TakeDamage(int damage) {
+    public bool TakeDamage(float damage) {
 
         RemoveHealth(damage);
 
@@ -222,7 +252,7 @@ public class EnemyController : MonoBehaviour {
 
     }
 
-    public void UpdateHealth(int health) {
+    public void UpdateHealth(float health) {
 
         if (healthLerpCoroutine != null)
             StopCoroutine(healthLerpCoroutine);
@@ -250,21 +280,21 @@ public class EnemyController : MonoBehaviour {
 
     }
 
-    private void SetHealth(int health) {
+    private void SetHealth(float health) {
 
         this.health = health;
         UpdateHealth(this.health);
 
     }
 
-    private void AddHealth(int health) {
+    private void AddHealth(float health) {
 
         this.health += health;
         UpdateHealth(this.health);
 
     }
 
-    private void RemoveHealth(int health) {
+    private void RemoveHealth(float health) {
 
         this.health -= health;
         UpdateHealth(this.health);
@@ -276,10 +306,18 @@ public class EnemyController : MonoBehaviour {
         // vision
         Gizmos.color = new Color(1f, 1f, 0f, 0.1f);
 
-        if (isFacingRight)
-            Gizmos.DrawCube((Vector2) transform.position + visionOffset, visionSize);
-        else
-            Gizmos.DrawCube((Vector2) transform.position - visionOffset, visionSize);
+        if (Application.isEditor && !Application.isPlaying) { // game is in editor and not playing
+
+            Gizmos.DrawCube((Vector2) transform.position + visionOffset, visionSize); // enemy will always be facing right in this case
+
+        } else {
+
+            if (isFacingRight)
+                Gizmos.DrawCube((Vector2) transform.position + visionOffset, visionSize);
+            else
+                Gizmos.DrawCube((Vector2) transform.position - visionOffset, visionSize);
+
+        }
 
         // patrolling
         Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
