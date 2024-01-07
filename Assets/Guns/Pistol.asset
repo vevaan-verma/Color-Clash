@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   name: Pistol
+  icon: {fileID: 21300000, guid: 0ae9c318f6b6a2a4dbac27baac7e4290, type: 3}
   damage: 12
   magazineSize: 12
   fireRate: 4

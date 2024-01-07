@@ -43,17 +43,21 @@ public class Bullet : MonoBehaviour {
 
     private void OnCollisionEnter2D(Collision2D collision) {
 
-        if (shooterType == ShooterType.Player)
-            collision.transform.GetComponent<EnemyController>()?.TakeDamage(damage);
-        else if (shooterType == ShooterType.Enemy)
-            collision.transform.GetComponent<PlayerController>()?.TakeDamage(damage);
+        bool? deathCaused = false; // to prevent impact effect when something dies (for better looking gfx)
 
-        SelfDestruct();
+        if (shooterType == ShooterType.Player)
+            deathCaused = collision.transform.GetComponent<EnemyController>()?.TakeDamage(damage); // damage enemy if player is shooter
+        else if (shooterType == ShooterType.Enemy)
+            deathCaused = collision.transform.GetComponent<PlayerController>()?.TakeDamage(damage); // damage player if enemy is shooter
+
+        if (deathCaused != null && !(bool) deathCaused)
+            SelfDestruct();
 
     }
 
     private void SelfDestruct() {
 
+        print("instantiate");
         Instantiate(impactEffect, transform.position, transform.rotation);
         Destroy(gameObject);
 

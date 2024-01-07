@@ -2,17 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Device;
 using UnityEngine.U2D;
+using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
+
+    [Header("References")]
+    private PlayerController playerController;
+
+    [Header("Health")]
+    [SerializeField] private Slider healthSlider;
+    [SerializeField] private Image sliderFill;
+    [SerializeField] private float healthLerpDuration;
+    [SerializeField] private Gradient healthGradient;
+    private Coroutine healthLerpCoroutine;
 
     [Header("Weapon HUD")]
     [SerializeField] private TMP_Text ammoText;
 
+    [Header("Gun Cycle")]
+    [SerializeField] private Image gunIconTop;
+    [SerializeField] private Image gunIconMiddle;
+    [SerializeField] private Image gunIconBottom;
+    [SerializeField] private Sprite blankGunSprite;
+
     [Header("Cursor")]
     [SerializeField] private Transform crosshair;
 
-    private void Start() {
+    private void Awake() {
+
+        playerController = FindObjectOfType<PlayerController>();
 
         //Cursor.visible = false;
 
@@ -26,9 +46,38 @@ public class UIController : MonoBehaviour {
 
     }
 
-    public void UpdateGunHUD(Gun gun) {
+    public void UpdateHealth(int health) {
+
+        if (healthLerpCoroutine != null)
+            StopCoroutine(healthLerpCoroutine);
+
+        healthLerpCoroutine = StartCoroutine(LerpHealth(health, healthLerpDuration));
+
+    }
+
+    private IEnumerator LerpHealth(float targetHealth, float duration) {
+
+        float currentTime = 0f;
+        float startHealth = healthSlider.value;
+
+        while (currentTime < duration) {
+
+            currentTime += Time.deltaTime;
+            healthSlider.value = Mathf.Lerp(startHealth, targetHealth, currentTime / duration);
+            sliderFill.color = healthGradient.Evaluate(healthSlider.normalizedValue); // normalizedValue returns the value between 0 and 1
+            yield return null;
+
+        }
+
+        healthSlider.value = targetHealth;
+        healthLerpCoroutine = null;
+
+    }
+
+    public void UpdateGunHUD(Gun gun, int currGunIndex) {
 
         ammoText.text = gun.GetCurrentAmmo() + " / " + gun.GetMagazineSize();
+        UpdateGunCycle(currGunIndex);
 
     }
 
@@ -36,5 +85,39 @@ public class UIController : MonoBehaviour {
 
         ammoText.text = "Reloading...";
 
+    }
+
+    private void UpdateGunCycle(int currGunIndex) {
+
+        List<Gun> guns = playerController.GetGuns();
+
+        if (guns.Count == 1) {
+
+            gunIconTop.sprite = blankGunSprite; // top gun is blank
+            gunIconMiddle.sprite = guns[0].GetIcon(); // middle gun is equipped gun
+            gunIconBottom.sprite = blankGunSprite; // bottom gun is blank
+            return;
+
+        }
+
+        if (currGunIndex == 0) { // equipped gun is first gun
+
+            gunIconTop.sprite = guns[currGunIndex + 1].GetIcon(); // top gun is last gun
+            gunIconMiddle.sprite = guns[currGunIndex].GetIcon(); // middle gun is equipped gun
+            gunIconBottom.sprite = guns[guns.Count - 1].GetIcon(); // bottom gun is second gun
+
+        } else if (currGunIndex == guns.Count - 1) {
+
+            gunIconTop.sprite = guns[0].GetIcon(); // top gun is second last gun
+            gunIconMiddle.sprite = guns[currGunIndex].GetIcon(); // middle gun is equipped gun
+            gunIconBottom.sprite = guns[currGunIndex - 1].GetIcon(); // bottom gun is first gun
+
+        } else {
+
+            gunIconTop.sprite = guns[currGunIndex + 1].GetIcon(); // top gun is previous gun
+            gunIconMiddle.sprite = guns[currGunIndex].GetIcon(); // middle gun is equipped gun
+            gunIconBottom.sprite = guns[currGunIndex - 1].GetIcon(); // bottom gun is next gun
+
+        }
     }
 }

@@ -6,13 +6,13 @@ public class Gun : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private GunData gunData;
-    [SerializeField] private LayerMask bulletMask;
     private Animator animator;
     private UIController uiController;
 
     [Header("Shooting")]
     [SerializeField] private Transform muzzle;
     [SerializeField] private Bullet bullet;
+    private int gunIndex;
     private int currAmmo;
     private bool isReloading;
     private bool shotReady;
@@ -23,16 +23,20 @@ public class Gun : MonoBehaviour {
 
     [Header("Impact")]
     [SerializeField] private GameObject impactEffect;
-    [SerializeField] private new Collider2D collider;
+    private new Collider2D collider;
 
-    // IMPORTANT: RELOAD ANIMATION MUST BE 1 SECOND LONG FOR SCALING TO WORK
+    /*
+    IMPORTANT:
+        - IMPORTANT: RELOAD ANIMATION MUST BE 1 SECOND LONG FOR SCALING TO WORK
+    */
 
-    public void Initialize(Collider2D collider) {
+    public void Initialize(Collider2D collider, int gunIndex) {
 
         animator = GetComponent<Animator>();
         uiController = FindObjectOfType<UIController>();
 
         this.collider = collider;
+        this.gunIndex = gunIndex;
 
         currAmmo = gunData.GetMagazineSize();
         shotReady = true;
@@ -51,14 +55,15 @@ public class Gun : MonoBehaviour {
 
             if (hitInfo) {
 
-                // damage enemy if hit
-                hitInfo.transform.GetComponent<EnemyController>()?.TakeDamage(gunData.GetDamage());
+                bool? deathCaused = false; // to prevent impact effect when something dies (for better looking gfx)
 
-                // damage player if hit
-                hitInfo.transform.GetComponent<PlayerController>()?.TakeDamage(gunData.GetDamage());
+                if (shooterType == ShooterType.Player)
+                    deathCaused = hitInfo.transform.GetComponent<EnemyController>()?.TakeDamage(gunData.GetDamage()); // damage enemy if player is shooter
+                else if (shooterType == ShooterType.Enemy)
+                    deathCaused = hitInfo.transform.GetComponent<PlayerController>()?.TakeDamage(gunData.GetDamage());  // damage player if enemy is shooter
 
-                // instantiate impact effect
-                Instantiate(impactEffect, hitInfo.point, Quaternion.identity);
+                if (deathCaused != null && !(bool) deathCaused)
+                    Instantiate(impactEffect, hitInfo.point, Quaternion.identity); // instantiate impact effect
 
                 // set bullet tracer points
                 bulletTracer.SetPosition(0, muzzle.position);
@@ -112,7 +117,7 @@ public class Gun : MonoBehaviour {
         yield return new WaitForSeconds(gunData.GetReloadTime()); // wait for reload time
         currAmmo = GetMagazineSize(); // reload gun
 
-        uiController.UpdateGunHUD(this); // update ui
+        uiController.UpdateGunHUD(this, gunIndex); // update ui
 
         isReloading = false;
         shotReady = true; // reset fire rate cooldown
@@ -133,6 +138,7 @@ public class Gun : MonoBehaviour {
 
     }
 
+    public Sprite GetIcon() { return gunData.GetIcon(); }
     public int GetCurrentAmmo() { return currAmmo; }
     public int GetMagazineSize() { return gunData.GetMagazineSize(); }
     public bool IsReloading() { return isReloading; }

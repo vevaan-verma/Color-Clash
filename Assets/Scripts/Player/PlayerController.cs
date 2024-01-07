@@ -37,7 +37,6 @@ public class PlayerController : MonoBehaviour {
     [Header("Color Cycling")]
     [SerializeField] private PlayerColor[] playerColors;
     [SerializeField] private float colorCycleCooldown;
-    private PlayerColor playerColor;
     private int currColorIndex;
     private SpriteRenderer spriteRenderer;
     private bool canColorCycle;
@@ -45,6 +44,10 @@ public class PlayerController : MonoBehaviour {
     [Header("Health")]
     [SerializeField] private int maxHealth;
     private int health;
+
+    [Header("Regeneration")]
+    [SerializeField] private int regenAmount;
+    [SerializeField] private float regenWaitDuration;
 
     [Header("Death")]
     [SerializeField] private ParticleSystem deathEffect;
@@ -56,6 +59,11 @@ public class PlayerController : MonoBehaviour {
 
     [Header("Quitting")]
     private bool quitting;
+
+    /*
+    IMPORTANT:
+        - PLAYER MUST START FACING RIGHT
+    */
 
     private void Start() {
 
@@ -76,9 +84,9 @@ public class PlayerController : MonoBehaviour {
 
         currGunIndex = 0;
         UpdateGunVisual(); // update visuals
-        uiController.UpdateGunHUD(guns[currGunIndex]); // update ui
 
-        health = maxHealth; // set health
+        SetHealth(maxHealth); // set health
+        StartCoroutine(HandleRegeneration()); // start regeneration
 
         isFacingRight = true;
         canColorCycle = true;
@@ -109,7 +117,7 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetMouseButton(0)) {
 
             StartCoroutine(guns[currGunIndex].Shoot(shootableMask, ShooterType.Player));
-            uiController.UpdateGunHUD(guns[currGunIndex]);
+            uiController.UpdateGunHUD(guns[currGunIndex], currGunIndex);
 
         }
 
@@ -231,7 +239,7 @@ public class PlayerController : MonoBehaviour {
     private void AddGun(Gun gun) {
 
         Gun newGun = Instantiate(gun, gunSlot); // add gun under gunSlot
-        newGun.Initialize(collider);
+        newGun.Initialize(collider, guns.Count); // index of new gun will be guns.Count
         guns.Add(newGun);
 
     }
@@ -247,7 +255,6 @@ public class PlayerController : MonoBehaviour {
             currGunIndex = guns.Count - 1;
 
         UpdateGunVisual(); // update visuals
-        uiController.UpdateGunHUD(guns[currGunIndex]); // update ui
 
     }
 
@@ -261,7 +268,6 @@ public class PlayerController : MonoBehaviour {
         currGunIndex = gunIndex;
 
         UpdateGunVisual(); // update visuals
-        uiController.UpdateGunHUD(guns[currGunIndex]); // update ui
 
     }
 
@@ -276,7 +282,6 @@ public class PlayerController : MonoBehaviour {
             currGunIndex = 0;
 
         UpdateGunVisual(); // update visuals
-        uiController.UpdateGunHUD(guns[currGunIndex]); // update ui
 
     }
 
@@ -287,16 +292,25 @@ public class PlayerController : MonoBehaviour {
             gunSlot.GetChild(i).gameObject.SetActive(false);
 
         guns[currGunIndex].gameObject.SetActive(true); // make current gun visible
+        uiController.UpdateGunHUD(guns[currGunIndex], currGunIndex); // update ui
 
     }
 
-    public void TakeDamage(int damage) {
+    // returns if player dies
+    public bool TakeDamage(int damage) {
 
-        health -= damage;
+        RemoveHealth(damage);
 
-        if (health <= 0f)
+        if (health <= 0f) {
+
             Die();
+            return true;
 
+        } else {
+
+            return false;
+
+        }
     }
 
     private void Die() {
@@ -304,11 +318,48 @@ public class PlayerController : MonoBehaviour {
         ParticleSystem.MainModule pm = Instantiate(deathEffect, transform.position, Quaternion.identity).main; // instantiate death effect where player died
         pm.startColor = spriteRenderer.color; // change particle color based on enemy color
         transform.position = levelManager.GetSpawn(); // respawn at level spawn
-        health = maxHealth; // restore health
+        SetHealth(maxHealth); // restore health
 
     }
 
-    public int GetHealth() { return health; }
+    private void SetHealth(int health) {
+
+        this.health = health;
+        uiController.UpdateHealth(this.health);
+
+    }
+
+    private void AddHealth(int health) {
+
+        this.health += health;
+        uiController.UpdateHealth(this.health);
+
+    }
+
+    private void RemoveHealth(int health) {
+
+        this.health -= health;
+        uiController.UpdateHealth(this.health);
+
+    }
+
+    private IEnumerator HandleRegeneration() {
+
+        while (true) {
+
+            if (health < maxHealth) {
+
+                AddHealth(regenAmount);
+                yield return new WaitForSeconds(regenWaitDuration);
+
+            }
+
+            yield return null;
+
+        }
+    }
+
+    public List<Gun> GetGuns() { return guns; }
 
 }
 
@@ -317,9 +368,16 @@ public class PlayerColor {
 
     [SerializeField] private Color spriteColor;
     [SerializeField] private Color claimColor;
+    [SerializeField] private EffectType effectType;
     [SerializeField] private float multiplier;
 
     public Color GetSpriteColor() { return spriteColor; }
     public Color GetClaimColor() { return claimColor; }
+
+}
+
+public enum EffectType {
+
+    Damage, Regeneration, Defense
 
 }
