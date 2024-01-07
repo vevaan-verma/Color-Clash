@@ -17,12 +17,19 @@ public class GunData : ScriptableObject {
     [SerializeField] private bool useRaycastShooting;
 
     public string GetName() { return name; }
+
     public Sprite GetIcon() { return icon; }
+
     public float GetDamage() { return damage; }
+
     public int GetMagazineSize() { return magazineSize; }
+
     public float GetFireRate() { return fireRate; }
+
     public float GetMaxRange() { return maxRange; }
+
     public float GetReloadTime() { return reloadTime; }
+
     public bool UsesRaycastShooting() { return useRaycastShooting; }
 
 }

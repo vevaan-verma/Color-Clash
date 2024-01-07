@@ -2,14 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Device;
-using UnityEngine.U2D;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
 
     [Header("References")]
-    private PlayerController playerController;
+    private PlayerHealthManager healthManager;
+    private PlayerClaimManager claimManager;
+    private PlayerGunManager gunManager;
+
+    [Header("Claimables")]
+    [SerializeField] private Transform claimableInfoParent;
+    [SerializeField] private ClaimableInfo claimableInfoPrefab;
+    private List<ClaimableInfo> claimableInfos;
 
     [Header("Health")]
     [SerializeField] private Slider healthSlider;
@@ -32,14 +37,27 @@ public class UIController : MonoBehaviour {
 
     private void Awake() {
 
-        playerController = FindObjectOfType<PlayerController>();
+        gunManager = FindObjectOfType<PlayerGunManager>();
+        claimManager = FindObjectOfType<PlayerClaimManager>();
+        healthManager = FindObjectOfType<PlayerHealthManager>();
 
         // set health slider values
-        healthSlider.maxValue = playerController.GetMaxHealth();
+        healthSlider.maxValue = healthManager.GetMaxHealth();
         healthSlider.value = healthSlider.maxValue;
 
         //Cursor.visible = false;
 
+        // claimable info
+        claimableInfos = new List<ClaimableInfo>();
+
+        Dictionary<Color, int> claimables = claimManager.GetClaims();
+
+        foreach (KeyValuePair<Color, int> pair in claimables) {
+
+            claimableInfos.Add(Instantiate(claimableInfoPrefab, claimableInfoParent)); // add to list
+            claimableInfos[claimableInfos.Count - 1].UpdateInfo(pair.Key, pair.Value); // update info
+
+        }
     }
 
     private void Update() {
@@ -47,6 +65,15 @@ public class UIController : MonoBehaviour {
         //Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         //mousePosition.z = Camera.main.transform.position.z + Camera.main.nearClipPlane;
         //crosshair.position = mousePosition;
+
+    }
+
+    public void UpdateClaimablesHUD() {
+
+        Dictionary<Color, int> claimables = claimManager.GetClaims();
+
+        foreach (ClaimableInfo info in claimableInfos)
+            info.UpdateInfo(claimables[info.GetColor()]); // update info
 
     }
 
@@ -85,15 +112,9 @@ public class UIController : MonoBehaviour {
 
     }
 
-    public void SetAmmoReloadingText() {
-
-        ammoText.text = "Reloading...";
-
-    }
-
     private void UpdateGunCycle(int currGunIndex) {
 
-        List<Gun> guns = playerController.GetGuns();
+        List<Gun> guns = gunManager.GetGuns();
 
         if (guns.Count == 1) {
 
@@ -106,21 +127,21 @@ public class UIController : MonoBehaviour {
 
         if (currGunIndex == 0) { // equipped gun is first gun
 
-            gunIconTop.sprite = guns[currGunIndex + 1].GetIcon(); // top gun is last gun
+            gunIconTop.sprite = guns[guns.Count - 1].GetIcon(); // top gun is last gun
             gunIconMiddle.sprite = guns[currGunIndex].GetIcon(); // middle gun is equipped gun
-            gunIconBottom.sprite = guns[guns.Count - 1].GetIcon(); // bottom gun is second gun
+            gunIconBottom.sprite = guns[currGunIndex + 1].GetIcon(); // bottom gun is second gun
 
         } else if (currGunIndex == guns.Count - 1) {
 
-            gunIconTop.sprite = guns[0].GetIcon(); // top gun is second last gun
+            gunIconTop.sprite = guns[currGunIndex - 1].GetIcon(); // top gun is second last gun
             gunIconMiddle.sprite = guns[currGunIndex].GetIcon(); // middle gun is equipped gun
-            gunIconBottom.sprite = guns[currGunIndex - 1].GetIcon(); // bottom gun is first gun
+            gunIconBottom.sprite = guns[0].GetIcon(); // bottom gun is first gun
 
         } else {
 
-            gunIconTop.sprite = guns[currGunIndex + 1].GetIcon(); // top gun is previous gun
+            gunIconTop.sprite = guns[currGunIndex - 1].GetIcon(); // top gun is previous gun
             gunIconMiddle.sprite = guns[currGunIndex].GetIcon(); // middle gun is equipped gun
-            gunIconBottom.sprite = guns[currGunIndex - 1].GetIcon(); // bottom gun is next gun
+            gunIconBottom.sprite = guns[currGunIndex + 1].GetIcon(); // bottom gun is next gun
 
         }
     }

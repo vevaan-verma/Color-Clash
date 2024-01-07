@@ -58,11 +58,10 @@ public class Gun : MonoBehaviour {
 
                 bool? deathCaused = false; // to prevent impact effect when something dies (for better looking gfx)
 
-                print(gunData.GetDamage() * multiplier);
                 if (shooterType == EntityType.Player)
                     deathCaused = hitInfo.transform.GetComponent<EnemyController>()?.TakeDamage(gunData.GetDamage() * multiplier); // damage enemy if player is shooter
                 else if (shooterType == EntityType.Enemy)
-                    deathCaused = hitInfo.transform.GetComponent<PlayerController>()?.TakeDamage(gunData.GetDamage() * multiplier);  // damage player if enemy is shooter
+                    deathCaused = hitInfo.transform.GetComponent<PlayerHealthManager>()?.TakeDamage(gunData.GetDamage() * multiplier);  // damage player if enemy is shooter
 
                 if (deathCaused != null && !(bool) deathCaused)
                     Instantiate(impactEffect, hitInfo.point, Quaternion.identity); // instantiate impact effect
@@ -126,11 +125,14 @@ public class Gun : MonoBehaviour {
 
     }
 
-    public void InstantReload() {
+    public void InstantReload(EntityType entityType) {
 
         if (!CanReload()) return;
 
         currAmmo = GetMagazineSize(); // reload gun
+
+        if (entityType == EntityType.Player) // player is reloading
+            uiController.UpdateGunHUD(this, gunIndex); // update ui
 
     }
 
@@ -141,8 +143,11 @@ public class Gun : MonoBehaviour {
     }
 
     public Sprite GetIcon() { return gunData.GetIcon(); }
+
     public int GetCurrentAmmo() { return currAmmo; }
+
     public int GetMagazineSize() { return gunData.GetMagazineSize(); }
+
     public bool IsReloading() { return isReloading; }
 
 }

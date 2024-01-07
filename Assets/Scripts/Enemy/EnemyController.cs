@@ -32,6 +32,7 @@ public class EnemyController : MonoBehaviour {
 
     [Header("States")]
     private EnemyState enemyState;
+    private EnemyState lastEnemyState;
 
     [Header("Patrol")]
     [SerializeField] private Transform pointA; // MUST BE POINT ON THE LEFT
@@ -39,6 +40,9 @@ public class EnemyController : MonoBehaviour {
     [SerializeField] private float maxPointDistance;
     [SerializeField] private float destinationWaitDuration;
     private Transform currPoint;
+
+    [Header("Attack")]
+    [SerializeField] private float firstShotDelay;
 
     [Header("Health")]
     [SerializeField] private int maxHealth;
@@ -108,6 +112,8 @@ public class EnemyController : MonoBehaviour {
 
     private void Update() {
 
+        lastEnemyState = enemyState;
+
         if (playerInVision)
             enemyState = EnemyState.Attack;
         else
@@ -121,13 +127,6 @@ public class EnemyController : MonoBehaviour {
             leftCollider.GetComponent<Claimable>()?.Claim(EntityType.Enemy, enemyColor.GetClaimColor());
         if (rightCollider != null)
             rightCollider.GetComponent<Claimable>()?.Claim(EntityType.Enemy, enemyColor.GetClaimColor());
-
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision) {
-
-        // claim claimable tiles when enemy collides with them
-        collision.transform.GetComponent<Claimable>()?.Claim(EntityType.Enemy, enemyColor.GetClaimColor());
 
     }
 
@@ -194,16 +193,22 @@ public class EnemyController : MonoBehaviour {
 
             if (enemyState == EnemyState.Attack) {
 
-                animator.SetBool("isRunning", false);
+                if (lastEnemyState != EnemyState.Attack) { // first frame of attack
+
+                    animator.SetBool("isRunning", false);
+                    rb.velocity = Vector2.zero; // stop movement
+                    yield return new WaitForSeconds(firstShotDelay);
+
+                }
 
                 if ((player.position.x <= transform.position.x && isFacingRight) || (player.position.x > transform.position.x && !isFacingRight)) // player is to the left of enemy | player is to the right of enemy
                     Flip();
 
-                rb.velocity = Vector2.zero;
+                rb.velocity = Vector2.zero; // stop movement
 
                 // gun shooting & reloading
                 StartCoroutine(gun.Shoot(shootableMask, EntityType.Enemy));
-                gun.InstantReload();
+                gun.InstantReload(EntityType.Enemy);
 
             }
 
@@ -230,6 +235,7 @@ public class EnemyController : MonoBehaviour {
     // returns if enemy dies
     public bool TakeDamage(float damage) {
 
+        // TODO: health slider randomly raises itself
         RemoveHealth(damage);
 
         if (health <= 0f) {
@@ -327,10 +333,4 @@ public class EnemyController : MonoBehaviour {
         Gizmos.DrawLine(pointA.position, pointB.position);
 
     }
-}
-
-public enum EnemyState {
-
-    Patrol, Attack
-
 }

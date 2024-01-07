@@ -5,7 +5,7 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour {
 
     [Header("References")]
-    private PlayerController playerController;
+    private PlayerClaimManager claimManager;
 
     [Header("Constant Prefabs")]
     [SerializeField] private AudioManager audioManager;
@@ -20,8 +20,8 @@ public class LevelManager : MonoBehaviour {
 
     private void Start() {
 
-        playerController = FindObjectOfType<PlayerController>();
-        playerController.transform.position = spawn.position;
+        claimManager = FindObjectOfType<PlayerClaimManager>();
+        claimManager.transform.position = spawn.position;
 
         Instantiate(audioManager).Initialize();
 
@@ -36,7 +36,7 @@ public class LevelManager : MonoBehaviour {
 
             PlayerClaim playerClaim = (PlayerClaim) claim;
             playerClaims.Add(playerClaim);
-            playerController.AddEffect(playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
+            claimManager.AddClaimable(playerClaim.GetColor(), playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
 
         } else if (claim is EnemyClaim) {
 
@@ -51,7 +51,7 @@ public class LevelManager : MonoBehaviour {
 
             PlayerClaim playerClaim = (PlayerClaim) claim;
             playerClaims.Remove(playerClaim);
-            playerController.RemoveEffect(playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
+            claimManager.RemoveClaimable(playerClaim.GetColor(), playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
 
         } else if (claim is EnemyClaim) {
 

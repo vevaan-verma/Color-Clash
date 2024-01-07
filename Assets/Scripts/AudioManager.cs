@@ -27,31 +27,26 @@ public class AudioManager : MonoBehaviour {
 
     }
 
-    public void PlaySound(GameSoundEffectType soundType) {
+    public void PlaySound(SoundEffectType soundType) {
 
         switch (soundType) {
 
-            case GameSoundEffectType.Footstep:
+            case SoundEffectType.Footstep:
 
                 if (!footstepSource.isPlaying)
                     footstepSource.PlayOneShot(footstepSound);
                 break;
 
-            case GameSoundEffectType.Land:
+            case SoundEffectType.Land:
 
                 soundEffectSource.PlayOneShot(landSound);
                 break;
 
-            case GameSoundEffectType.Death:
+            case SoundEffectType.Death:
 
                 soundEffectSource.PlayOneShot(deathSound);
                 break;
 
         }
     }
-}
-public enum GameSoundEffectType {
-
-    Footstep, Land, Death
-
 }

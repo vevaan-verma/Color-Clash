@@ -1,15 +1,8 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class EnemyColor {
+public class EnemyColor : EntityColor {
 
-    [SerializeField] private Color spriteColor;
-    [SerializeField] private Color claimColor;
-
-    public Color GetSpriteColor() { return spriteColor; }
-    public Color GetClaimColor() { return claimColor; }
 
 }

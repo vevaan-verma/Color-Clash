@@ -10,7 +10,9 @@ public class Level : ScriptableObject {
     [SerializeField] private AudioClip backgroundMusic;
 
     public string GetName() { return name; }
+
     public Object GetScene() { return scene; }
+
     public AudioClip GetBackgroundMusic() { return backgroundMusic; }
 
 }
