@@ -620,13 +620,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerColors:
   - spriteColor: {r: 0.8627451, g: 0, b: 0, a: 1}
-    claimColor: {r: 0.8301887, g: 0, b: 0, a: 1}
+    claimColor: {r: 1, g: 0.495283, b: 0.495283, a: 1}
     effectType: 0
   - spriteColor: {r: 0.023529412, g: 0.8627451, b: 0, a: 1}
-    claimColor: {r: 0.019811302, g: 0.7264151, b: 0, a: 1}
+    claimColor: {r: 0.463029, g: 1, b: 0.4481132, a: 1}
     effectType: 1
   - spriteColor: {r: 0, g: 0.6, b: 0.8627451, a: 1}
-    claimColor: {r: 0, g: 0.47894514, b: 0.6886792, a: 1}
+    claimColor: {r: 0.41037738, g: 0.81909305, b: 1, a: 1}
     effectType: 2
   colorCycleCooldown: 2
   colorSwitchKey: 306
@@ -642,7 +642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1222e92b07c0d434a9cb8bfdd3bc4c6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  claimCheckRadius: 0
+  claimCheckRadius: 0.1
 --- !u!114 &90319437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -692,6 +692,7 @@ MonoBehaviour:
   regenAmount: 1
   regenWaitDuration: 1
   deathEffect: {fileID: 8961104740163596906, guid: 4f35fb8934391ed46be3d10586c62f53, type: 3}
+  respawnTime: 0
 --- !u!1 &97965140
 GameObject:
   m_ObjectHideFlags: 0
@@ -785,7 +786,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -11.5, y: 4, z: 0}
-  m_LocalScale: {x: 6, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 851957779}
@@ -803,7 +804,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   addedMultiplier: 5
-  colorFadeDuration: 0.5
+  claimDuration: 0.5
 --- !u!61 &184402497
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -841,11 +842,11 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 6, y: 1}
     adaptiveTilingThreshold: 0.5
-    drawMode: 0
+    drawMode: 2
     adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_AutoTiling: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
@@ -890,12 +891,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 47b48e7beebc29f49ba496da56fa8efd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_DrawMode: 2
+  m_Size: {x: 6, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -986,7 +987,7 @@ GameObject:
   - component: {fileID: 251352579}
   m_Layer: 8
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1088,10 +1089,10 @@ MonoBehaviour:
   visionSize: {x: 6, y: 0.9}
   pointA: {fileID: 1000935990}
   pointB: {fileID: 271022509}
-  maxPointDistance: 0.1
+  maxPointDistance: 0.5
   destinationWaitDuration: 2
   firstShotDelay: 0.5
-  maxHealth: 5000
+  maxHealth: 3
   healthCanvas: {fileID: 1292520494}
   healthSlider: {fileID: 1112786902}
   sliderFill: {fileID: 1656445162}
@@ -1502,6 +1503,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 90319428}
   followSmoothing: 3
+  mapBounds: {fileID: 840524219}
 --- !u!1 &521785583
 GameObject:
   m_ObjectHideFlags: 0
@@ -2115,6 +2117,7 @@ GameObject:
   - component: {fileID: 840524217}
   - component: {fileID: 840524216}
   - component: {fileID: 840524218}
+  - component: {fileID: 840524219}
   m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
@@ -2167,10 +2170,10 @@ SpriteRenderer:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
+  m_DrawMode: 2
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
+  m_SpriteTileMode: 1
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
@@ -2184,7 +2187,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 38.4, y: 21.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2202,6 +2205,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scrollSpeed: 0.5
+--- !u!61 &840524219
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 840524215}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 19.2, y: 10.8}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 2
+    adaptiveTiling: 1
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &851957778
 GameObject:
   m_ObjectHideFlags: 0
@@ -2372,7 +2420,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.5, z: 0}
-  m_LocalScale: {x: 6, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 851957779}
@@ -2418,12 +2466,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 47b48e7beebc29f49ba496da56fa8efd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_DrawMode: 2
+  m_Size: {x: 6, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2466,11 +2514,11 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 6, y: 1}
     adaptiveTilingThreshold: 0.5
-    drawMode: 0
+    drawMode: 2
     adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_AutoTiling: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
@@ -2487,7 +2535,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   addedMultiplier: 0.25
-  colorFadeDuration: 0.5
+  claimDuration: 0.5
 --- !u!1 &1112786900
 GameObject:
   m_ObjectHideFlags: 0
@@ -3524,7 +3572,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7, y: 0.5, z: 0}
-  m_LocalScale: {x: 6, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 851957779}
@@ -3570,12 +3618,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 47b48e7beebc29f49ba496da56fa8efd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_DrawMode: 2
+  m_Size: {x: 6, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -3618,11 +3666,11 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 6, y: 1}
     adaptiveTilingThreshold: 0.5
-    drawMode: 0
+    drawMode: 2
     adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_AutoTiling: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
@@ -3639,7 +3687,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   addedMultiplier: 0.25
-  colorFadeDuration: 0.5
+  claimDuration: 0.5
 --- !u!1 &2050818157
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,7 @@ public class EnemyController : MonoBehaviour {
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
+    private LevelManager levelManager;
     private Transform player;
 
     [Header("Movement")]
@@ -78,6 +79,7 @@ public class EnemyController : MonoBehaviour {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         player = FindObjectOfType<PlayerController>().transform;
+        levelManager = FindObjectOfType<LevelManager>();
         visionCollider = visionObj.AddComponent<BoxCollider2D>();
 
         visionCollider.offset = visionOffset;
@@ -255,6 +257,12 @@ public class EnemyController : MonoBehaviour {
         Destroy(gameObject);
         ParticleSystem.MainModule pm = Instantiate(deathEffect, transform.position, Quaternion.identity).main;
         pm.startColor = spriteRenderer.color; // change particle color based on enemy color
+
+        // clear all enemy claims
+        List<EnemyClaim> enemyClaims = levelManager.GetEnemyClaims();
+
+        foreach (EnemyClaim claim in enemyClaims)
+            Destroy(claim);
 
     }
 

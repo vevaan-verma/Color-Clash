@@ -23,6 +23,9 @@ public class PlayerHealthManager : MonoBehaviour {
     [Header("Death")]
     [SerializeField] private ParticleSystem deathEffect;
 
+    [Header("Respawn")]
+    [SerializeField] private float respawnTime;
+
     [Header("Quitting")]
     private bool quitting;
 
@@ -51,7 +54,7 @@ public class PlayerHealthManager : MonoBehaviour {
         if (quitting) return; // to prevent error
 
         // player falls out of screen
-        Die(); // kill player
+        StartCoroutine(Die()); // kill player
 
     }
 
@@ -62,7 +65,7 @@ public class PlayerHealthManager : MonoBehaviour {
 
         if (health <= 0f) {
 
-            Die();
+            StartCoroutine(Die()); // kill player
             return true;
 
         } else {
@@ -72,7 +75,7 @@ public class PlayerHealthManager : MonoBehaviour {
         }
     }
 
-    private void Die() {
+    private IEnumerator Die() {
 
         health = 0f;
 
@@ -84,8 +87,11 @@ public class PlayerHealthManager : MonoBehaviour {
 
         ParticleSystem.MainModule pm = Instantiate(deathEffect, transform.position, Quaternion.identity).main; // instantiate death effect where player died
         pm.startColor = colorManager.GetCurrentPlayerColor().GetSpriteColor(); // change particle color based on player color
-        transform.position = levelManager.GetSpawn(); // respawn at level spawn
+
+        yield return new WaitForSeconds(respawnTime);
+
         SetHealth(maxHealth); // restore health
+        transform.position = levelManager.GetSpawn(); // respawn at level spawn
 
     }
 

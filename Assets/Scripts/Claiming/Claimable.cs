@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 
 public class Claimable : MonoBehaviour {
@@ -12,7 +11,7 @@ public class Claimable : MonoBehaviour {
     [SerializeField] private float addedMultiplier;
 
     [Header("Animations")]
-    [SerializeField] private float colorFadeDuration;
+    [SerializeField] private float claimDuration;
     // create separate coroutines for each entity to allow them to claim at the same time and show visual feedback (color alternates)
     private Coroutine playerColorCoroutine;
     private Coroutine enemyColorCoroutine;
@@ -34,21 +33,21 @@ public class Claimable : MonoBehaviour {
             return;
 
         if (entityType == EntityType.Player)
-            playerColorCoroutine = StartCoroutine(FadeColor(entityType, effectType, claimColor, colorFadeDuration));
+            playerColorCoroutine = StartCoroutine(StartClaim(entityType, effectType, claimColor, claimDuration));
         if (entityType == EntityType.Enemy)
-            enemyColorCoroutine = StartCoroutine(FadeColor(entityType, effectType, claimColor, colorFadeDuration));
+            enemyColorCoroutine = StartCoroutine(StartClaim(entityType, effectType, claimColor, claimDuration));
 
     }
 
-    private IEnumerator FadeColor(EntityType entityType, EffectType? effectType, Color claimColor, float duration) {
+    private IEnumerator StartClaim(EntityType entityType, EffectType? effectType, Color claimColor, float claimDuration) {
 
         float currentTime = 0f;
         Color startColor = spriteRenderer.color;
 
-        while (currentTime < duration) {
+        while (currentTime < claimDuration) {
 
             currentTime += Time.deltaTime;
-            spriteRenderer.color = Color.Lerp(startColor, claimColor, currentTime / duration);
+            spriteRenderer.color = Color.Lerp(startColor, claimColor, currentTime / claimDuration);
             yield return null;
 
         }
