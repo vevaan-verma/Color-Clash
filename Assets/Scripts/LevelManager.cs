@@ -6,14 +6,17 @@ public class LevelManager : MonoBehaviour {
 
     [Header("References")]
     private PlayerClaimManager claimManager;
+    private CameraFollow cameraFollow;
 
     [Header("Constant Prefabs")]
-    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private PlayerController playerPrefab;
     [SerializeField] private AudioManager audioManagerPrefab;
 
     [Header("Level")]
     [SerializeField] private Level level;
-    [SerializeField] private Transform spawn;
+
+    [Header("Spawns")]
+    [SerializeField] private Transform playerSpawn;
 
     [Header("Claims")]
     private List<PlayerClaim> playerClaims;
@@ -21,14 +24,26 @@ public class LevelManager : MonoBehaviour {
 
     private void Awake() {
 
-        Instantiate(playerPrefab, spawn.position, Quaternion.identity);
+        cameraFollow = FindObjectOfType<CameraFollow>();
+
+        SpawnPlayer();
+
         Instantiate(audioManagerPrefab).Initialize();
 
         claimManager = FindObjectOfType<PlayerClaimManager>();
-        claimManager.transform.position = spawn.position;
+        claimManager.transform.position = playerSpawn.position;
 
         playerClaims = new List<PlayerClaim>();
         enemyClaims = new List<EnemyClaim>();
+
+    }
+
+    public void SpawnPlayer() {
+
+        foreach (PlayerController obj in FindObjectsOfType<PlayerController>())
+            Destroy(obj.gameObject);
+
+        cameraFollow.SetTarget(Instantiate(playerPrefab, playerSpawn.position + new Vector3(0f, playerPrefab.transform.localScale.y / 2f, 0f), Quaternion.identity).transform);
 
     }
 
@@ -62,7 +77,7 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
-    public Vector3 GetSpawn() { return spawn.position; }
+    public Vector3 GetPlayerSpawn() { return playerSpawn.position; }
 
     public AudioClip GetBackgroundMusic() { return level.GetBackgroundMusic(); }
 

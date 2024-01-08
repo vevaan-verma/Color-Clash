@@ -47,7 +47,7 @@ public class Bullet : MonoBehaviour {
         bool? deathCaused = false; // to prevent impact effect when something dies (for better looking gfx)
 
         if (shooterType == EntityType.Player)
-            deathCaused = collision.transform.GetComponent<EnemyController>()?.TakeDamage(damage); // damage enemy if player is shooter
+            deathCaused = collision.transform.GetComponent<EnemyHealthManager>()?.TakeDamage(damage); // damage enemy if player is shooter
         else if (shooterType == EntityType.Enemy)
             deathCaused = collision.transform.GetComponent<PlayerHealthManager>()?.TakeDamage(damage); // damage player if enemy is shooter
 

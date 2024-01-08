@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerController))]
 public class PlayerHealthManager : MonoBehaviour {
 
     [Header("References")]
@@ -46,16 +47,17 @@ public class PlayerHealthManager : MonoBehaviour {
 
     private void OnApplicationQuit() {
 
-        quitting = true;
+        quitting = true; // to prevent trigger exit death coroutine on quit
 
     }
 
-    private void OnBecameInvisible() {
+    private void OnTriggerExit2D(Collider2D collision) {
 
-        if (quitting) return; // to prevent error
+        if (quitting) return;
 
-        // player falls out of screen
-        StartCoroutine(Die()); // kill player
+        // player falls out of map
+        if (collision.CompareTag("Map"))
+            StartCoroutine(Die()); // kill player
 
     }
 
@@ -100,7 +102,7 @@ public class PlayerHealthManager : MonoBehaviour {
         yield return new WaitForSeconds(respawnTime);
 
         SetHealth(maxHealth); // restore health
-        transform.position = levelManager.GetSpawn(); // respawn at level spawn
+        transform.position = levelManager.GetPlayerSpawn(); // respawn at level spawn
         uiController.UpdateClaimablesHUD(); // update ui
 
         isDead = false;

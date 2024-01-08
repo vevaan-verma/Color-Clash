@@ -9,7 +9,7 @@ public class CameraFollow : MonoBehaviour {
 
     [Header("Follow")]
     [SerializeField] private float followSmoothing;
-    private Transform player;
+    private Transform target;
     private Vector3 offset;
 
     [Header("Bounds")]
@@ -20,10 +20,10 @@ public class CameraFollow : MonoBehaviour {
 
     private void Start() {
 
-        player = FindObjectOfType<PlayerController>().transform;
+        target = FindObjectOfType<PlayerController>().transform;
         camera = GetComponent<Camera>();
 
-        offset = transform.position - player.position;
+        offset = transform.position - target.position;
 
         xMin = mapBounds.bounds.min.x;
         yMin = mapBounds.bounds.min.y;
@@ -31,13 +31,16 @@ public class CameraFollow : MonoBehaviour {
         yMax = mapBounds.bounds.max.y;
 
         camSize = camera.orthographicSize;
-        camRatio = (xMax + camSize) / 2f;
+        camRatio = ((float) Screen.width / Screen.height) * camSize;
 
     }
 
     private void LateUpdate() {
 
-        transform.position = Vector3.Lerp(transform.position, new Vector3(Mathf.Clamp(player.position.x, xMin + camRatio, xMax - camRatio), Mathf.Clamp(player.position.y, yMin + camSize, yMax - camSize), transform.position.z) + offset, followSmoothing * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, new Vector3(Mathf.Clamp(target.position.x, xMin + camRatio, xMax - camRatio), Mathf.Clamp(target.position.y, yMin + camSize, yMax - camSize), transform.position.z) + offset, followSmoothing * Time.deltaTime);
 
     }
+
+    public void SetTarget(Transform target) { this.target = target; }
+
 }

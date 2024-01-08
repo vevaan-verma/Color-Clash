@@ -3,6 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerClaimManager))]
+[RequireComponent(typeof(PlayerColorManager))]
+[RequireComponent(typeof(PlayerEffectManager))]
+[RequireComponent(typeof(PlayerGunManager))]
+[RequireComponent(typeof(PlayerHealthManager))]
 public class PlayerController : MonoBehaviour {
 
     [Header("References")]
