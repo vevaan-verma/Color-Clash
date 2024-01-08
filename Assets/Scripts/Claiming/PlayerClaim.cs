@@ -18,7 +18,8 @@ public class PlayerClaim : EntityClaim {
 
     private void OnDestroy() {
 
-        levelManager.RemoveClaim(this);
+        GetComponent<Claimable>().OnClaimDestroy(this); // trigger destroy event
+        levelManager.RemoveClaim(this); // remove claim
 
     }
 

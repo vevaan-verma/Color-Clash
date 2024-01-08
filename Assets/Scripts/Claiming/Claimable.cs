@@ -5,7 +5,9 @@ using UnityEngine;
 public class Claimable : MonoBehaviour {
 
     [Header("References")]
+    private PlayerHealthManager healthManager;
     private SpriteRenderer spriteRenderer;
+    private Color startColor;
 
     [Header("Claiming")]
     [SerializeField] private float addedMultiplier;
@@ -15,22 +17,36 @@ public class Claimable : MonoBehaviour {
     // create separate coroutines for each entity to allow them to claim at the same time and show visual feedback (color alternates)
     private Coroutine playerColorCoroutine;
     private Coroutine enemyColorCoroutine;
+    private Coroutine resetCoroutine;
 
-    private void Awake() {
+    [Header("Quitting")]
+    private bool quitting;
 
+    private void Start() {
+
+        healthManager = FindObjectOfType<PlayerHealthManager>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        startColor = spriteRenderer.color;
+
+    }
+
+    private void OnApplicationQuit() {
+
+        quitting = true;
 
     }
 
     public void Claim(EntityType entityType, Color claimColor, EffectType? effectType = null) {
 
-        // TODO: claim script keeps alternating when two entities are claiming, giving player extra multiplier for a few frames (could be a feature)
-
         PlayerClaim playerClaim = GetComponent<PlayerClaim>();
         EnemyClaim enemyClaim = GetComponent<EnemyClaim>();
 
-        if ((entityType == EntityType.Player && playerClaim && playerClaim.GetEffectType() == effectType) || (entityType == EntityType.Player && playerColorCoroutine != null) || (entityType == EntityType.Enemy && enemyClaim) || (entityType == EntityType.Enemy && enemyColorCoroutine != null)) // already claimed by entity (player done this way to make sure if effect types are different, they are still replaced)
+        if ((entityType == EntityType.Player && ((playerClaim && playerClaim.GetEffectType() == effectType) || playerColorCoroutine != null || healthManager.IsDead())) || (entityType == EntityType.Enemy && (enemyClaim || enemyColorCoroutine != null))) // already claimed by entity (player done this way to make sure if effect types are different, they are still replaced)
             return;
+
+        if (resetCoroutine != null)
+            StopCoroutine(resetCoroutine);
 
         if (entityType == EntityType.Player)
             playerColorCoroutine = StartCoroutine(StartClaim(entityType, effectType, claimColor, claimDuration));
@@ -87,6 +103,44 @@ public class Claimable : MonoBehaviour {
             gameObject.AddComponent<EnemyClaim>().Claim(); // claim for enemy
 
         }
+    }
+
+    public void OnClaimDestroy(EntityClaim entityClaim) {
+
+        if (quitting || playerColorCoroutine != null || enemyColorCoroutine != null) return;
+
+        // check if there is another entity claim on the claimable
+        foreach (EntityClaim claim in GetComponents<EntityClaim>())
+            if (claim != entityClaim)
+                return;
+
+        if (entityClaim is PlayerClaim && playerColorCoroutine != null)
+            StopCoroutine(playerColorCoroutine);
+        if (entityClaim is EnemyClaim && enemyColorCoroutine != null)
+            StopCoroutine(enemyColorCoroutine);
+
+        if (resetCoroutine != null)
+            StopCoroutine(resetCoroutine);
+
+        resetCoroutine = StartCoroutine(ResetClaim(startColor, claimDuration)); // reset claim
+
+    }
+
+    private IEnumerator ResetClaim(Color resetColor, float claimDuration) {
+
+        float currentTime = 0f;
+        Color startColor = spriteRenderer.color;
+
+        while (currentTime < claimDuration) {
+
+            currentTime += Time.deltaTime;
+            spriteRenderer.color = Color.Lerp(startColor, resetColor, currentTime / claimDuration);
+            yield return null;
+
+        }
+
+        spriteRenderer.color = resetColor;
+
     }
 
     public float GetMultiplierAddition() { return addedMultiplier; }

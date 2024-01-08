@@ -22,6 +22,7 @@ public class PlayerHealthManager : MonoBehaviour {
 
     [Header("Death")]
     [SerializeField] private ParticleSystem deathEffect;
+    private bool isDead;
 
     [Header("Respawn")]
     [SerializeField] private float respawnTime;
@@ -77,7 +78,15 @@ public class PlayerHealthManager : MonoBehaviour {
 
     private IEnumerator Die() {
 
+        isDead = true;
+
         health = 0f;
+
+        // clear all player claims
+        List<PlayerClaim> playerClaims = levelManager.GetPlayerClaims();
+
+        foreach (PlayerClaim claim in playerClaims)
+            Destroy(claim);
 
         // reload all weapons
         foreach (Gun gun in gunManager.GetGuns())
@@ -92,27 +101,30 @@ public class PlayerHealthManager : MonoBehaviour {
 
         SetHealth(maxHealth); // restore health
         transform.position = levelManager.GetSpawn(); // respawn at level spawn
+        uiController.UpdateClaimablesHUD(); // update ui
+
+        isDead = false;
 
     }
 
     private void SetHealth(float health) {
 
         this.health = health;
-        uiController.UpdateHealth(this.health);
+        uiController.UpdateHealth();
 
     }
 
     private void AddHealth(float health) {
 
         this.health += health;
-        uiController.UpdateHealth(this.health);
+        uiController.UpdateHealth();
 
     }
 
     private void RemoveHealth(float health) {
 
         this.health -= health;
-        uiController.UpdateHealth(this.health);
+        uiController.UpdateHealth();
 
     }
 
@@ -132,6 +144,10 @@ public class PlayerHealthManager : MonoBehaviour {
         }
     }
 
+    public float GetCurrentHealth() { return health; }
+
     public int GetMaxHealth() { return maxHealth; }
+
+    public bool IsDead() { return isDead; }
 
 }

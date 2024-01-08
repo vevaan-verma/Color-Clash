@@ -237,7 +237,6 @@ public class EnemyController : MonoBehaviour {
     // returns if enemy dies
     public bool TakeDamage(float damage) {
 
-        // TODO: health slider randomly raises itself
         RemoveHealth(damage);
 
         if (health <= 0f) {

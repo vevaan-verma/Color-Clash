@@ -8,7 +8,8 @@ public class LevelManager : MonoBehaviour {
     private PlayerClaimManager claimManager;
 
     [Header("Constant Prefabs")]
-    [SerializeField] private AudioManager audioManager;
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private AudioManager audioManagerPrefab;
 
     [Header("Level")]
     [SerializeField] private Level level;
@@ -18,12 +19,13 @@ public class LevelManager : MonoBehaviour {
     private List<PlayerClaim> playerClaims;
     private List<EnemyClaim> enemyClaims;
 
-    private void Start() {
+    private void Awake() {
+
+        Instantiate(playerPrefab, spawn.position, Quaternion.identity);
+        Instantiate(audioManagerPrefab).Initialize();
 
         claimManager = FindObjectOfType<PlayerClaimManager>();
         claimManager.transform.position = spawn.position;
-
-        Instantiate(audioManager).Initialize();
 
         playerClaims = new List<PlayerClaim>();
         enemyClaims = new List<EnemyClaim>();

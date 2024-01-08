@@ -77,12 +77,12 @@ public class UIController : MonoBehaviour {
 
     }
 
-    public void UpdateHealth(float health) {
+    public void UpdateHealth() {
 
         if (healthLerpCoroutine != null)
             StopCoroutine(healthLerpCoroutine);
 
-        healthLerpCoroutine = StartCoroutine(LerpHealth(health, healthLerpDuration));
+        healthLerpCoroutine = StartCoroutine(LerpHealth(healthManager.GetCurrentHealth(), healthLerpDuration));
 
     }
 
