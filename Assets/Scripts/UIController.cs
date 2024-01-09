@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,6 +11,11 @@ public class UIController : MonoBehaviour {
     private PlayerHealthManager healthManager;
     private PlayerClaimManager claimManager;
     private PlayerGunManager gunManager;
+    private LevelManager levelManager;
+
+    [Header("HUD")]
+    [SerializeField] private CanvasGroup playerHUD;
+    [SerializeField] private float playerHUDFadeDuration;
 
     [Header("Claimables")]
     [SerializeField] private Transform claimableInfoParent;
@@ -32,6 +38,12 @@ public class UIController : MonoBehaviour {
     [SerializeField] private Image gunIconBottom;
     [SerializeField] private Sprite blankGunSprite;
 
+    [Header("Loading")]
+    [SerializeField] private CanvasGroup loadingScreen;
+    [SerializeField] private float loadingScreenFadeDuration;
+    [SerializeField] private TMP_Text loadingText;
+    // [SerializeField] private float loadingTextDisplayDuration;
+
     [Header("Cursor")]
     [SerializeField] private Transform crosshair;
 
@@ -40,6 +52,12 @@ public class UIController : MonoBehaviour {
         gunManager = FindObjectOfType<PlayerGunManager>();
         claimManager = FindObjectOfType<PlayerClaimManager>();
         healthManager = FindObjectOfType<PlayerHealthManager>();
+        levelManager = FindObjectOfType<LevelManager>();
+
+        // player HUD
+        playerHUD.alpha = 0f; // reset alpha for fade
+        playerHUD.gameObject.SetActive(true);
+        playerHUD.DOFade(1f, playerHUDFadeDuration).SetEase(Ease.InCirc);
 
         // set health slider values
         healthSlider.maxValue = healthManager.GetMaxHealth();
@@ -58,6 +76,12 @@ public class UIController : MonoBehaviour {
             claimableInfos[claimableInfos.Count - 1].UpdateInfo(pair.Key, pair.Value); // update info
 
         }
+
+        // loading
+        loadingScreen.alpha = 1f; // reset alpha for fade
+        loadingScreen.gameObject.SetActive(true);
+        loadingScreen.DOFade(0f, loadingScreenFadeDuration);
+
     }
 
     private void Update() {
@@ -95,7 +119,7 @@ public class UIController : MonoBehaviour {
 
             currentTime += Time.deltaTime;
             healthSlider.value = Mathf.Lerp(startHealth, targetHealth, currentTime / duration);
-            sliderFill.color = healthGradient.Evaluate(healthSlider.normalizedValue); // normalizedValue returns the value between 0 and 1
+            sliderFill.color = healthGradient.Evaluate(healthSlider.normalizedValue); // normalizedValue returns the value between 0 and 1 (can't use DoTween here because of this line)
             yield return null;
 
         }

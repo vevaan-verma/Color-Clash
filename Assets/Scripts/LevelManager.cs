@@ -24,8 +24,6 @@ public class LevelManager : MonoBehaviour {
 
     private void Awake() {
 
-        cameraFollow = FindObjectOfType<CameraFollow>();
-
         SpawnPlayer();
 
         Instantiate(audioManagerPrefab).Initialize();
@@ -38,11 +36,13 @@ public class LevelManager : MonoBehaviour {
 
     }
 
-    public void SpawnPlayer() {
+    private void SpawnPlayer() {
 
+        // destroy existing players in scene
         foreach (PlayerController obj in FindObjectsOfType<PlayerController>())
             Destroy(obj.gameObject);
 
+        cameraFollow = FindObjectOfType<CameraFollow>(); // IMPORTANT: SET THIS AFTER PLAYERS ARE DESTROYED
         cameraFollow.SetTarget(Instantiate(playerPrefab, playerSpawn.position + new Vector3(0f, playerPrefab.transform.localScale.y / 2f, 0f), Quaternion.identity).transform);
 
     }

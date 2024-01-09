@@ -5,8 +5,10 @@ using UnityEngine;
 public class BackgroundScroller : MonoBehaviour {
 
     [Header("Scrolling")]
-    [SerializeField][Range(-1f, 1f)] private float scrollSpeed;
-    private float offset;
+    [SerializeField][Range(-1f, 1f)] private float xScrollSpeed;
+    [SerializeField][Range(-1f, 1f)] private float yScrollSpeed;
+    private float xOffset;
+    private float yOffset;
     private Material material;
 
     private void Start() {
@@ -17,8 +19,9 @@ public class BackgroundScroller : MonoBehaviour {
 
     private void Update() {
 
-        offset += Time.deltaTime * scrollSpeed / 10f; // divide by 10 to reduce scrolling speed
-        material.SetTextureOffset("_MainTex", new Vector2(offset, 0f));
+        xOffset += Time.deltaTime * xScrollSpeed / 10f; // divide by 10 to reduce scrolling speed
+        yOffset += Time.deltaTime * yScrollSpeed / 10f; // divide by 10 to reduce scrolling speed
+        material.SetTextureOffset("_MainTex", new Vector2(xOffset, xOffset));
 
     }
 }

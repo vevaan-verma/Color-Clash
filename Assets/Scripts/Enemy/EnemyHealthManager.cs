@@ -84,7 +84,7 @@ public class EnemyHealthManager : MonoBehaviour {
 
             currentTime += Time.deltaTime;
             healthSlider.value = Mathf.Lerp(startHealth, targetHealth, currentTime / duration);
-            sliderFill.color = healthGradient.Evaluate(healthSlider.normalizedValue); // normalizedValue returns the value between 0 and 1
+            sliderFill.color = healthGradient.Evaluate(healthSlider.normalizedValue); // normalizedValue returns the value between 0 and 1 (can't use DoTween here because of this line)
             yield return null;
 
         }

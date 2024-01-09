@@ -6,12 +6,12 @@ using UnityEngine;
 public class Level : ScriptableObject {
 
     [SerializeField] private new string name;
-    [SerializeField] private Object scene;
+    [SerializeField] private int sceneBuildIndex;
     [SerializeField] private AudioClip backgroundMusic;
 
     public string GetName() { return name; }
 
-    public Object GetScene() { return scene; }
+    public int GetSceneBuildIndex() { return sceneBuildIndex; }
 
     public AudioClip GetBackgroundMusic() { return backgroundMusic; }
 
