@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private Level[] levels;
     private AsyncOperation levelLoad;
 
-    private void Start() {
+    private void Awake() {
 
         DontDestroyOnLoad(gameObject);
 

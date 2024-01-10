@@ -10,6 +10,7 @@ public class LevelManager : MonoBehaviour {
 
     [Header("Constant Prefabs")]
     [SerializeField] private PlayerController playerPrefab;
+    [SerializeField] private EnemyController enemyPrefab;
     [SerializeField] private AudioManager audioManagerPrefab;
 
     [Header("Level")]
@@ -24,9 +25,10 @@ public class LevelManager : MonoBehaviour {
 
     private void Awake() {
 
-        SpawnPlayer();
-
         Instantiate(audioManagerPrefab).Initialize();
+
+        SpawnPlayer();
+        SpawnEnemies();
 
         claimManager = FindObjectOfType<PlayerClaimManager>();
         claimManager.transform.position = playerSpawn.position;
@@ -43,7 +45,18 @@ public class LevelManager : MonoBehaviour {
             Destroy(obj.gameObject);
 
         cameraFollow = FindObjectOfType<CameraFollow>(); // IMPORTANT: SET THIS AFTER PLAYERS ARE DESTROYED
-        cameraFollow.SetTarget(Instantiate(playerPrefab, playerSpawn.position + new Vector3(0f, playerPrefab.transform.localScale.y / 2f, 0f), Quaternion.identity).transform);
+        cameraFollow.SetTarget(Instantiate(playerPrefab, playerSpawn.position + new Vector3(0f, playerPrefab.transform.localScale.y / 2f, 0f), Quaternion.identity).transform); // spawn player
+
+    }
+
+    private void SpawnEnemies() {
+
+        // destroy existing enemies in scene
+        foreach (EnemyController obj in FindObjectsOfType<EnemyController>())
+            Destroy(obj.gameObject);
+
+        foreach (EnemySpawn enemySpawn in FindObjectsOfType<EnemySpawn>())
+            enemySpawn.SpawnEnemy(enemyPrefab); // spawn enemy & pass its patrol points
 
     }
 

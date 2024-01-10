@@ -42,15 +42,15 @@ public class MenuButton : MonoBehaviour {
 
     private void OnPointerEnter(PointerEventData eventData) {
 
-        text.DOColor(hoverColor, hoverFadeDuration);
-        underline.DOValue(underline.maxValue, underlineDuration).SetEase(Ease.InFlash);
+        text.DOColor(hoverColor, hoverFadeDuration); // color transition
+        underline.DOValue(underline.maxValue, underlineDuration).SetEase(Ease.InFlash); // underline
 
     }
 
     private void OnPointerExit(PointerEventData eventData) {
 
-        text.DOColor(startColor, hoverFadeDuration);
-        underline.DOValue(0f, underlineDuration).SetEase(Ease.OutFlash);
+        text.DOColor(startColor, hoverFadeDuration); // color transition
+        underline.DOValue(0f, underlineDuration).SetEase(Ease.OutFlash); // underline
 
     }
 }

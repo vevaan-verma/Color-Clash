@@ -37,7 +37,7 @@ public class CameraFollow : MonoBehaviour {
 
     private void LateUpdate() {
 
-        transform.position = Vector3.Lerp(transform.position, new Vector3(Mathf.Clamp(target.position.x, xMin + camRatio, xMax - camRatio), Mathf.Clamp(target.position.y, yMin + camSize, yMax - camSize), transform.position.z) + offset, followSmoothing * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, new Vector3(Mathf.Clamp(target.position.x, xMin + camRatio, xMax - camRatio), Mathf.Clamp(target.position.y, yMin + camSize, yMax - camSize), 0f) + offset, followSmoothing * Time.deltaTime); // z value of vector3 should be zero because offset is being added after
 
     }
 

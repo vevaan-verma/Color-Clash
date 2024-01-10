@@ -21,7 +21,7 @@ public class BackgroundScroller : MonoBehaviour {
 
         xOffset += Time.deltaTime * xScrollSpeed / 10f; // divide by 10 to reduce scrolling speed
         yOffset += Time.deltaTime * yScrollSpeed / 10f; // divide by 10 to reduce scrolling speed
-        material.SetTextureOffset("_MainTex", new Vector2(xOffset, xOffset));
+        material.SetTextureOffset("_MainTex", new Vector2(xOffset, yOffset));
 
     }
 }

@@ -1,5 +1,5 @@
 public enum SoundEffectType {
 
-    Footstep, Land, Death
+    Footstep, Land, Death, Click
 
 }

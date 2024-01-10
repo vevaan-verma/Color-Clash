@@ -49,4 +49,10 @@ public class AudioManager : MonoBehaviour {
 
         }
     }
+
+    public void PlaySound(AudioClip audioClip) {
+
+        soundEffectSource.PlayOneShot(audioClip);
+
+    }
 }

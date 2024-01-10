@@ -6,6 +6,7 @@ public class Gun : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private GunData gunData;
+    private AudioManager audioManager;
     private Animator animator;
     private UIController uiController;
 
@@ -33,6 +34,7 @@ public class Gun : MonoBehaviour {
     // start function
     public void Initialize(Collider2D collider, int gunIndex) {
 
+        audioManager = FindObjectOfType<AudioManager>();
         animator = GetComponent<Animator>();
         uiController = FindObjectOfType<UIController>();
 
@@ -49,6 +51,9 @@ public class Gun : MonoBehaviour {
         if (!CanShoot()) yield break;
 
         shotReady = false;
+
+        if (gunData.GetShootSound() != null)
+            audioManager.PlaySound(gunData.GetShootSound()); // play shoot sound
 
         if (gunData.UsesRaycastShooting()) {
 
@@ -108,6 +113,9 @@ public class Gun : MonoBehaviour {
         if (!CanReload()) yield break;
 
         isReloading = true;
+
+        if (gunData.GetReloadSound() != null)
+            audioManager.PlaySound(gunData.GetReloadSound()); // play reload sound
 
         // uiController.SetAmmoReloadingText(); // for notifying player of reload
 

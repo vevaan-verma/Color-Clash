@@ -12,9 +12,14 @@ public class EnemyController : MonoBehaviour {
     [Header("References")]
     private EnemyHealthManager enemyHealth;
     private EnemyColorManager colorManager;
+    private EnemyStateManager stateManager;
     private Rigidbody2D rb;
 
+    [Header("Spawn")]
+    private EnemySpawn enemySpawn;
+
     [Header("Movement")]
+    private bool flipped;
     private bool isFacingRight;
 
     [Header("Ground Check")]
@@ -29,13 +34,19 @@ public class EnemyController : MonoBehaviour {
         - VISION OBJECT CANNOT BE ON ENEMY LAYER
     */
 
-    private void Awake() {
+    public void Initialize(EnemySpawn enemySpawn, bool flipped, Transform[] patrolPoints) {
 
         colorManager = GetComponent<EnemyColorManager>();
         enemyHealth = GetComponent<EnemyHealthManager>();
+        stateManager = GetComponent<EnemyStateManager>();
         rb = GetComponent<Rigidbody2D>();
 
-        isFacingRight = true;
+        this.enemySpawn = enemySpawn;
+
+        stateManager.SetPatrolPoints(patrolPoints);
+
+        this.flipped = flipped;
+        isFacingRight = !flipped;
 
     }
 
@@ -54,7 +65,10 @@ public class EnemyController : MonoBehaviour {
 
     public void CheckFlip() {
 
-        if ((isFacingRight && rb.velocity.x < 0f) || (!isFacingRight && rb.velocity.x > 0f))
+        if ((flipped && ((isFacingRight && rb.velocity.x > 0f) // flipped player is going LEFT (because they're flipped) while facing right
+            || (!isFacingRight && rb.velocity.x < 0f))) // flipped player is going RIGHT (because they're flipped) while facing left
+            || (!flipped && ((isFacingRight && rb.velocity.x < 0f) // unflipped player is going left while facing right
+            || (!isFacingRight && rb.velocity.x > 0f)))) // unflipped player is going right while facing left
             Flip();
 
     }
@@ -66,6 +80,8 @@ public class EnemyController : MonoBehaviour {
         isFacingRight = !isFacingRight; // breaks when there are errors
 
     }
+
+    public EnemySpawn GetEnemySpawn() { return enemySpawn; }
 
     public bool IsFacingRight() { return isFacingRight; }
 

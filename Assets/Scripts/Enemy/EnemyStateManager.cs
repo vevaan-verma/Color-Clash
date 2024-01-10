@@ -27,9 +27,9 @@ public class EnemyStateManager : MonoBehaviour {
     private EnemyState lastEnemyState;
 
     [Header("Patrol")]
-    [SerializeField] private Transform[] patrolPoints;
     [SerializeField] private float maxPointDistance;
     [SerializeField] private float destinationWaitDuration;
+    private Transform[] patrolPoints;
     private int currPointIndex;
 
     [Header("Attack")]
@@ -89,6 +89,12 @@ public class EnemyStateManager : MonoBehaviour {
 
         if (collision.transform.CompareTag("Player")) // collider is player
             playerInVision = false;
+
+    }
+
+    public void SetPatrolPoints(Transform[] patrolPoints) {
+
+        this.patrolPoints = patrolPoints;
 
     }
 
@@ -160,20 +166,17 @@ public class EnemyStateManager : MonoBehaviour {
         // vision
         Gizmos.color = new Color(1f, 1f, 0f, 0.1f);
 
-        if (Application.isEditor && !Application.isPlaying) { // game is in editor and not playing
-
-            Gizmos.DrawCube((Vector2) transform.position + visionOffset, visionSize); // enemy will always be facing right in this case
-
-        } else {
-
-            if (enemyController.IsFacingRight())
-                Gizmos.DrawCube((Vector2) transform.position + visionOffset, visionSize);
-            else
-                Gizmos.DrawCube((Vector2) transform.position - visionOffset, visionSize);
-
-        }
+        if (transform.right.x > 0f)
+            Gizmos.DrawCube((Vector2) transform.position + visionOffset, visionSize);
+        else
+            Gizmos.DrawCube((Vector2) transform.position - visionOffset, visionSize);
 
         // patrolling
+        patrolPoints = null; // set to null to refresh every time
+
+        if (patrolPoints == null && transform.parent.GetComponentInChildren<EnemyPatrolRoute>() != null) // check if enemy patrol route object exists
+            patrolPoints = transform.parent.GetComponentInChildren<EnemyPatrolRoute>().GetPatrolPoints(); // get patrol points directly from enemy patrol route object instead of enemy spawn object because enemy spawn doesn't have a set reference yet
+
         Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
 
         // draw patrol points

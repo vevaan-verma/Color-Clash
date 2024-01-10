@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class EnemyHealthManager : MonoBehaviour {
 
     [Header("References")]
+    private EnemyController enemyController;
     private LevelManager levelManager;
     private SpriteRenderer spriteRenderer;
 
@@ -25,6 +26,7 @@ public class EnemyHealthManager : MonoBehaviour {
 
     private void Start() {
 
+        enemyController = GetComponent<EnemyController>();
         levelManager = FindObjectOfType<LevelManager>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -64,6 +66,7 @@ public class EnemyHealthManager : MonoBehaviour {
         foreach (EnemyClaim claim in enemyClaims)
             Destroy(claim);
 
+        enemyController.GetEnemySpawn().OnEnemyDeath(); // tell enemy spawn to respawn enemy if enabled
     }
 
     public void UpdateHealth(float health) {

@@ -15,6 +15,8 @@ public class GunData : ScriptableObject {
     [SerializeField] private float maxRange;
     [SerializeField] private float reloadTime;
     [SerializeField] private bool useRaycastShooting;
+    [SerializeField] private AudioClip shootSound;
+    [SerializeField] private AudioClip reloadSound;
 
     public string GetName() { return name; }
 
@@ -31,5 +33,9 @@ public class GunData : ScriptableObject {
     public float GetReloadTime() { return reloadTime; }
 
     public bool UsesRaycastShooting() { return useRaycastShooting; }
+
+    public AudioClip GetShootSound() { return shootSound; }
+
+    public AudioClip GetReloadSound() { return reloadSound; }
 
 }
