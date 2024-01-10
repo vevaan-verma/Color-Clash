@@ -28,13 +28,18 @@ public class LevelManager : MonoBehaviour {
         Instantiate(audioManagerPrefab).Initialize();
 
         SpawnPlayer();
-        SpawnEnemies();
 
         claimManager = FindObjectOfType<PlayerClaimManager>();
         claimManager.transform.position = playerSpawn.position;
 
         playerClaims = new List<PlayerClaim>();
         enemyClaims = new List<EnemyClaim>();
+
+    }
+
+    private void Start() {
+
+        SpawnEnemies(); // to allow enemy spawn class to run awake method first
 
     }
 

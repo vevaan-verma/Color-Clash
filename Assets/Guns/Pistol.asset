@@ -20,5 +20,5 @@ MonoBehaviour:
   maxRange: 10
   reloadTime: 0.5
   useRaycastShooting: 1
-  shootSound: {fileID: 8300000, guid: 59e749115b7943b4c8c5ecc2337f4ee6, type: 3}
+  shootSound: {fileID: 0}
   reloadSound: {fileID: 8300000, guid: 096a6bea04648d94daa082fa276d2ebc, type: 3}
