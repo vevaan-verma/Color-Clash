@@ -2,24 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(EnemyController))]
-public class EnemyColorManager : MonoBehaviour {
+[RequireComponent(typeof(PhantomController))]
+public class PhantomColorManager : MonoBehaviour {
 
     [Header("References")]
     private SpriteRenderer spriteRenderer;
 
     [Header("Color")]
-    [SerializeField] private EnemyColor enemyColor;
+    [SerializeField] private PhantomColor phantomColor;
 
     private void Start() {
 
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         // color
-        spriteRenderer.color = enemyColor.GetSpriteColor();
+        spriteRenderer.color = phantomColor.GetSpriteColor();
 
     }
 
-    public EnemyColor GetCurrentEnemyColor() { return enemyColor; }
+    public PhantomColor GetCurrentEnemyColor() { return phantomColor; }
 
 }

@@ -1,22 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 
-[RequireComponent(typeof(EnemyColorManager))]
-[RequireComponent(typeof(EnemyGunManager))]
-[RequireComponent(typeof(EnemyHealthManager))]
-[RequireComponent(typeof(EnemyStateManager))]
-public class EnemyController : MonoBehaviour {
+[RequireComponent(typeof(PhantomColorManager))]
+[RequireComponent(typeof(PhantomGunManager))]
+[RequireComponent(typeof(PhantomHealthManager))]
+[RequireComponent(typeof(PhantomStateManager))]
+public class PhantomController : MonoBehaviour {
 
     [Header("References")]
-    private EnemyHealthManager enemyHealth;
-    private EnemyColorManager colorManager;
-    private EnemyStateManager stateManager;
+    private PhantomHealthManager healthManager;
+    private PhantomGunManager gunManager;
+    private PhantomColorManager colorManager;
+    private PhantomStateManager stateManager;
     private Rigidbody2D rb;
 
+    [Header("Label")]
+    [SerializeField] private string enemyName;
+    [SerializeField] private TMP_Text nameText;
+
     [Header("Spawn")]
-    private EnemySpawn enemySpawn;
+    private PhantomSpawn phantomSpawn;
 
     [Header("Movement")]
     private bool flipped;
@@ -34,16 +40,21 @@ public class EnemyController : MonoBehaviour {
         - VISION OBJECT CANNOT BE ON ENEMY LAYER
     */
 
-    public void Initialize(EnemySpawn enemySpawn, bool flipped, Transform[] patrolPoints) {
+    public void Initialize(PhantomSpawn phantomSpawn, Gun gun, bool flipped, Transform[] patrolPoints) {
 
-        colorManager = GetComponent<EnemyColorManager>();
-        enemyHealth = GetComponent<EnemyHealthManager>();
-        stateManager = GetComponent<EnemyStateManager>();
+        colorManager = GetComponent<PhantomColorManager>();
+        gunManager = GetComponent<PhantomGunManager>();
+        healthManager = GetComponent<PhantomHealthManager>();
+        stateManager = GetComponent<PhantomStateManager>();
         rb = GetComponent<Rigidbody2D>();
 
-        this.enemySpawn = enemySpawn;
+        nameText.text = enemyName;
 
-        stateManager.SetPatrolPoints(patrolPoints);
+        this.phantomSpawn = phantomSpawn;
+
+        gunManager.SetGun(gun);
+
+        stateManager.Initialize(patrolPoints);
 
         this.flipped = flipped;
         isFacingRight = !flipped;
@@ -52,7 +63,7 @@ public class EnemyController : MonoBehaviour {
 
     private void Update() {
 
-        // if enemy is standing on something, claim it
+        // if phantom is standing on something, claim it
         Collider2D leftCollider = Physics2D.OverlapCircle(leftFoot.position, groundCheckRadius, environmentMask);
         Collider2D rightCollider = Physics2D.OverlapCircle(rightFoot.position, groundCheckRadius, environmentMask);
 
@@ -76,12 +87,12 @@ public class EnemyController : MonoBehaviour {
     public void Flip() {
 
         transform.Rotate(0f, 180f, 0f);
-        enemyHealth.FlipCanvas();
+        healthManager.FlipCanvas();
         isFacingRight = !isFacingRight; // breaks when there are errors
 
     }
 
-    public EnemySpawn GetEnemySpawn() { return enemySpawn; }
+    public PhantomSpawn GetEnemySpawn() { return phantomSpawn; }
 
     public bool IsFacingRight() { return isFacingRight; }
 

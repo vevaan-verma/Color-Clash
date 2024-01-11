@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(EnemyController))]
-public class EnemyHealthManager : MonoBehaviour {
+[RequireComponent(typeof(PhantomController))]
+public class PhantomHealthManager : MonoBehaviour {
 
     [Header("References")]
-    private EnemyController enemyController;
+    private PhantomController phantomController;
     private LevelManager levelManager;
     private SpriteRenderer spriteRenderer;
 
@@ -26,7 +26,7 @@ public class EnemyHealthManager : MonoBehaviour {
 
     private void Start() {
 
-        enemyController = GetComponent<EnemyController>();
+        phantomController = GetComponent<PhantomController>();
         levelManager = FindObjectOfType<LevelManager>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -37,7 +37,7 @@ public class EnemyHealthManager : MonoBehaviour {
 
     }
 
-    // returns if enemy dies
+    // returns if phantom dies
     public bool TakeDamage(float damage) {
 
         RemoveHealth(damage);
@@ -58,15 +58,16 @@ public class EnemyHealthManager : MonoBehaviour {
 
         Destroy(gameObject);
         ParticleSystem.MainModule pm = Instantiate(deathEffect, transform.position, Quaternion.identity).main;
-        pm.startColor = spriteRenderer.color; // change particle color based on enemy color
+        pm.startColor = spriteRenderer.color; // change particle color based on phantom color
 
-        // clear all enemy claims
-        List<EnemyClaim> enemyClaims = levelManager.GetEnemyClaims();
+        // clear all phantom claims
+        List<EnemyClaim> phantomClaims = levelManager.GetEnemyClaims();
 
-        foreach (EnemyClaim claim in enemyClaims)
+        foreach (EnemyClaim claim in phantomClaims)
             Destroy(claim);
 
-        enemyController.GetEnemySpawn().OnEnemyDeath(); // tell enemy spawn to respawn enemy if enabled
+        phantomController.GetEnemySpawn().OnEnemyDeath(); // tell phantom spawn to respawn phantom if enabled
+
     }
 
     public void UpdateHealth(float health) {

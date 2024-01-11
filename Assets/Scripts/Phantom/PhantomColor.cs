@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class EnemyColor : EntityColor {
+public class PhantomColor : EntityColor {
 
 
 }

@@ -2,20 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(EnemyController))]
-public class EnemyGunManager : MonoBehaviour {
+[RequireComponent(typeof(PhantomController))]
+public class PhantomGunManager : MonoBehaviour {
 
     [Header("Shooting")]
-    [SerializeField] private Gun starterGun; // DON'T USE THIS GUN, IT ISN'T INSTANTIATED
     [SerializeField] private Transform gunSlot;
     [SerializeField] private LayerMask shootableMask; // just to avoid bullet collisions
     private Gun gun;
 
-    private void Start() {
+    public void SetGun(Gun gun) {
 
         // guns
-        gun = Instantiate(starterGun, gunSlot);
-        gun.Initialize(GetComponent<Collider2D>(), 0);
+        this.gun = Instantiate(gun, gunSlot);
+        this.gun.Initialize(GetComponent<Collider2D>(), 0);
 
     }
 

@@ -1,16 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
-[RequireComponent(typeof(EnemyController))]
-public class EnemyStateManager : MonoBehaviour {
+[RequireComponent(typeof(PhantomController))]
+public class PhantomStateManager : MonoBehaviour {
 
     [Header("References")]
-    private EnemyController enemyController;
-    private EnemyGunManager gunManager;
+    private PhantomController phantomController;
+    private PhantomGunManager gunManager;
     private Rigidbody2D rb;
     private Animator animator;
     private Transform player;
+    private bool initialized;
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
@@ -19,12 +21,13 @@ public class EnemyStateManager : MonoBehaviour {
     [SerializeField] private GameObject visionObj;
     [SerializeField] private Vector2 visionOffset;
     [SerializeField] private Vector2 visionSize;
+    [SerializeField] private GameObject dangerIcon;
     private BoxCollider2D visionCollider;
     private bool playerInVision;
 
     [Header("States")]
-    private EnemyState enemyState;
-    private EnemyState lastEnemyState;
+    private PhantomState phantomState;
+    private PhantomState lastPhantomState;
 
     [Header("Patrol")]
     [SerializeField] private float maxPointDistance;
@@ -35,10 +38,17 @@ public class EnemyStateManager : MonoBehaviour {
     [Header("Attack")]
     [SerializeField] private float firstShotDelay;
 
-    private void Start() {
+    public void Initialize(Transform[] patrolPoints) {
 
-        enemyController = GetComponent<EnemyController>();
-        gunManager = GetComponent<EnemyGunManager>();
+        this.patrolPoints = patrolPoints;
+        initialized = true;
+
+    }
+
+    private IEnumerator Start() {
+
+        phantomController = GetComponent<PhantomController>();
+        gunManager = GetComponent<PhantomGunManager>();
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         player = FindObjectOfType<PlayerController>().transform;
@@ -50,8 +60,13 @@ public class EnemyStateManager : MonoBehaviour {
         visionCollider.size = visionSize;
         visionCollider.isTrigger = true;
 
+        dangerIcon.SetActive(false); // disable danger icon
+
+        while (!initialized) // wait for initialization
+            yield return null;
+
         // states
-        enemyState = EnemyState.Patrol; // default state is patrol
+        phantomState = PhantomState.Patrol; // default state is patrol
 
         // patrolling
         if (patrolPoints.Length > 1) {
@@ -69,42 +84,48 @@ public class EnemyStateManager : MonoBehaviour {
 
     private void Update() {
 
-        lastEnemyState = enemyState;
+        lastPhantomState = phantomState;
 
         if (playerInVision)
-            enemyState = EnemyState.Attack;
+            phantomState = PhantomState.Attack;
         else
-            enemyState = EnemyState.Patrol;
+            phantomState = PhantomState.Patrol;
 
     }
 
     private void OnTriggerEnter2D(Collider2D collision) {
 
-        if (collision.transform.CompareTag("Player")) // collider is player
+        if (collision.transform.CompareTag("Player")) { // collider is player
+
             playerInVision = true;
 
+            // play danger animation
+            dangerIcon.SetActive(true);
+            animator.SetBool("playerInVision", true);
+
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision) {
 
-        if (collision.transform.CompareTag("Player")) // collider is player
+        if (collision.transform.CompareTag("Player")) { // collider is player
+
+            // stop danger animation
+            animator.SetBool("playerInVision", false);
+            dangerIcon.SetActive(false);
+
             playerInVision = false;
 
-    }
-
-    public void SetPatrolPoints(Transform[] patrolPoints) {
-
-        this.patrolPoints = patrolPoints;
-
+        }
     }
 
     private IEnumerator Patrol() {
 
         while (true) {
 
-            if (enemyState == EnemyState.Patrol) {
+            if (phantomState == PhantomState.Patrol) {
 
-                enemyController.CheckFlip();
+                phantomController.CheckFlip();
 
                 if (transform.position.x < patrolPoints[currPointIndex].position.x)
                     rb.velocity = new Vector2(moveSpeed, 0f); // move to the right
@@ -113,13 +134,13 @@ public class EnemyStateManager : MonoBehaviour {
 
                 if (Vector2.Distance(transform.position, patrolPoints[currPointIndex].position) < maxPointDistance) {
 
-                    // stop enemy and wait
+                    // stop phantom and wait
                     rb.velocity = Vector2.zero;
                     animator.SetBool("isRunning", false);
                     yield return new WaitForSeconds(destinationWaitDuration);
                     animator.SetBool("isRunning", true);
 
-                    // redirect enemy patrol to point a and flip enemy
+                    // redirect phantom patrol to point a and flip phantom
                     currPointIndex++;
 
                     if (currPointIndex >= patrolPoints.Length)
@@ -137,23 +158,30 @@ public class EnemyStateManager : MonoBehaviour {
 
         while (true) {
 
-            if (enemyState == EnemyState.Attack) {
+            if (phantomState == PhantomState.Attack) {
 
-                if (lastEnemyState != EnemyState.Attack) { // first frame of attack
+                if (lastPhantomState != PhantomState.Attack) { // first frame of attack
 
                     animator.SetBool("isRunning", false);
                     rb.velocity = Vector2.zero; // stop movement
+
+                    // phantom should look at player before shot delay
+                    if ((player.position.x <= transform.position.x && phantomController.IsFacingRight()) // player is to the left of phantom
+                        || (player.position.x > transform.position.x && !phantomController.IsFacingRight())) // player is to the right of phantom
+                        phantomController.Flip();
+
                     yield return new WaitForSeconds(firstShotDelay); // wait for first shot delay
 
                 }
 
-                if ((player.position.x <= transform.position.x && enemyController.IsFacingRight()) || (player.position.x > transform.position.x && !enemyController.IsFacingRight())) // player is to the left of enemy | player is to the right of enemy
-                    enemyController.Flip();
+                // make sure enemy is still attacking after delay
+                if (phantomState == PhantomState.Attack) {
 
-                rb.velocity = Vector2.zero; // stop movement
+                    rb.velocity = Vector2.zero; // stop movement
 
-                gunManager.Shoot(); // shoot
+                    gunManager.Shoot(); // shoot
 
+                }
             }
 
             yield return null;
@@ -162,6 +190,8 @@ public class EnemyStateManager : MonoBehaviour {
     }
 
     private void OnDrawGizmosSelected() {
+
+        if (Application.isPlaying || PrefabStageUtility.GetCurrentPrefabStage() != null) return; // don't draw gizmos in game or prefab mode
 
         // vision
         Gizmos.color = new Color(1f, 1f, 0f, 0.1f);
@@ -174,8 +204,8 @@ public class EnemyStateManager : MonoBehaviour {
         // patrolling
         patrolPoints = null; // set to null to refresh every time
 
-        if (patrolPoints == null && transform.parent.GetComponentInChildren<EnemyPatrolRoute>() != null) // check if enemy patrol route object exists
-            patrolPoints = transform.parent.GetComponentInChildren<EnemyPatrolRoute>().GetPatrolPoints(); // get patrol points directly from enemy patrol route object instead of enemy spawn object because enemy spawn doesn't have a set reference yet
+        if (patrolPoints == null && transform.parent.GetComponentInChildren<PhantomPatrolRoute>() != null) // check if phantom patrol route object exists
+            patrolPoints = transform.parent.GetComponentInChildren<PhantomPatrolRoute>().GetPatrolPoints(); // get patrol points directly from phantom patrol route object instead of phantom spawn object because phantom spawn doesn't have a set reference yet
 
         Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
 

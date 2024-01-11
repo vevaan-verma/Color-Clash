@@ -17,7 +17,7 @@ public class Claimable : MonoBehaviour {
     [SerializeField] private float claimDuration;
     // create separate coroutines for each entity to allow them to claim at the same time and show visual feedback (color alternates)
     private Coroutine playerColorCoroutine;
-    private Coroutine enemyColorCoroutine;
+    private Coroutine phantomColorCoroutine;
     private Coroutine resetCoroutine;
 
     [Header("Quitting")]
@@ -41,9 +41,9 @@ public class Claimable : MonoBehaviour {
     public void Claim(EntityType entityType, Color claimColor, EffectType? effectType = null) {
 
         PlayerClaim playerClaim = GetComponent<PlayerClaim>();
-        EnemyClaim enemyClaim = GetComponent<EnemyClaim>();
+        EnemyClaim phantomClaim = GetComponent<EnemyClaim>();
 
-        if ((entityType == EntityType.Player && ((playerClaim && playerClaim.GetEffectType() == effectType) || playerColorCoroutine != null || healthManager.IsDead())) || (entityType == EntityType.Enemy && (enemyClaim || enemyColorCoroutine != null))) // already claimed by entity (player done this way to make sure if effect types are different, they are still replaced)
+        if ((entityType == EntityType.Player && ((playerClaim && playerClaim.GetEffectType() == effectType) || playerColorCoroutine != null || healthManager.IsDead())) || (entityType == EntityType.Enemy && (phantomClaim || phantomColorCoroutine != null))) // already claimed by entity (player done this way to make sure if effect types are different, they are still replaced)
             return;
 
         if (resetCoroutine != null)
@@ -52,7 +52,7 @@ public class Claimable : MonoBehaviour {
         if (entityType == EntityType.Player)
             playerColorCoroutine = StartCoroutine(StartClaim(entityType, effectType, claimColor, claimDuration));
         if (entityType == EntityType.Enemy)
-            enemyColorCoroutine = StartCoroutine(StartClaim(entityType, effectType, claimColor, claimDuration));
+            phantomColorCoroutine = StartCoroutine(StartClaim(entityType, effectType, claimColor, claimDuration));
 
     }
 
@@ -75,7 +75,7 @@ public class Claimable : MonoBehaviour {
         if (entityType == EntityType.Player)
             playerColorCoroutine = null;
         if (entityType == EntityType.Enemy)
-            enemyColorCoroutine = null;
+            phantomColorCoroutine = null;
 
     }
 
@@ -101,14 +101,14 @@ public class Claimable : MonoBehaviour {
             foreach (EnemyClaim claim in GetComponents<EnemyClaim>())
                 Destroy(claim);
 
-            gameObject.AddComponent<EnemyClaim>().Claim(); // claim for enemy
+            gameObject.AddComponent<EnemyClaim>().Claim(); // claim for phantom
 
         }
     }
 
     public void OnClaimDestroy(EntityClaim entityClaim) {
 
-        if (quitting || playerColorCoroutine != null || enemyColorCoroutine != null) return;
+        if (quitting || playerColorCoroutine != null || phantomColorCoroutine != null) return;
 
         // check if there is another entity claim on the claimable
         foreach (EntityClaim claim in GetComponents<EntityClaim>())
@@ -117,8 +117,8 @@ public class Claimable : MonoBehaviour {
 
         if (entityClaim is PlayerClaim && playerColorCoroutine != null)
             StopCoroutine(playerColorCoroutine);
-        if (entityClaim is EnemyClaim && enemyColorCoroutine != null)
-            StopCoroutine(enemyColorCoroutine);
+        if (entityClaim is EnemyClaim && phantomColorCoroutine != null)
+            StopCoroutine(phantomColorCoroutine);
 
         if (resetCoroutine != null)
             StopCoroutine(resetCoroutine);

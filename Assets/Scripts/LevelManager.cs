@@ -10,7 +10,6 @@ public class LevelManager : MonoBehaviour {
 
     [Header("Constant Prefabs")]
     [SerializeField] private PlayerController playerPrefab;
-    [SerializeField] private EnemyController enemyPrefab;
     [SerializeField] private AudioManager audioManagerPrefab;
 
     [Header("Level")]
@@ -57,11 +56,11 @@ public class LevelManager : MonoBehaviour {
     private void SpawnEnemies() {
 
         // destroy existing enemies in scene
-        foreach (EnemyController obj in FindObjectsOfType<EnemyController>())
+        foreach (PhantomController obj in FindObjectsOfType<PhantomController>())
             Destroy(obj.gameObject);
 
-        foreach (EnemySpawn enemySpawn in FindObjectsOfType<EnemySpawn>())
-            enemySpawn.SpawnEnemy(enemyPrefab); // spawn enemy & pass its patrol points
+        foreach (PhantomSpawn enemySpawn in FindObjectsOfType<PhantomSpawn>())
+            enemySpawn.SpawnEnemy(); // spawn enemy
 
     }
 

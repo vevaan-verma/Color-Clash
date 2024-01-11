@@ -64,7 +64,7 @@ public class Gun : MonoBehaviour {
                 bool? deathCaused = false; // to prevent impact effect when something dies (for better looking gfx)
 
                 if (shooterType == EntityType.Player)
-                    deathCaused = hitInfo.transform.GetComponent<EnemyHealthManager>()?.TakeDamage(gunData.GetDamage() * multiplier); // damage enemy if player is shooter
+                    deathCaused = hitInfo.transform.GetComponent<PhantomHealthManager>()?.TakeDamage(gunData.GetDamage() * multiplier); // damage enemy if player is shooter
                 else if (shooterType == EntityType.Enemy)
                     deathCaused = hitInfo.transform.GetComponent<PlayerHealthManager>()?.TakeDamage(gunData.GetDamage() * multiplier);  // damage player if enemy is shooter
 

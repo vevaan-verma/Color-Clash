@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyPatrolRoute : MonoBehaviour {
+public class PhantomPatrolRoute : MonoBehaviour {
 
     [Header("Patrol")]
     [SerializeField] private Transform[] patrolPoints;
