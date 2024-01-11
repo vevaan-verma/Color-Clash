@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 8384790298835611893}
   - component: {fileID: 6712915185084512710}
   m_Layer: 8
-  m_Name: BasicPhantom
+  m_Name: HyperPhantom
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -162,7 +162,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 747e649c6b4b0e549afe6d079e855990, type: 3}
-  m_Color: {r: 0, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.11461386, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -278,7 +278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cbecb8f77ae0134b844297896224177, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyName: Basic Phantom
+  enemyName: Hyper Phantom
   nameText: {fileID: 8710364954250587024}
   leftFoot: {fileID: 8317153675061886291}
   rightFoot: {fileID: 8442632808001873245}
@@ -299,8 +299,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   phantomColor:
-    spriteColor: {r: 0, g: 1, b: 1, a: 1}
-    claimColor: {r: 0, g: 0.4716981, b: 0.4716981, a: 1}
+    spriteColor: {r: 1, g: 0.11372549, b: 0, a: 1}
+    claimColor: {r: 0.4716981, g: 0.053322393, b: 0, a: 1}
 --- !u!114 &2845087285824394786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,7 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b4c10ae7a2dd784e8cc4ba06bd943df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  maxHealth: 250
   healthCanvas: {fileID: 1755825816564006659}
   healthSlider: {fileID: 17245404156734532}
   sliderFill: {fileID: 2170668741683112252}
@@ -377,14 +377,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74c8b7441245b264b932488b43946668, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
+  moveSpeed: 5
   visionObj: {fileID: 2529694425881020967}
   visionOffset: {x: 1.5, y: 0}
   visionSize: {x: 6, y: 1}
   dangerIcon: {fileID: 4007544245864682391}
   maxPointDistance: 0.5
-  destinationWaitDuration: 2
-  firstShotDelay: 1
+  destinationWaitDuration: 1
+  firstShotDelay: 0.25
 --- !u!95 &6712915185084512710
 Animator:
   serializedVersion: 5

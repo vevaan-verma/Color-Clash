@@ -48,6 +48,14 @@ public class Gun : MonoBehaviour {
 
     public IEnumerator Shoot(LayerMask shootableMask, EntityType shooterType, float multiplier = 1f) {
 
+        // reload if out of ammo
+        if (currAmmo == 0) {
+
+            StartCoroutine(Reload());
+            yield break;
+
+        }
+
         if (!CanShoot()) yield break;
 
         shotReady = false;

@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SceneManagement;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement; // import only in editor
+#endif
 
 [RequireComponent(typeof(PhantomController))]
 public class PhantomStateManager : MonoBehaviour {
@@ -191,7 +194,11 @@ public class PhantomStateManager : MonoBehaviour {
 
     private void OnDrawGizmosSelected() {
 
-        if (Application.isPlaying || PrefabStageUtility.GetCurrentPrefabStage() != null) return; // don't draw gizmos in game or prefab mode
+#if UNITY_EDITOR
+        if (PrefabStageUtility.GetCurrentPrefabStage() != null) return; // don't draw gizmos in prefab mode
+#endif
+
+        if (Application.isPlaying) return; // don't draw gizmos in game
 
         // vision
         Gizmos.color = new Color(1f, 1f, 0f, 0.1f);
