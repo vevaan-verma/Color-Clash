@@ -20,7 +20,7 @@ public class LevelManager : MonoBehaviour {
 
     [Header("Claims")]
     private List<PlayerClaim> playerClaims;
-    private List<EnemyClaim> enemyClaims;
+    private List<PhantomClaim> enemyClaims;
 
     private void Awake() {
 
@@ -32,7 +32,7 @@ public class LevelManager : MonoBehaviour {
         claimManager.transform.position = playerSpawn.position;
 
         playerClaims = new List<PlayerClaim>();
-        enemyClaims = new List<EnemyClaim>();
+        enemyClaims = new List<PhantomClaim>();
 
     }
 
@@ -72,9 +72,9 @@ public class LevelManager : MonoBehaviour {
             playerClaims.Add(playerClaim);
             claimManager.AddClaimable(playerClaim.GetColor(), playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
 
-        } else if (claim is EnemyClaim) {
+        } else if (claim is PhantomClaim) {
 
-            enemyClaims.Add((EnemyClaim) claim);
+            enemyClaims.Add((PhantomClaim) claim);
 
         }
     }
@@ -87,9 +87,9 @@ public class LevelManager : MonoBehaviour {
             playerClaims.Remove(playerClaim);
             claimManager.RemoveClaimable(playerClaim.GetColor(), playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
 
-        } else if (claim is EnemyClaim) {
+        } else if (claim is PhantomClaim) {
 
-            enemyClaims.Remove((EnemyClaim) claim);
+            enemyClaims.Remove((PhantomClaim) claim);
 
         }
     }
@@ -100,6 +100,6 @@ public class LevelManager : MonoBehaviour {
 
     public List<PlayerClaim> GetPlayerClaims() { return playerClaims; }
 
-    public List<EnemyClaim> GetEnemyClaims() { return enemyClaims; }
+    public List<PhantomClaim> GetEnemyClaims() { return enemyClaims; }
 
 }

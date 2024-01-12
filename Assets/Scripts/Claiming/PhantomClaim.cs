@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyClaim : EntityClaim {
+public class PhantomClaim : EntityClaim {
 
     public void Claim() {
 

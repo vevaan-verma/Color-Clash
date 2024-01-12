@@ -41,7 +41,7 @@ public class Claimable : MonoBehaviour {
     public void Claim(EntityType entityType, Color claimColor, EffectType? effectType = null) {
 
         PlayerClaim playerClaim = GetComponent<PlayerClaim>();
-        EnemyClaim phantomClaim = GetComponent<EnemyClaim>();
+        PhantomClaim phantomClaim = GetComponent<PhantomClaim>();
 
         if ((entityType == EntityType.Player && ((playerClaim && playerClaim.GetEffectType() == effectType) || playerColorCoroutine != null || healthManager.IsDead())) || (entityType == EntityType.Enemy && (phantomClaim || phantomColorCoroutine != null))) // already claimed by entity (player done this way to make sure if effect types are different, they are still replaced)
             return;
@@ -87,7 +87,7 @@ public class Claimable : MonoBehaviour {
             foreach (PlayerClaim claim in GetComponents<PlayerClaim>())
                 Destroy(claim);
 
-            foreach (EnemyClaim claim in GetComponents<EnemyClaim>())
+            foreach (PhantomClaim claim in GetComponents<PhantomClaim>())
                 Destroy(claim);
 
             gameObject.AddComponent<PlayerClaim>().Claim(claimColor, (EffectType) effectType); // claim for player
@@ -98,10 +98,10 @@ public class Claimable : MonoBehaviour {
             foreach (PlayerClaim claim in GetComponents<PlayerClaim>())
                 Destroy(claim);
 
-            foreach (EnemyClaim claim in GetComponents<EnemyClaim>())
+            foreach (PhantomClaim claim in GetComponents<PhantomClaim>())
                 Destroy(claim);
 
-            gameObject.AddComponent<EnemyClaim>().Claim(); // claim for phantom
+            gameObject.AddComponent<PhantomClaim>().Claim(); // claim for phantom
 
         }
     }
@@ -117,7 +117,7 @@ public class Claimable : MonoBehaviour {
 
         if (entityClaim is PlayerClaim && playerColorCoroutine != null)
             StopCoroutine(playerColorCoroutine);
-        if (entityClaim is EnemyClaim && phantomColorCoroutine != null)
+        if (entityClaim is PhantomClaim && phantomColorCoroutine != null)
             StopCoroutine(phantomColorCoroutine);
 
         if (resetCoroutine != null)

@@ -19,6 +19,7 @@ public class PhantomStateManager : MonoBehaviour {
 
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
+    private bool isFlipped;
 
     [Header("Vision")]
     [SerializeField] private GameObject visionObj;
@@ -41,9 +42,10 @@ public class PhantomStateManager : MonoBehaviour {
     [Header("Attack")]
     [SerializeField] private float firstShotDelay;
 
-    public void Initialize(Transform[] patrolPoints) {
+    public void Initialize(Transform[] patrolPoints, bool isFlipped) {
 
         this.patrolPoints = patrolPoints;
+        this.isFlipped = isFlipped;
         initialized = true;
 
     }
@@ -163,22 +165,30 @@ public class PhantomStateManager : MonoBehaviour {
 
             if (phantomState == PhantomState.Attack) {
 
-                if (lastPhantomState != PhantomState.Attack) { // first frame of attack
+                // phantom should look at player before shooting
+                if ((transform.position.x > player.position.x && phantomController.IsFacingRight()) // phantom is to the right of player
+                    || (transform.position.x <= player.position.x && !phantomController.IsFacingRight())) { // phantom is to the left of player
 
-                    animator.SetBool("isRunning", false);
-                    rb.velocity = Vector2.zero; // stop movement
+                    phantomController.Flip(); // flip phantom
 
-                    // phantom should look at player before shot delay
-                    if ((player.position.x <= transform.position.x && phantomController.IsFacingRight()) // player is to the left of phantom
-                        || (player.position.x > transform.position.x && !phantomController.IsFacingRight())) // player is to the right of phantom
-                        phantomController.Flip();
+                    // only have shot delay if player isn't in front of phantom
+                    if (lastPhantomState != PhantomState.Attack) { // first frame of attack
 
-                    yield return new WaitForSeconds(firstShotDelay); // wait for first shot delay
+                        animator.SetBool("isRunning", false);
+                        rb.velocity = Vector2.zero; // stop movement
 
+                        yield return new WaitForSeconds(firstShotDelay); // wait for first shot delay
+
+                    }
                 }
 
                 // make sure enemy is still attacking after delay
                 if (phantomState == PhantomState.Attack) {
+
+                    // make sure phantom is still looking at player after delay
+                    if ((transform.position.x > player.position.x && phantomController.IsFacingRight()) // phantom is to the right of player
+                        || (transform.position.x <= player.position.x && !phantomController.IsFacingRight())) // phantom is to the left of player
+                        phantomController.Flip(); // flip phantom
 
                     rb.velocity = Vector2.zero; // stop movement
 

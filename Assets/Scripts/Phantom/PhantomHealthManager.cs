@@ -61,9 +61,9 @@ public class PhantomHealthManager : MonoBehaviour {
         pm.startColor = spriteRenderer.color; // change particle color based on phantom color
 
         // clear all phantom claims
-        List<EnemyClaim> phantomClaims = levelManager.GetEnemyClaims();
+        List<PhantomClaim> phantomClaims = levelManager.GetEnemyClaims();
 
-        foreach (EnemyClaim claim in phantomClaims)
+        foreach (PhantomClaim claim in phantomClaims)
             Destroy(claim);
 
         phantomController.GetEnemySpawn().OnEnemyDeath(); // tell phantom spawn to respawn phantom if enabled

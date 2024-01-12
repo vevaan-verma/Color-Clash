@@ -410,7 +410,7 @@ MonoBehaviour:
   moveSpeed: 5
   visionObj: {fileID: 2529694425881020967}
   visionOffset: {x: 1.5, y: 0}
-  visionSize: {x: 6, y: 0.8}
+  visionSize: {x: 6, y: 0.1}
   dangerIcon: {fileID: 4007544245864682391}
   maxPointDistance: 0.5
   destinationWaitDuration: 1

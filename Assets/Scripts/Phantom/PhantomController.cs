@@ -25,7 +25,7 @@ public class PhantomController : MonoBehaviour {
     private PhantomSpawn phantomSpawn;
 
     [Header("Movement")]
-    private bool flipped;
+    private bool isFlipped;
     private bool isFacingRight;
 
     [Header("Ground Check")]
@@ -40,7 +40,7 @@ public class PhantomController : MonoBehaviour {
         - VISION OBJECT CANNOT BE ON ENEMY LAYER
     */
 
-    public void Initialize(PhantomSpawn phantomSpawn, Gun gun, bool flipped, Transform[] patrolPoints) {
+    public void Initialize(PhantomSpawn phantomSpawn, Gun gun, bool isFlipped, Transform[] patrolPoints) {
 
         colorManager = GetComponent<PhantomColorManager>();
         gunManager = GetComponent<PhantomGunManager>();
@@ -54,10 +54,10 @@ public class PhantomController : MonoBehaviour {
 
         gunManager.SetGun(gun);
 
-        stateManager.Initialize(patrolPoints);
+        this.isFlipped = isFlipped;
+        isFacingRight = !isFlipped;
 
-        this.flipped = flipped;
-        isFacingRight = !flipped;
+        stateManager.Initialize(patrolPoints, isFlipped);
 
     }
 
@@ -76,10 +76,8 @@ public class PhantomController : MonoBehaviour {
 
     public void CheckFlip() {
 
-        if ((flipped && ((isFacingRight && rb.velocity.x > 0f) // flipped player is going LEFT (because they're flipped) while facing right
-            || (!isFacingRight && rb.velocity.x < 0f))) // flipped player is going RIGHT (because they're flipped) while facing left
-            || (!flipped && ((isFacingRight && rb.velocity.x < 0f) // unflipped player is going left while facing right
-            || (!isFacingRight && rb.velocity.x > 0f)))) // unflipped player is going right while facing left
+        if ((isFacingRight && rb.velocity.x < 0f) // player is going left while facing right
+            || (!isFacingRight && rb.velocity.x > 0f)) // player is going right while facing left
             Flip();
 
     }
