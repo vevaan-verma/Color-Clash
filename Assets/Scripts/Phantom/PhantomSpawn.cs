@@ -14,7 +14,10 @@ public class PhantomSpawn : MonoBehaviour {
 
     [Header("Respawn")]
     [SerializeField] private bool respawnEnabled;
-    [SerializeField] private float respawnWaitDuration; // TODO: move to phantom type class?
+    [SerializeField] private float respawnWaitDuration;
+
+    [Header("Claimable")]
+    [SerializeField][Tooltip("Can be left null if no claimable platform is available nearby")] private Claimable claimablePlatform;
 
     private void Awake() {
 
@@ -40,6 +43,11 @@ public class PhantomSpawn : MonoBehaviour {
     private IEnumerator RespawnEnemy() {
 
         yield return new WaitForSeconds(respawnWaitDuration);
+
+        if (claimablePlatform) // some spawns might not have a claimable platform
+            while (claimablePlatform.GetClaimer() == EntityType.Player) // don't respawn enemy if claimed by player
+                yield return null;
+
         SpawnEnemy();
 
     }

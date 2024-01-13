@@ -44,8 +44,9 @@ public class UIController : MonoBehaviour {
     [SerializeField] private TMP_Text loadingText;
     // [SerializeField] private float loadingTextDisplayDuration;
 
-    [Header("Cursor")]
-    [SerializeField] private Transform crosshair;
+    [Header("Level Cleared")]
+    [SerializeField] private CanvasGroup levelClearedScreen;
+    [SerializeField] private float levelClearedFadeDuration;
 
     private void Awake() {
 
@@ -82,13 +83,9 @@ public class UIController : MonoBehaviour {
         loadingScreen.gameObject.SetActive(true);
         loadingScreen.DOFade(0f, loadingScreenFadeDuration);
 
-    }
-
-    private void Update() {
-
-        //Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //mousePosition.z = Camera.main.transform.position.z + Camera.main.nearClipPlane;
-        //crosshair.position = mousePosition;
+        // level cleared screen
+        levelClearedScreen.gameObject.SetActive(false);
+        levelClearedScreen.alpha = 0f;
 
     }
 
@@ -168,5 +165,12 @@ public class UIController : MonoBehaviour {
             gunIconBottom.sprite = guns[currGunIndex + 1].GetIcon(); // bottom gun is next gun
 
         }
+    }
+
+    public void OnLevelCleared() {
+
+        levelClearedScreen.gameObject.SetActive(true);
+        levelClearedScreen.DOFade(1f, levelClearedFadeDuration);
+
     }
 }

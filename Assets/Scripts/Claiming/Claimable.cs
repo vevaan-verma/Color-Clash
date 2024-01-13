@@ -12,6 +12,7 @@ public class Claimable : MonoBehaviour {
 
     [Header("Claiming")]
     [SerializeField] private float addedMultiplier;
+    private EntityType claimer;
 
     [Header("Animations")]
     [SerializeField] private float claimDuration;
@@ -90,7 +91,7 @@ public class Claimable : MonoBehaviour {
             foreach (PhantomClaim claim in GetComponents<PhantomClaim>())
                 Destroy(claim);
 
-            gameObject.AddComponent<PlayerClaim>().Claim(claimColor, (EffectType) effectType); // claim for player
+            gameObject.AddComponent<PlayerClaim>().Claim(this, claimColor, (EffectType) effectType); // claim for player
 
         } else if (entityType == EntityType.Enemy) {
 
@@ -104,6 +105,9 @@ public class Claimable : MonoBehaviour {
             gameObject.AddComponent<PhantomClaim>().Claim(); // claim for phantom
 
         }
+
+        claimer = entityType;
+
     }
 
     public void OnClaimDestroy(EntityClaim entityClaim) {
@@ -141,9 +145,12 @@ public class Claimable : MonoBehaviour {
         }
 
         spriteRenderer.color = resetColor;
+        claimer = EntityType.None;
 
     }
 
     public float GetMultiplierAddition() { return addedMultiplier; }
+
+    public EntityType GetClaimer() { return claimer; }
 
 }

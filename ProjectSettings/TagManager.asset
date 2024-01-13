@@ -17,8 +17,8 @@ TagManager:
   - Player
   - Enemy
   - Bullet
-  - 
-  - 
+  - Player Bullet Collider
+  - Enemy Bullet Collider
   - 
   - 
   - 

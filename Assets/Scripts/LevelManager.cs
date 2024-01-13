@@ -5,6 +5,7 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour {
 
     [Header("References")]
+    private UIController uiController;
     private PlayerClaimManager claimManager;
     private CameraFollow cameraFollow;
 
@@ -19,10 +20,22 @@ public class LevelManager : MonoBehaviour {
     [SerializeField] private Transform playerSpawn;
 
     [Header("Claims")]
+    private List<Claimable> levelClaimables;
     private List<PlayerClaim> playerClaims;
     private List<PhantomClaim> enemyClaims;
 
+    [Header("Level Clear")]
+    private bool levelCleared;
+
     private void Awake() {
+
+        uiController = FindObjectOfType<UIController>();
+
+        // add all claimables to list
+        levelClaimables = new List<Claimable>();
+
+        foreach (Claimable claimable in FindObjectsOfType<Claimable>())
+            levelClaimables.Add(claimable);
 
         Instantiate(audioManagerPrefab).Initialize();
 
@@ -71,6 +84,7 @@ public class LevelManager : MonoBehaviour {
             PlayerClaim playerClaim = (PlayerClaim) claim;
             playerClaims.Add(playerClaim);
             claimManager.AddClaimable(playerClaim.GetColor(), playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
+            CheckLevelClear(); // check if player has claimed all platforms
 
         } else if (claim is PhantomClaim) {
 
@@ -92,6 +106,40 @@ public class LevelManager : MonoBehaviour {
             enemyClaims.Remove((PhantomClaim) claim);
 
         }
+    }
+
+    private bool CheckLevelClear() {
+
+        // make sure player has all claimables claimed
+        bool found;
+
+        foreach (Claimable claimable in levelClaimables) {
+
+            found = false;
+
+            for (int i = 0; i < playerClaims.Count; i++) {
+
+                if (playerClaims[i].GetClaimable() == claimable) {
+
+                    found = true;
+                    break;
+
+                }
+            }
+
+            if (!found)
+                return false;
+
+        }
+
+        // make sure all phantoms are dead
+        if (FindObjectsOfType<PhantomController>().Length != 0)
+            return false;
+
+        levelCleared = true;
+        uiController.OnLevelCleared();
+        return true;
+
     }
 
     public Vector3 GetPlayerSpawn() { return playerSpawn.position; }
