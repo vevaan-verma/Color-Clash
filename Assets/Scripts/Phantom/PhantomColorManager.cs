@@ -20,6 +20,6 @@ public class PhantomColorManager : MonoBehaviour {
 
     }
 
-    public PhantomColor GetCurrentEnemyColor() { return phantomColor; }
+    public PhantomColor GetCurrentPhantomColor() { return phantomColor; }
 
 }

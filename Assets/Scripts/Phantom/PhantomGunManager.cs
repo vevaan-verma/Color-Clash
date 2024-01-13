@@ -21,7 +21,7 @@ public class PhantomGunManager : MonoBehaviour {
     public void Shoot() {
 
         // gun shooting & reloading
-        StartCoroutine(gun.Shoot(shootableMask, EntityType.Enemy));
+        StartCoroutine(gun.Shoot(EntityType.Enemy, shootableMask));
         gun.InstantReload(EntityType.Enemy);
 
     }

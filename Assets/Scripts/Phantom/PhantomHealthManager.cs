@@ -1,5 +1,7 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +18,7 @@ public class PhantomHealthManager : MonoBehaviour {
     [SerializeField] private Transform healthCanvas;
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Image sliderFill;
+    [SerializeField] private TMP_Text healthText;
     [SerializeField] private float healthLerpDuration;
     [SerializeField] private Gradient healthGradient;
     private Coroutine healthLerpCoroutine;
@@ -88,6 +91,7 @@ public class PhantomHealthManager : MonoBehaviour {
 
             currentTime += Time.deltaTime;
             healthSlider.value = Mathf.Lerp(startHealth, targetHealth, currentTime / duration);
+            healthText.text = Mathf.Ceil(healthSlider.value) + ""; // health text is health rounded up
             sliderFill.color = healthGradient.Evaluate(healthSlider.normalizedValue); // normalizedValue returns the value between 0 and 1 (can't use DoTween here because of this line)
             yield return null;
 

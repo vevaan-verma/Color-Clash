@@ -46,7 +46,7 @@ public class Gun : MonoBehaviour {
 
     }
 
-    public IEnumerator Shoot(LayerMask shootableMask, EntityType shooterType, float multiplier = 1f) {
+    public IEnumerator Shoot(EntityType shooterType, LayerMask shootableMask, float multiplier = 1f) {
 
         // reload if out of ammo
         if (currAmmo == 0) {
@@ -76,8 +76,9 @@ public class Gun : MonoBehaviour {
                 else if (shooterType == EntityType.Enemy)
                     deathCaused = hitInfo.transform.GetComponent<PlayerHealthManager>()?.TakeDamage(gunData.GetDamage() * multiplier);  // damage player if enemy is shooter
 
+                // impact effect
                 if (deathCaused != null && !(bool) deathCaused)
-                    Instantiate(impactEffect, hitInfo.point, Quaternion.identity); // instantiate impact effect
+                    Instantiate(impactEffect, hitInfo.point, Quaternion.identity);
 
                 // set bullet tracer points
                 bulletTracer.SetPosition(0, muzzle.position);

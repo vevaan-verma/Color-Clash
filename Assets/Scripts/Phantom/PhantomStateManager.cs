@@ -40,7 +40,8 @@ public class PhantomStateManager : MonoBehaviour {
     private int currPointIndex;
 
     [Header("Attack")]
-    [SerializeField] private float firstShotDelay;
+    [SerializeField][Tooltip("Shot delay when player enters vision in front of enemy")] private float frontShotDelay;
+    [SerializeField][Tooltip("Shot delay when player enters vision behind enemy")] private float behindShotDelay;
 
     public void Initialize(Transform[] patrolPoints, bool isFlipped) {
 
@@ -171,19 +172,32 @@ public class PhantomStateManager : MonoBehaviour {
 
                     phantomController.Flip(); // flip phantom
 
-                    // only have shot delay if player isn't in front of phantom
+                    // only have behind shot delay if player isn't in front of phantom
                     if (lastPhantomState != PhantomState.Attack) { // first frame of attack
 
-                        animator.SetBool("isRunning", false);
+                        animator.SetBool("isRunning", false); // stop run animation
                         rb.velocity = Vector2.zero; // stop movement
 
-                        yield return new WaitForSeconds(firstShotDelay); // wait for first shot delay
+                        yield return new WaitForSeconds(behindShotDelay); // wait for first shot delay
+
+                    }
+                } else {
+
+                    // only have front shot delay if player is in front of phantom
+                    if (lastPhantomState != PhantomState.Attack) { // first frame of attack
+
+                        animator.SetBool("isRunning", false); // stop run animation
+                        rb.velocity = Vector2.zero; // stop movement
+
+                        yield return new WaitForSeconds(frontShotDelay); // wait for first shot delay
 
                     }
                 }
 
                 // make sure enemy is still attacking after delay
                 if (phantomState == PhantomState.Attack) {
+
+                    animator.SetBool("isRunning", false); // stop run animation
 
                     // make sure phantom is still looking at player after delay
                     if ((transform.position.x > player.position.x && phantomController.IsFacingRight()) // phantom is to the right of player

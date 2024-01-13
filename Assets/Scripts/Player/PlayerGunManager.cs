@@ -44,7 +44,7 @@ public class PlayerGunManager : MonoBehaviour {
         // shooting
         if (Input.GetMouseButton(0)) {
 
-            StartCoroutine(guns[currGunIndex].Shoot(shootableMask, EntityType.Player, colorManager.GetCurrentPlayerColor().GetEffectType() == EffectType.Damage ? effectManager.GetEffectMultiplier(EffectType.Damage) : 1f)); // if player has the damage color equipped, add multiplier
+            StartCoroutine(guns[currGunIndex].Shoot(EntityType.Player, shootableMask, colorManager.GetCurrentPlayerColor().GetEffectType() == EffectType.Damage ? effectManager.GetEffectMultiplier(EffectType.Damage) : 1f)); // if player has the damage color equipped, add multiplier
             uiController.UpdateGunHUD(guns[currGunIndex], currGunIndex);
 
         }

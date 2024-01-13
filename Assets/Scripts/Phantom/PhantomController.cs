@@ -68,9 +68,9 @@ public class PhantomController : MonoBehaviour {
         Collider2D rightCollider = Physics2D.OverlapCircle(rightFoot.position, groundCheckRadius, environmentMask);
 
         if (leftCollider != null)
-            leftCollider.GetComponent<Claimable>()?.Claim(EntityType.Enemy, colorManager.GetCurrentEnemyColor().GetClaimColor());
+            leftCollider.GetComponent<Claimable>()?.Claim(EntityType.Enemy, colorManager.GetCurrentPhantomColor().GetClaimColor());
         if (rightCollider != null)
-            rightCollider.GetComponent<Claimable>()?.Claim(EntityType.Enemy, colorManager.GetCurrentEnemyColor().GetClaimColor());
+            rightCollider.GetComponent<Claimable>()?.Claim(EntityType.Enemy, colorManager.GetCurrentPhantomColor().GetClaimColor());
 
     }
 

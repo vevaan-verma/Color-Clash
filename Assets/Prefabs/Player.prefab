@@ -341,7 +341,7 @@ MonoBehaviour:
   - spriteColor: {r: 0, g: 0.6, b: 0.8627451, a: 1}
     claimColor: {r: 0.41037738, g: 0.81909305, b: 1, a: 1}
     effectType: 2
-  colorCycleCooldown: 2
+  colorCycleCooldown: 0.3
   colorSwitchKey: 306
 --- !u!114 &5242082214896361896
 MonoBehaviour:
@@ -355,6 +355,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddc1cd702785a8a489607cf693a7f6e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  effectValues:
+  - effectType: 0
+    effectMultiplier: 1
+  - effectType: 1
+    effectMultiplier: 8
+  - effectType: 2
+    effectMultiplier: 3
 --- !u!114 &5938639835511817533
 MonoBehaviour:
   m_ObjectHideFlags: 0
