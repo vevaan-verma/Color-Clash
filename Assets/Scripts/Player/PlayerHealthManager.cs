@@ -53,7 +53,7 @@ public class PlayerHealthManager : MonoBehaviour {
 
     private void OnTriggerExit2D(Collider2D collision) {
 
-        if (quitting) return;
+        if (levelManager.IsLevelCleared() || quitting) return; // to prevent errors
 
         // player falls out of map
         if (collision.CompareTag("Map"))

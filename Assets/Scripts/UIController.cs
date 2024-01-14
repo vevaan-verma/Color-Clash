@@ -1,8 +1,10 @@
 using DG.Tweening;
+using DG.Tweening.Core.Easing;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
@@ -11,7 +13,7 @@ public class UIController : MonoBehaviour {
     private PlayerHealthManager healthManager;
     private PlayerClaimManager claimManager;
     private PlayerGunManager gunManager;
-    private LevelManager levelManager;
+    private GameManager gameManager;
 
     [Header("HUD")]
     [SerializeField] private CanvasGroup playerHUD;
@@ -46,14 +48,18 @@ public class UIController : MonoBehaviour {
 
     [Header("Level Cleared")]
     [SerializeField] private CanvasGroup levelClearedScreen;
+    [SerializeField] private RectTransform buttonsLayout;
     [SerializeField] private float levelClearedFadeDuration;
+    [SerializeField] private Button mainMenuButton;
+    [SerializeField] private Button replayButton;
+    [SerializeField] private Button nextLevelButton;
 
     private void Awake() {
 
         gunManager = FindObjectOfType<PlayerGunManager>();
         claimManager = FindObjectOfType<PlayerClaimManager>();
         healthManager = FindObjectOfType<PlayerHealthManager>();
-        levelManager = FindObjectOfType<LevelManager>();
+        gameManager = FindObjectOfType<GameManager>();
 
         // player HUD
         playerHUD.alpha = 0f; // reset alpha for fade
@@ -81,11 +87,14 @@ public class UIController : MonoBehaviour {
         // loading
         loadingScreen.alpha = 1f; // reset alpha for fade
         loadingScreen.gameObject.SetActive(true);
-        loadingScreen.DOFade(0f, loadingScreenFadeDuration);
+        loadingScreen.DOFade(0f, loadingScreenFadeDuration).OnComplete(() => loadingScreen.gameObject.SetActive(false)); // disable loading screen on complete & reset loading text
 
         // level cleared screen
         levelClearedScreen.gameObject.SetActive(false);
         levelClearedScreen.alpha = 0f;
+
+        mainMenuButton.onClick.AddListener(LoadMainMenu);
+        replayButton.onClick.AddListener(ReplayLevel);
 
     }
 
@@ -171,6 +180,90 @@ public class UIController : MonoBehaviour {
 
         levelClearedScreen.gameObject.SetActive(true);
         levelClearedScreen.DOFade(1f, levelClearedFadeDuration);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(levelClearedScreen.GetComponent<RectTransform>()); // rebuild level cleared screen layout
+        LayoutRebuilder.ForceRebuildLayoutImmediate(buttonsLayout); // rebuild button layout too
+
+    }
+
+    private void LoadMainMenu() {
+
+        levelClearedScreen.gameObject.SetActive(false);
+        loadingScreen.gameObject.SetActive(true);
+        loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishMainMenuLoad());
+        //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
+        gameManager.StartLoadMainMenuAsync(); // load first level
+
+    }
+
+    private void FinishMainMenuLoad() {
+
+        //StopCoroutine(loadingTextCoroutine); // IMPORTANT TO PREVENT COROUTINE FROM CYCLING INFINITELY
+        gameManager.FinishMainMenuLoad();
+
+    }
+
+    private void ReplayLevel() {
+
+        levelClearedScreen.gameObject.SetActive(false);
+        loadingScreen.gameObject.SetActive(true);
+        loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishLevelLoad());
+        //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
+        gameManager.StartLoadLevelAsync(-1); // pass -1 to reload level
+
+    }
+
+    private void FinishLevelLoad() {
+
+        //StopCoroutine(loadingTextCoroutine); // IMPORTANT TO PREVENT COROUTINE FROM CYCLING INFINITELY
+        gameManager.FinishLevelLoad();
+
+    }
+
+    /*
+    for adding ... after loading in a cycle (doesn't look good with current font)
+    private IEnumerator UpdateLoadingText() {
+
+        while (true) {
+
+            for (int i = 0; i < 4; i++) {
+
+                switch (i) {
+
+                    case 0:
+
+                        loadingText.text = "Loading";
+                        break;
+
+                    case 1:
+
+                        loadingText.text = "Loading.";
+                        break;
+
+                    case 2:
+
+                        loadingText.text = "Loading..";
+                        break;
+
+                    case 3:
+
+                        loadingText.text = "Loading...";
+                        break;
+
+                }
+
+                yield return new WaitForSeconds(loadingTextDisplayDuration);
+
+            }
+
+            yield return null;
+
+        }
+    }
+    */
+
+    public void SetLoadingText(string text) {
+
+        loadingText.text = text;
 
     }
 }

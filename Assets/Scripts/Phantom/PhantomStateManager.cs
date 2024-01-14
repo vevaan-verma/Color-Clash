@@ -12,6 +12,7 @@ public class PhantomStateManager : MonoBehaviour {
     [Header("References")]
     private PhantomController phantomController;
     private PhantomGunManager gunManager;
+    private PhantomHealthManager healthManager;
     private Rigidbody2D rb;
     private Animator animator;
     private Transform player;
@@ -55,6 +56,7 @@ public class PhantomStateManager : MonoBehaviour {
 
         phantomController = GetComponent<PhantomController>();
         gunManager = GetComponent<PhantomGunManager>();
+        healthManager = GetComponent<PhantomHealthManager>();
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         player = FindObjectOfType<PlayerController>().transform;
@@ -85,6 +87,10 @@ public class PhantomStateManager : MonoBehaviour {
 
         // attacking
         StartCoroutine(Attack());
+
+        // reallign canvas with phantom if flipped
+        if (isFlipped)
+            healthManager.FlipCanvas();
 
     }
 

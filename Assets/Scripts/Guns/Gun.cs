@@ -6,7 +6,7 @@ public class Gun : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private GunData gunData;
-    private AudioManager audioManager;
+    private LevelAudioManager audioManager;
     private Animator animator;
     private UIController uiController;
 
@@ -34,7 +34,7 @@ public class Gun : MonoBehaviour {
     // start function
     public void Initialize(Collider2D collider, int gunIndex) {
 
-        audioManager = FindObjectOfType<AudioManager>();
+        audioManager = FindObjectOfType<LevelAudioManager>();
         animator = GetComponent<Animator>();
         uiController = FindObjectOfType<UIController>();
 

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,14 +9,32 @@ public class GameManager : MonoBehaviour {
     [Header("Levels")]
     [SerializeField] private Level[] levels;
     private AsyncOperation levelLoad;
+    private AsyncOperation menuLoad;
 
-    private void Awake() {
+    public void StartLoadMainMenuAsync() {
 
-        DontDestroyOnLoad(gameObject);
+        menuLoad = SceneManager.LoadSceneAsync(0); // main menu has build index of 0
+        menuLoad.allowSceneActivation = false; // allow the loading screen to fully fade in before activating scene
 
     }
 
-    public void StartLoadLevelAsync(int levelIndex) { // parameter is LEVEL index NOT scene index
+    public void FinishMainMenuLoad() {
+
+        if (menuLoad == null) return;
+
+        menuLoad.allowSceneActivation = true;
+
+    }
+
+    public void StartLoadLevelAsync(int levelIndex) { // parameter is LEVEL index NOT scene index (PASSING -1 RELOADS CURRENT LEVEL)
+
+        if (levelIndex == -1) {
+
+            levelLoad = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex); // reload level
+            levelLoad.allowSceneActivation = false; // allow the loading screen to fully fade in before activating scene
+            return;
+
+        }
 
         if (levels.Length == 0) return;
 

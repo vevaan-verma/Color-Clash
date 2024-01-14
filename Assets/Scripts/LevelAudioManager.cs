@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour {
+public class LevelAudioManager : MonoBehaviour {
 
     [Header("References")]
     [SerializeField] private AudioSource musicSource;
@@ -22,7 +20,13 @@ public class AudioManager : MonoBehaviour {
 
         musicSource.loop = true;
 
-        musicSource.clip = levelManager.GetBackgroundMusic(); // play background music
+        PlayBackgroundMusic(levelManager.GetBackgroundMusic()); // play background music
+
+    }
+
+    private void PlayBackgroundMusic(AudioClip backgroundMusic) {
+
+        musicSource.clip = backgroundMusic;
         musicSource.Play();
 
     }

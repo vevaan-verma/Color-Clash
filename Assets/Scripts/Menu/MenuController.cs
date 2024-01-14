@@ -1,6 +1,4 @@
 using DG.Tweening;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,9 +11,15 @@ public class MenuController : MonoBehaviour {
     [Header("Menu")]
     [SerializeField] private CanvasGroup menuScreen;
     [SerializeField] private float menuScreenFadeDuration;
+    [SerializeField] private RectTransform menuButtonsLayout;
     [SerializeField] private Button playButton;
     [SerializeField] private Button instructionsButton;
     [SerializeField] private Button quitButton;
+
+    [Header("Instructions")]
+    [SerializeField] private CanvasGroup instructionsScreen;
+    [SerializeField] private float instructionsScreenFadeDuration;
+    [SerializeField] private Button instructionsCloseButton;
 
     [Header("Loading")]
     [SerializeField] private CanvasGroup loadingScreen;
@@ -30,15 +34,26 @@ public class MenuController : MonoBehaviour {
 
         // menu
         playButton.onClick.AddListener(Play);
+        instructionsButton.onClick.AddListener(ShowInstructions);
         quitButton.onClick.AddListener(Quit);
 
         menuScreen.alpha = 0f; // reset alpha for fade
         menuScreen.gameObject.SetActive(true);
         menuScreen.DOFade(1f, menuScreenFadeDuration).SetEase(Ease.InCirc);
 
+        LayoutRebuilder.ForceRebuildLayoutImmediate(menuScreen.GetComponent<RectTransform>()); // rebuild menu screen layout
+        LayoutRebuilder.ForceRebuildLayoutImmediate(menuButtonsLayout); // rebuild menu buttons layout
+
+        // instructions
+        instructionsCloseButton.onClick.AddListener(HideInstructions);
+
+        instructionsScreen.gameObject.SetActive(false);
+        instructionsScreen.alpha = 0f;
+
         // loading
-        loadingScreen.alpha = 0f; // reset alpha for fade
-        loadingScreen.gameObject.SetActive(false);
+        loadingScreen.alpha = 1f; // reset alpha for fade
+        loadingScreen.gameObject.SetActive(true);
+        loadingScreen.DOFade(0f, loadingScreenFadeDuration).OnComplete(() => loadingScreen.gameObject.SetActive(false)); // disable loading screen on complete & reset loading text
 
     }
 
@@ -102,9 +117,35 @@ public class MenuController : MonoBehaviour {
     }
     */
 
+    private void ShowInstructions() {
+
+        menuScreen.gameObject.SetActive(false);
+        menuScreen.alpha = 0f; // reset alpha for fade
+
+        instructionsScreen.gameObject.SetActive(true);
+        instructionsScreen.DOFade(1f, instructionsScreenFadeDuration).SetEase(Ease.InCirc);
+
+    }
+
+    private void HideInstructions() {
+
+        instructionsScreen.gameObject.SetActive(false);
+        instructionsScreen.alpha = 0f;
+
+        menuScreen.gameObject.SetActive(true);
+        menuScreen.DOFade(1f, menuScreenFadeDuration).SetEase(Ease.InCirc); // alpha was reset when instructions were shown
+
+    }
+
     private void Quit() {
 
         Application.Quit();
+
+    }
+
+    public void SetLoadingText(string text) {
+
+        loadingText.text = text;
 
     }
 }

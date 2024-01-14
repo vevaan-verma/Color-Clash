@@ -7,6 +7,7 @@ public class Claimable : MonoBehaviour {
 
     [Header("References")]
     private PlayerHealthManager healthManager;
+    private LevelManager levelManager;
     private SpriteRenderer spriteRenderer;
     private Color startColor;
 
@@ -27,6 +28,7 @@ public class Claimable : MonoBehaviour {
     private void Start() {
 
         healthManager = FindObjectOfType<PlayerHealthManager>();
+        levelManager = FindObjectOfType<LevelManager>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         startColor = spriteRenderer.color;
@@ -43,6 +45,9 @@ public class Claimable : MonoBehaviour {
 
         PlayerClaim playerClaim = GetComponent<PlayerClaim>();
         PhantomClaim phantomClaim = GetComponent<PhantomClaim>();
+
+        // no claiming after level is cleared
+        if (levelManager.IsLevelCleared()) return;
 
         if ((entityType == EntityType.Player && ((playerClaim && playerClaim.GetEffectType() == effectType) || playerColorCoroutine != null || healthManager.IsDead())) || (entityType == EntityType.Enemy && (phantomClaim || phantomColorCoroutine != null))) // already claimed by entity (player done this way to make sure if effect types are different, they are still replaced)
             return;
@@ -111,6 +116,9 @@ public class Claimable : MonoBehaviour {
     }
 
     public void OnClaimDestroy(EntityClaim entityClaim) {
+
+        // no resetting after level is cleared
+        if (levelManager.IsLevelCleared()) return;
 
         if (quitting || playerColorCoroutine != null || phantomColorCoroutine != null) return;
 

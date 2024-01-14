@@ -11,7 +11,8 @@ public class LevelManager : MonoBehaviour {
 
     [Header("Constant Prefabs")]
     [SerializeField] private PlayerController playerPrefab;
-    [SerializeField] private AudioManager audioManagerPrefab;
+    [SerializeField] private GameManager gameManagerPrefab;
+    [SerializeField] private LevelAudioManager audioManagerPrefab;
 
     [Header("Level")]
     [SerializeField] private Level level;
@@ -37,7 +38,13 @@ public class LevelManager : MonoBehaviour {
         foreach (Claimable claimable in FindObjectsOfType<Claimable>())
             levelClaimables.Add(claimable);
 
-        Instantiate(audioManagerPrefab).Initialize();
+        // destroy all game managers
+        foreach (GameManager gameManager in FindObjectsOfType<GameManager>())
+            Destroy(gameManager.gameObject);
+
+        Instantiate(gameManagerPrefab); // instantiate game manager
+
+        Instantiate(audioManagerPrefab).Initialize(); // instantiate audio manager
 
         SpawnPlayer();
 
@@ -149,5 +156,7 @@ public class LevelManager : MonoBehaviour {
     public List<PlayerClaim> GetPlayerClaims() { return playerClaims; }
 
     public List<PhantomClaim> GetEnemyClaims() { return enemyClaims; }
+
+    public bool IsLevelCleared() { return levelCleared; }
 
 }
