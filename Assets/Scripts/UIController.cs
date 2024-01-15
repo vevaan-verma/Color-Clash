@@ -1,19 +1,24 @@
 using DG.Tweening;
 using DG.Tweening.Core.Easing;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
 
     [Header("References")]
-    private PlayerHealthManager healthManager;
     private PlayerClaimManager claimManager;
+    private PlayerController playerController;
     private PlayerGunManager gunManager;
+    private PlayerHealthManager healthManager;
     private GameManager gameManager;
+    private LevelManager levelManager;
+    private CodeManager codeManager;
 
     [Header("HUD")]
     [SerializeField] private CanvasGroup playerHUD;
@@ -23,6 +28,13 @@ public class UIController : MonoBehaviour {
     [SerializeField] private Transform claimableInfoParent;
     [SerializeField] private ClaimableInfo claimableInfoPrefab;
     private List<ClaimableInfo> claimableInfos;
+
+    [Header("Code")]
+    [SerializeField] private CanvasGroup codeHUD;
+    [SerializeField] private float codeHUDFadeDuration;
+    [SerializeField] private TMP_InputField codeInput;
+    [SerializeField] private Button codeHUDCloseButton;
+    private VaultController vaultController;
 
     [Header("Health")]
     [SerializeField] private Slider healthSlider;
@@ -50,16 +62,18 @@ public class UIController : MonoBehaviour {
     [SerializeField] private CanvasGroup levelClearedScreen;
     [SerializeField] private RectTransform buttonsLayout;
     [SerializeField] private float levelClearedFadeDuration;
-    [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button replayButton;
+    [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button nextLevelButton;
 
     private void Awake() {
 
-        gunManager = FindObjectOfType<PlayerGunManager>();
         claimManager = FindObjectOfType<PlayerClaimManager>();
+        playerController = FindObjectOfType<PlayerController>();
+        gunManager = FindObjectOfType<PlayerGunManager>();
         healthManager = FindObjectOfType<PlayerHealthManager>();
         gameManager = FindObjectOfType<GameManager>();
+        levelManager = FindObjectOfType<LevelManager>();
 
         // player HUD
         playerHUD.alpha = 0f; // reset alpha for fade
@@ -84,6 +98,21 @@ public class UIController : MonoBehaviour {
 
         }
 
+        // code
+        if (levelManager.LevelHasCode()) { // make sure level has code to avoid null errors
+
+            codeManager = FindObjectOfType<CodeManager>();
+            vaultController = FindObjectOfType<VaultController>();
+
+            codeHUDCloseButton.onClick.AddListener(CloseCodeHUD);
+
+            codeHUD.gameObject.SetActive(false);
+            codeHUD.alpha = 0f;
+
+        }
+
+        codeInput.onValueChanged.AddListener(InputChanged);
+
         // loading
         loadingScreen.alpha = 1f; // reset alpha for fade
         loadingScreen.gameObject.SetActive(true);
@@ -93,8 +122,8 @@ public class UIController : MonoBehaviour {
         levelClearedScreen.gameObject.SetActive(false);
         levelClearedScreen.alpha = 0f;
 
-        mainMenuButton.onClick.AddListener(LoadMainMenu);
         replayButton.onClick.AddListener(ReplayLevel);
+        mainMenuButton.onClick.AddListener(LoadMainMenu);
 
     }
 
@@ -105,6 +134,34 @@ public class UIController : MonoBehaviour {
         foreach (ClaimableInfo info in claimableInfos)
             info.UpdateInfo(claimables[info.GetColor()]); // update info
 
+    }
+
+    public void OpenCodeHUD() {
+
+        playerController.SetHasControl(false); // disable player controls
+        codeHUD.gameObject.SetActive(true);
+        codeHUD.DOFade(1f, codeHUDFadeDuration); // disable loading screen on complete & reset loading text
+        codeInput.text = ""; // clear input
+        codeInput.ActivateInputField(); // select input field
+
+    }
+
+    public void CloseCodeHUD() {
+
+        codeHUD.gameObject.SetActive(true);
+        codeHUD.DOFade(0f, codeHUDFadeDuration).OnComplete(() => codeHUD.gameObject.SetActive(false)); // disable loading screen on complete & reset loading text
+        playerController.SetHasControl(true); // enable player controls
+
+    }
+
+    private void InputChanged(string input) {
+
+        if (codeManager.CheckCode(input)) {
+
+            vaultController.Open();
+            CloseCodeHUD();
+
+        }
     }
 
     public void UpdateHealth() {
@@ -185,6 +242,16 @@ public class UIController : MonoBehaviour {
 
     }
 
+    private void ReplayLevel() {
+
+        levelClearedScreen.gameObject.SetActive(false);
+        loadingScreen.gameObject.SetActive(true);
+        loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishLevelLoad());
+        //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
+        gameManager.StartLoadLevelAsync(-1); // pass -1 to reload level
+
+    }
+
     private void LoadMainMenu() {
 
         levelClearedScreen.gameObject.SetActive(false);
@@ -199,16 +266,6 @@ public class UIController : MonoBehaviour {
 
         //StopCoroutine(loadingTextCoroutine); // IMPORTANT TO PREVENT COROUTINE FROM CYCLING INFINITELY
         gameManager.FinishMainMenuLoad();
-
-    }
-
-    private void ReplayLevel() {
-
-        levelClearedScreen.gameObject.SetActive(false);
-        loadingScreen.gameObject.SetActive(true);
-        loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishLevelLoad());
-        //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
-        gameManager.StartLoadLevelAsync(-1); // pass -1 to reload level
 
     }
 

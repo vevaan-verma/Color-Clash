@@ -451,10 +451,10 @@ MonoBehaviour:
     effectType: 0
   - spriteColor: {r: 0, g: 0.6, b: 0.8627451, a: 1}
     claimColor: {r: 0.41037738, g: 0.81909305, b: 1, a: 1}
-    effectType: 2
+    effectType: 1
   - spriteColor: {r: 0.023529412, g: 0.8627451, b: 0, a: 1}
     claimColor: {r: 0.463029, g: 1, b: 0.4481132, a: 1}
-    effectType: 1
+    effectType: 2
   colorCycleCooldown: 0
   colorSwitchKey: 306
 --- !u!114 &5242082214896361896
@@ -472,9 +472,9 @@ MonoBehaviour:
   effectValues:
   - effectType: 0
     effectMultiplier: 1
-  - effectType: 2
-    effectMultiplier: 3
   - effectType: 1
+    effectMultiplier: 3
+  - effectType: 2
     effectMultiplier: 8
 --- !u!114 &5938639835511817533
 MonoBehaviour:

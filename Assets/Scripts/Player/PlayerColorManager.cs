@@ -5,6 +5,9 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController))]
 public class PlayerColorManager : MonoBehaviour {
 
+    [Header("References")]
+    private PlayerController playerController;
+
     [Header("Color Cycling")]
     [SerializeField] private PlayerColor[] playerColors;
     [SerializeField] private float colorCycleCooldown;
@@ -17,6 +20,7 @@ public class PlayerColorManager : MonoBehaviour {
 
     private void Start() {
 
+        playerController = GetComponent<PlayerController>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         currColorIndex = 0;
@@ -27,6 +31,8 @@ public class PlayerColorManager : MonoBehaviour {
     }
 
     private void Update() {
+
+        if (!playerController.HasControl()) return; // don't let player do anything if they don't have control
 
         // color switching
         if (Input.GetKeyDown(colorSwitchKey))

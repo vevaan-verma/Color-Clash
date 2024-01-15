@@ -1,6 +1,8 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour {
 
@@ -158,5 +160,7 @@ public class LevelManager : MonoBehaviour {
     public List<PhantomClaim> GetEnemyClaims() { return enemyClaims; }
 
     public bool IsLevelCleared() { return levelCleared; }
+
+    public bool LevelHasCode() { return level.HasCode(); }
 
 }

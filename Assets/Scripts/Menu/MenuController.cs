@@ -7,6 +7,7 @@ public class MenuController : MonoBehaviour {
 
     [Header("References")]
     private GameManager gameManager;
+    private MenuManager menuManager;
 
     [Header("Menu")]
     [SerializeField] private CanvasGroup menuScreen;
@@ -31,6 +32,7 @@ public class MenuController : MonoBehaviour {
     private void Start() {
 
         gameManager = FindObjectOfType<GameManager>();
+        menuManager = FindObjectOfType<MenuManager>();
 
         // menu
         playButton.onClick.AddListener(Play);
@@ -51,10 +53,13 @@ public class MenuController : MonoBehaviour {
         instructionsScreen.alpha = 0f;
 
         // loading
-        loadingScreen.alpha = 1f; // reset alpha for fade
-        loadingScreen.gameObject.SetActive(true);
-        loadingScreen.DOFade(0f, loadingScreenFadeDuration).OnComplete(() => loadingScreen.gameObject.SetActive(false)); // disable loading screen on complete & reset loading text
+        if (!menuManager.IsFirstLoadCompleted()) { // don't fade in loading screen on first load
 
+            loadingScreen.alpha = 1f; // reset alpha for fade
+            loadingScreen.gameObject.SetActive(true);
+            loadingScreen.DOFade(0f, loadingScreenFadeDuration).OnComplete(() => loadingScreen.gameObject.SetActive(false)); // disable loading screen on complete & reset loading text
+
+        }
     }
 
     private void Play() {

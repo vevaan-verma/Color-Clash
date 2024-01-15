@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour {
     private Animator animator;
     private Rigidbody2D rb;
 
+    [Header("Control")]
+    private bool hasControl;
+
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
     private float horizontalInput;
@@ -43,6 +46,8 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody2D>();
 
         isFacingRight = true;
+
+        hasControl = true;
 
     }
 
@@ -96,5 +101,9 @@ public class PlayerController : MonoBehaviour {
     public Transform GetRightFoot() { return rightFoot; }
 
     public LayerMask GetEnvironmentMask() { return environmentMask; }
+
+    public bool HasControl() { return hasControl; }
+
+    public void SetHasControl(bool hasControl) { this.hasControl = hasControl; }
 
 }

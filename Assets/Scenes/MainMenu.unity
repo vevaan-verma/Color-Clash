@@ -986,6 +986,7 @@ MonoBehaviour:
   text: {fileID: 1265051949}
   hoverColor: {r: 1, g: 1, b: 1, a: 1}
   hoverFadeDuration: 0.5
+  hasOverlays: 0
 --- !u!1 &705791130
 GameObject:
   m_ObjectHideFlags: 0
@@ -1481,6 +1482,7 @@ MonoBehaviour:
   text: {fileID: 983982348}
   hoverColor: {r: 1, g: 1, b: 1, a: 1}
   hoverFadeDuration: 0.5
+  hasOverlays: 1
 --- !u!1 &975279422
 GameObject:
   m_ObjectHideFlags: 0
@@ -1975,6 +1977,7 @@ MonoBehaviour:
   text: {fileID: 2111143747}
   hoverColor: {r: 1, g: 1, b: 1, a: 1}
   hoverFadeDuration: 0.5
+  hasOverlays: 1
 --- !u!1 &1197863530
 GameObject:
   m_ObjectHideFlags: 0
@@ -3216,6 +3219,7 @@ MonoBehaviour:
   text: {fileID: 1867982543}
   hoverColor: {r: 1, g: 1, b: 1, a: 1}
   hoverFadeDuration: 0.5
+  hasOverlays: 1
 --- !u!1 &2111143744
 GameObject:
   m_ObjectHideFlags: 0

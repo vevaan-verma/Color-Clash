@@ -7,6 +7,7 @@ public class HoverButton : CustomButton {
     [Header("Animations")]
     [SerializeField] protected Color hoverColor;
     [SerializeField] protected float hoverFadeDuration;
+    [SerializeField][Tooltip("check if other screens/HUDs fade over it")] private bool hasOverlays;
     protected Color startColor;
 
     private void Start() {
@@ -17,8 +18,9 @@ public class HoverButton : CustomButton {
 
     private void OnDisable() {
 
-        // remove hover effects
-        text.DOColor(startColor, hoverFadeDuration);
+        // remove hover effects if this has overlays
+        if (hasOverlays)
+            text.DOColor(startColor, hoverFadeDuration);
 
     }
 

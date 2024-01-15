@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class MenuManager : MonoBehaviour {
 
+    [Header("Loading")]
+    private static bool firstLoadCompleted;
+
     [Header("Constant Prefabs")]
     [SerializeField] private GameManager gameManagerPrefab;
     [SerializeField] private MenuAudioManager audioManagerPrefab;
@@ -11,7 +14,7 @@ public class MenuManager : MonoBehaviour {
     [Header("Music")]
     [SerializeField] private AudioClip backgroundMusic;
 
-    private void Start() {
+    private void Awake() {
 
         // destroy all game managers
         foreach (GameManager gameManager in FindObjectsOfType<GameManager>())
@@ -22,6 +25,15 @@ public class MenuManager : MonoBehaviour {
         Instantiate(audioManagerPrefab).Initialize(); // instantiate audio manager
 
     }
+
+    [RuntimeInitializeOnLoadMethod]
+    private static void OnFirstLoad() { // only gets called on first load of game
+
+        firstLoadCompleted = true;
+
+    }
+
+    public bool IsFirstLoadCompleted() { return firstLoadCompleted; }
 
     public AudioClip GetBackgroundMusic() { return backgroundMusic; }
 

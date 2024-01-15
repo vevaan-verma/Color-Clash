@@ -10,7 +10,6 @@ public class PlayerClaimManager : MonoBehaviour {
     private PlayerController playerController;
     private PlayerColorManager colorManager;
     private PlayerEffectManager effectManager;
-    private UIController uiController;
 
     [Header("Claims")]
     [SerializeField] private float claimCheckRadius;
@@ -21,7 +20,6 @@ public class PlayerClaimManager : MonoBehaviour {
         playerController = GetComponent<PlayerController>();
         colorManager = GetComponent<PlayerColorManager>();
         effectManager = GetComponent<PlayerEffectManager>();
-        uiController = FindObjectOfType<UIController>();
 
         // claimable info
         claims = new Dictionary<Color, int>();
@@ -49,7 +47,6 @@ public class PlayerClaimManager : MonoBehaviour {
 
         claims[claimColor]++; // add claimable
         effectManager.AddEffectMultiplier(effectType, addedMultiplier); // add effect multiplier to previous multiplier
-        uiController.UpdateClaimablesHUD(); // update ui
 
     }
 
@@ -57,7 +54,6 @@ public class PlayerClaimManager : MonoBehaviour {
 
         claims[claimColor]--; // remove claimable
         effectManager.RemoveEffectMultiplier(effectType, addedMultiplier); // remove effect multiplier from previous multiplier
-        uiController.UpdateClaimablesHUD(); // update ui
 
     }
 

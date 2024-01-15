@@ -6,11 +6,16 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController))]
 public class PlayerEffectManager : MonoBehaviour {
 
+    [Header("References")]
+    private UIController uiController;
+
     [Header("Effects")]
     [SerializeField] private List<EffectValue> effectValues;
     private Dictionary<EffectType, float> effectMultipliers;
 
     private void Start() {
+
+        uiController = FindObjectOfType<UIController>();
 
         // effects
         effectMultipliers = new Dictionary<EffectType, float>();
@@ -45,12 +50,14 @@ public class PlayerEffectManager : MonoBehaviour {
     public void AddEffectMultiplier(EffectType effectType, float multiplier) {
 
         effectMultipliers[effectType] += multiplier;
+        uiController.UpdateClaimablesHUD(); // update ui
 
     }
 
     public void RemoveEffectMultiplier(EffectType effectType, float multiplier) {
 
         effectMultipliers[effectType] -= multiplier;
+        uiController.UpdateClaimablesHUD(); // update ui
 
     }
 

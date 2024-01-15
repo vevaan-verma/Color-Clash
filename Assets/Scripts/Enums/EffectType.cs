@@ -1,5 +1,5 @@
 public enum EffectType {
 
-    Damage, Regeneration, Defense
+    Damage, Defense, Regeneration
 
 }

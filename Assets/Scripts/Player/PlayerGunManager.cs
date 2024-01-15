@@ -7,6 +7,7 @@ public class PlayerGunManager : MonoBehaviour {
 
     [Header("References")]
     private PlayerColorManager colorManager;
+    private PlayerController playerController;
     private PlayerEffectManager effectManager;
     private new Collider2D collider;
     private UIController uiController;
@@ -24,6 +25,7 @@ public class PlayerGunManager : MonoBehaviour {
     private void Start() {
 
         colorManager = GetComponent<PlayerColorManager>();
+        playerController = GetComponent<PlayerController>();
         effectManager = GetComponent<PlayerEffectManager>();
         collider = GetComponent<Collider2D>();
         uiController = FindObjectOfType<UIController>();
@@ -40,6 +42,8 @@ public class PlayerGunManager : MonoBehaviour {
     }
 
     private void Update() {
+
+        if (!playerController.HasControl()) return; // don't let player do anything if they don't have control
 
         // shooting
         if (Input.GetMouseButton(0)) {
