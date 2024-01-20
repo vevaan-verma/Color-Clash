@@ -124,6 +124,7 @@ public class UIController : MonoBehaviour {
 
         replayButton.onClick.AddListener(ReplayLevel);
         mainMenuButton.onClick.AddListener(LoadMainMenu);
+        nextLevelButton.onClick.AddListener(LoadNextLevel);
 
     }
 
@@ -235,6 +236,7 @@ public class UIController : MonoBehaviour {
 
     public void OnLevelCleared() {
 
+        playerController.SetHasControl(false); // disable player control
         levelClearedScreen.gameObject.SetActive(true);
         levelClearedScreen.DOFade(1f, levelClearedFadeDuration);
         LayoutRebuilder.ForceRebuildLayoutImmediate(levelClearedScreen.GetComponent<RectTransform>()); // rebuild level cleared screen layout
@@ -317,6 +319,18 @@ public class UIController : MonoBehaviour {
         }
     }
     */
+
+    private void LoadNextLevel() {
+
+        if (gameManager.StartLoadLevelAsync(levelManager.GetLevelSceneBuildIndex())) { // make sure level loads
+
+            levelClearedScreen.gameObject.SetActive(false);
+            loadingScreen.gameObject.SetActive(true);
+            loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishLevelLoad());
+            //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
+
+        }
+    }
 
     public void SetLoadingText(string text) {
 

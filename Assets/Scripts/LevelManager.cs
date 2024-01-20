@@ -1,15 +1,12 @@
 using DG.Tweening;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour {
 
     [Header("References")]
-    private UIController uiController;
     private PlayerClaimManager claimManager;
-    private CameraFollow cameraFollow;
+    private CameraController cameraFollow;
 
     [Header("Constant Prefabs")]
     [SerializeField] private PlayerController playerPrefab;
@@ -26,13 +23,12 @@ public class LevelManager : MonoBehaviour {
     private List<Claimable> levelClaimables;
     private List<PlayerClaim> playerClaims;
     private List<PhantomClaim> enemyClaims;
+    private int levelCurrClaimables; // for teleporter
 
-    [Header("Level Clear")]
-    private bool levelCleared;
+    [Header("Teleporter")]
+    [SerializeField] private Teleporter teleporter;
 
     private void Awake() {
-
-        uiController = FindObjectOfType<UIController>();
 
         // add all claimables to list
         levelClaimables = new List<Claimable>();
@@ -45,11 +41,12 @@ public class LevelManager : MonoBehaviour {
             Destroy(gameManager.gameObject);
 
         Instantiate(gameManagerPrefab); // instantiate game manager
-
         Instantiate(audioManagerPrefab).Initialize(); // instantiate audio manager
 
+        // spawns
         SpawnPlayer();
 
+        // claims
         claimManager = FindObjectOfType<PlayerClaimManager>();
         claimManager.transform.position = playerSpawn.position;
 
@@ -70,7 +67,7 @@ public class LevelManager : MonoBehaviour {
         foreach (PlayerController obj in FindObjectsOfType<PlayerController>())
             Destroy(obj.gameObject);
 
-        cameraFollow = FindObjectOfType<CameraFollow>(); // IMPORTANT: SET THIS AFTER PLAYERS ARE DESTROYED
+        cameraFollow = FindObjectOfType<CameraController>(); // IMPORTANT: SET THIS AFTER PLAYERS ARE DESTROYED
         cameraFollow.SetTarget(Instantiate(playerPrefab, playerSpawn.position + new Vector3(0f, playerPrefab.transform.localScale.y / 2f, 0f), Quaternion.identity).transform); // spawn player
 
     }
@@ -93,7 +90,14 @@ public class LevelManager : MonoBehaviour {
             PlayerClaim playerClaim = (PlayerClaim) claim;
             playerClaims.Add(playerClaim);
             claimManager.AddClaimable(playerClaim.GetColor(), playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
+            levelCurrClaimables++;
+
+            /* FOR ENDING GAME WHEN EVERYTHING IS CLAIMED
             CheckLevelClear(); // check if player has claimed all platforms
+            */
+
+            if (level.HasTeleporter() && levelClaimables.Contains(playerClaim.GetClaimable())) // to track how many required claims player has for teleporter
+                teleporter.UpdateTeleporter();
 
         } else if (claim is PhantomClaim) {
 
@@ -109,6 +113,10 @@ public class LevelManager : MonoBehaviour {
             PlayerClaim playerClaim = (PlayerClaim) claim;
             playerClaims.Remove(playerClaim);
             claimManager.RemoveClaimable(playerClaim.GetColor(), playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
+            levelCurrClaimables--;
+
+            if (level.HasTeleporter() && levelClaimables.Contains(playerClaim.GetClaimable())) // to track how many required claims player has for teleporter
+                teleporter.UpdateTeleporter();
 
         } else if (claim is PhantomClaim) {
 
@@ -117,7 +125,7 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
-    private bool CheckLevelClear() {
+    public bool IsLevelCleared() {
 
         // make sure player has all claimables claimed
         bool found;
@@ -145,11 +153,11 @@ public class LevelManager : MonoBehaviour {
         if (FindObjectsOfType<PhantomController>().Length != 0)
             return false;
 
-        levelCleared = true;
-        uiController.OnLevelCleared();
         return true;
 
     }
+
+    public int GetLevelSceneBuildIndex() { return level.GetSceneBuildIndex(); }
 
     public Vector3 GetPlayerSpawn() { return playerSpawn.position; }
 
@@ -159,7 +167,9 @@ public class LevelManager : MonoBehaviour {
 
     public List<PhantomClaim> GetEnemyClaims() { return enemyClaims; }
 
-    public bool IsLevelCleared() { return levelCleared; }
+    public int GetLevelTotalClaimables() { return levelClaimables.Count; }
+
+    public int GetLevelCurrentClaimables() { return levelCurrClaimables; }
 
     public bool LevelHasCode() { return level.HasCode(); }
 

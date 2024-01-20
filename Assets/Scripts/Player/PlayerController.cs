@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     [Header("References")]
+    private CameraController cameraController;
     private Animator animator;
     private Rigidbody2D rb;
 
@@ -32,6 +34,9 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float groundCheckRadius;
     private bool isGrounded;
 
+    [Header("Rotation")]
+    private bool isRotated;
+
     [Header("Keybinds")]
     [SerializeField] private KeyCode jumpKey;
 
@@ -42,6 +47,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Start() {
 
+        cameraController = FindObjectOfType<CameraController>();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
 
@@ -64,14 +70,14 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKey(jumpKey) && isGrounded)
             Jump();
 
-        if (Input.GetKeyUp(jumpKey) && rb.velocity.y > 0f) // if jump is let go in the air, player falls quicker
+        if (Input.GetKeyUp(jumpKey) && (isRotated ? -1f : 1f) * rb.velocity.y > 0f) // if jump is let go in the air, player falls quicker, adjust input based on rotation
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
 
     }
 
     private void FixedUpdate() {
 
-        rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
+        rb.velocity = new Vector2((isRotated ? -1f : 1f) * horizontalInput * moveSpeed, rb.velocity.y); // adjust input based on rotation
 
         if (horizontalInput != 0f && isGrounded) // player is moving on ground
             animator.SetBool("isRunning", true);
@@ -92,7 +98,28 @@ public class PlayerController : MonoBehaviour {
 
     private void Jump() {
 
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        rb.velocity = transform.up * new Vector2(rb.velocity.x, jumpForce); // multiply by transform.up to make sure jump is always up relative to player
+
+    }
+
+    public void FlipPlayer(float rotationDuration) {
+
+        if (isRotated)
+            transform.rotation = Quaternion.identity;
+        else
+            transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 180f);
+
+        cameraController.RotateCamera(rotationDuration, isRotated);
+        isRotated = !isRotated;
+
+    }
+
+    public void ResetPlayer() {
+
+        transform.rotation = Quaternion.identity;
+        cameraController.ResetCamera();
+        isRotated = false;
+        isFacingRight = true; // player will always start facing right
 
     }
 

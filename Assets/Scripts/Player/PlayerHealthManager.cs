@@ -9,8 +9,10 @@ public class PlayerHealthManager : MonoBehaviour {
     private PlayerColorManager colorManager;
     private PlayerEffectManager effectManager;
     private PlayerGunManager gunManager;
+    private GameManager gameManager;
     private LevelManager levelManager;
     private UIController uiController;
+    private PlayerController playerController;
     private Rigidbody2D rb;
 
     [Header("Health")]
@@ -28,16 +30,15 @@ public class PlayerHealthManager : MonoBehaviour {
     [Header("Respawn")]
     [SerializeField] private float respawnTime;
 
-    [Header("Quitting")]
-    private bool quitting;
-
     private void Start() {
 
         colorManager = GetComponent<PlayerColorManager>();
         effectManager = GetComponent<PlayerEffectManager>();
         gunManager = GetComponent<PlayerGunManager>();
+        gameManager = FindObjectOfType<GameManager>();
         levelManager = FindObjectOfType<LevelManager>();
         uiController = FindObjectOfType<UIController>();
+        playerController = FindObjectOfType<PlayerController>();
         rb = GetComponent<Rigidbody2D>();
 
         SetHealth(maxHealth); // set health
@@ -45,15 +46,9 @@ public class PlayerHealthManager : MonoBehaviour {
 
     }
 
-    private void OnApplicationQuit() {
-
-        quitting = true; // to prevent trigger exit death coroutine on quit
-
-    }
-
     private void OnTriggerExit2D(Collider2D collision) {
 
-        if (levelManager.IsLevelCleared() || quitting) return; // to prevent errors
+        if (gameManager.IsQuitting() || levelManager.IsLevelCleared()) return; // to prevent errors
 
         // player falls out of map
         if (collision.CompareTag("Map"))
@@ -83,6 +78,8 @@ public class PlayerHealthManager : MonoBehaviour {
         isDead = true;
 
         health = 0f;
+
+        playerController.ResetPlayer(); // reset player
 
         // clear all player claims
         List<PlayerClaim> playerClaims = levelManager.GetPlayerClaims();

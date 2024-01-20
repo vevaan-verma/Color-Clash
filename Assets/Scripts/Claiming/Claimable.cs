@@ -7,6 +7,7 @@ public class Claimable : MonoBehaviour {
 
     [Header("References")]
     private PlayerHealthManager healthManager;
+    private GameManager gameManager;
     private LevelManager levelManager;
     private SpriteRenderer spriteRenderer;
     private Color startColor;
@@ -22,22 +23,14 @@ public class Claimable : MonoBehaviour {
     private Coroutine phantomColorCoroutine;
     private Coroutine resetCoroutine;
 
-    [Header("Quitting")]
-    private bool quitting;
-
     private void Start() {
 
         healthManager = FindObjectOfType<PlayerHealthManager>();
+        gameManager = FindObjectOfType<GameManager>();
         levelManager = FindObjectOfType<LevelManager>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         startColor = spriteRenderer.color;
-
-    }
-
-    private void OnApplicationQuit() {
-
-        quitting = true;
 
     }
 
@@ -120,7 +113,7 @@ public class Claimable : MonoBehaviour {
         // no resetting after level is cleared
         if (levelManager.IsLevelCleared()) return;
 
-        if (quitting || playerColorCoroutine != null || phantomColorCoroutine != null) return;
+        if (gameManager.IsQuitting() || playerColorCoroutine != null || phantomColorCoroutine != null) return;
 
         // check if there is another entity claim on the claimable
         foreach (EntityClaim claim in GetComponents<EntityClaim>())

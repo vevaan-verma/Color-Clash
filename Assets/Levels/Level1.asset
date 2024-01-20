@@ -16,3 +16,15 @@ MonoBehaviour:
   sceneBuildIndex: 1
   backgroundMusic: {fileID: 8300000, guid: be5eb11bf472c5c45acd77e031371165, type: 3}
   hasCode: 1
+  hasTeleporter: 1
+  teleporterFills:
+  - {fileID: 1352033408, guid: 687eea672123bc9498afe9c68306229d, type: 3}
+  - {fileID: -2086948325, guid: 687eea672123bc9498afe9c68306229d, type: 3}
+  - {fileID: -148609925, guid: 687eea672123bc9498afe9c68306229d, type: 3}
+  - {fileID: 267042582, guid: 687eea672123bc9498afe9c68306229d, type: 3}
+  - {fileID: -1467179172, guid: 687eea672123bc9498afe9c68306229d, type: 3}
+  - {fileID: -930826238, guid: 687eea672123bc9498afe9c68306229d, type: 3}
+  - {fileID: -411368004, guid: 687eea672123bc9498afe9c68306229d, type: 3}
+  - {fileID: -1805424153, guid: 687eea672123bc9498afe9c68306229d, type: 3}
+  - {fileID: -965605804, guid: 687eea672123bc9498afe9c68306229d, type: 3}
+  - {fileID: -1202516359, guid: 687eea672123bc9498afe9c68306229d, type: 3}
