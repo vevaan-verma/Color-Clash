@@ -6,7 +6,7 @@ public class GravityFlipper : MonoBehaviour {
 
     [Header("References")]
     private PlayerController playerController;
-    private GameManager gameManager;
+    private GameCore gameCore;
 
     [Header("Rotation")]
     [SerializeField] private float rotationDuration;
@@ -16,7 +16,7 @@ public class GravityFlipper : MonoBehaviour {
     private void Start() {
 
         playerController = FindObjectOfType<PlayerController>();
-        gameManager = FindObjectOfType<GameManager>();
+        gameCore = FindObjectOfType<GameCore>();
 
         canRotate = true;
 
@@ -33,7 +33,7 @@ public class GravityFlipper : MonoBehaviour {
 
         if (!canRotate) return;
 
-        gameManager.FlipGravity();
+        gameCore.FlipGravity();
         playerController.FlipPlayer(rotationDuration);
         canRotate = false;
 

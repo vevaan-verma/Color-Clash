@@ -6,11 +6,11 @@ using UnityEngine;
 public class EntityClaim : MonoBehaviour {
 
     [Header("References")]
-    protected LevelManager levelManager;
+    protected GameManager gameManager;
 
     private void Awake() {
 
-        levelManager = FindObjectOfType<LevelManager>();
+        gameManager = FindObjectOfType<GameManager>();
 
     }
 }

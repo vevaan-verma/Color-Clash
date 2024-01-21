@@ -6,7 +6,7 @@ public class LevelAudioManager : MonoBehaviour {
     [SerializeField] private AudioSource musicSource;
     [SerializeField] private AudioSource footstepSource;
     [SerializeField] private AudioSource soundEffectSource;
-    private LevelManager levelManager;
+    private GameManager gameManager;
 
     [Header("Audio Clips")]
     [SerializeField] private AudioClip footstepSound;
@@ -16,11 +16,11 @@ public class LevelAudioManager : MonoBehaviour {
     // start function
     public void Initialize() {
 
-        levelManager = FindObjectOfType<LevelManager>();
+        gameManager = FindObjectOfType<GameManager>();
 
         musicSource.loop = true;
 
-        PlayBackgroundMusic(levelManager.GetBackgroundMusic()); // play background music
+        PlayBackgroundMusic(gameManager.GetBackgroundMusic()); // play background music
 
     }
 

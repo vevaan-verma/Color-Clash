@@ -1,89 +1,17 @@
 using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class LevelManager : MonoBehaviour {
+public class LevelManager : GameManager {
 
-    [Header("References")]
-    private PlayerClaimManager claimManager;
-    private CameraController cameraFollow;
+    protected override void Initialize() {
 
-    [Header("Constant Prefabs")]
-    [SerializeField] private PlayerController playerPrefab;
-    [SerializeField] private GameManager gameManagerPrefab;
-    [SerializeField] private LevelAudioManager audioManagerPrefab;
-
-    [Header("Level")]
-    [SerializeField] private Level level;
-
-    [Header("Spawns")]
-    [SerializeField] private Transform playerSpawn;
-
-    [Header("Claims")]
-    private List<Claimable> levelClaimables;
-    private List<PlayerClaim> playerClaims;
-    private List<PhantomClaim> enemyClaims;
-    private int levelCurrClaimables; // for teleporter
-
-    [Header("Teleporter")]
-    [SerializeField] private Teleporter teleporter;
-
-    private void Awake() {
-
-        // add all claimables to list
-        levelClaimables = new List<Claimable>();
-
-        foreach (Claimable claimable in FindObjectsOfType<Claimable>())
-            levelClaimables.Add(claimable);
-
-        // destroy all game managers
-        foreach (GameManager gameManager in FindObjectsOfType<GameManager>())
-            Destroy(gameManager.gameObject);
-
-        Instantiate(gameManagerPrefab); // instantiate game manager
-        Instantiate(audioManagerPrefab).Initialize(); // instantiate audio manager
-
-        // spawns
-        SpawnPlayer();
-
-        // claims
-        claimManager = FindObjectOfType<PlayerClaimManager>();
-        claimManager.transform.position = playerSpawn.position;
-
-        playerClaims = new List<PlayerClaim>();
-        enemyClaims = new List<PhantomClaim>();
+        playerController.EnableAllMechanics(); // enable all player controls
 
     }
 
-    private void Start() {
-
-        SpawnEnemies(); // to allow enemy spawn class to run awake method first
-
-    }
-
-    private void SpawnPlayer() {
-
-        // destroy existing players in scene
-        foreach (PlayerController obj in FindObjectsOfType<PlayerController>())
-            Destroy(obj.gameObject);
-
-        cameraFollow = FindObjectOfType<CameraController>(); // IMPORTANT: SET THIS AFTER PLAYERS ARE DESTROYED
-        cameraFollow.SetTarget(Instantiate(playerPrefab, playerSpawn.position + new Vector3(0f, playerPrefab.transform.localScale.y / 2f, 0f), Quaternion.identity).transform); // spawn player
-
-    }
-
-    private void SpawnEnemies() {
-
-        // destroy existing enemies in scene
-        foreach (PhantomController obj in FindObjectsOfType<PhantomController>())
-            Destroy(obj.gameObject);
-
-        foreach (PhantomSpawn enemySpawn in FindObjectsOfType<PhantomSpawn>())
-            enemySpawn.SpawnEnemy(); // spawn enemy
-
-    }
-
-    public void AddClaim(EntityClaim claim) {
+    public override void AddClaim(EntityClaim claim) {
 
         if (claim is PlayerClaim) {
 
@@ -96,7 +24,8 @@ public class LevelManager : MonoBehaviour {
             CheckLevelClear(); // check if player has claimed all platforms
             */
 
-            if (level.HasTeleporter() && levelClaimables.Contains(playerClaim.GetClaimable())) // to track how many required claims player has for teleporter
+            // update teleporter because some track claimables
+            if (level.HasTeleporter() && levelClaimables.Contains(playerClaim.GetClaimable()))
                 teleporter.UpdateTeleporter();
 
         } else if (claim is PhantomClaim) {
@@ -106,7 +35,7 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
-    public void RemoveClaim(EntityClaim claim) {
+    public override void RemoveClaim(EntityClaim claim) {
 
         if (claim is PlayerClaim) {
 
@@ -115,7 +44,8 @@ public class LevelManager : MonoBehaviour {
             claimManager.RemoveClaimable(playerClaim.GetColor(), playerClaim.GetEffectType(), playerClaim.GetMultiplierAddition());
             levelCurrClaimables--;
 
-            if (level.HasTeleporter() && levelClaimables.Contains(playerClaim.GetClaimable())) // to track how many required claims player has for teleporter
+            // update teleporter because some track claimables
+            if (level.HasTeleporter() && levelClaimables.Contains(playerClaim.GetClaimable()))
                 teleporter.UpdateTeleporter();
 
         } else if (claim is PhantomClaim) {
@@ -125,7 +55,7 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
-    public bool IsLevelCleared() {
+    public override bool IsLevelCleared() {
 
         // make sure player has all claimables claimed
         bool found;
@@ -156,21 +86,4 @@ public class LevelManager : MonoBehaviour {
         return true;
 
     }
-
-    public int GetLevelSceneBuildIndex() { return level.GetSceneBuildIndex(); }
-
-    public Vector3 GetPlayerSpawn() { return playerSpawn.position; }
-
-    public AudioClip GetBackgroundMusic() { return level.GetBackgroundMusic(); }
-
-    public List<PlayerClaim> GetPlayerClaims() { return playerClaims; }
-
-    public List<PhantomClaim> GetEnemyClaims() { return enemyClaims; }
-
-    public int GetLevelTotalClaimables() { return levelClaimables.Count; }
-
-    public int GetLevelCurrentClaimables() { return levelCurrClaimables; }
-
-    public bool LevelHasCode() { return level.HasCode(); }
-
 }

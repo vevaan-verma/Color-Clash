@@ -9,8 +9,8 @@ public class PlayerHealthManager : MonoBehaviour {
     private PlayerColorManager colorManager;
     private PlayerEffectManager effectManager;
     private PlayerGunManager gunManager;
+    private GameCore gameCore;
     private GameManager gameManager;
-    private LevelManager levelManager;
     private UIController uiController;
     private PlayerController playerController;
     private Rigidbody2D rb;
@@ -35,8 +35,8 @@ public class PlayerHealthManager : MonoBehaviour {
         colorManager = GetComponent<PlayerColorManager>();
         effectManager = GetComponent<PlayerEffectManager>();
         gunManager = GetComponent<PlayerGunManager>();
+        gameCore = FindObjectOfType<GameCore>();
         gameManager = FindObjectOfType<GameManager>();
-        levelManager = FindObjectOfType<LevelManager>();
         uiController = FindObjectOfType<UIController>();
         playerController = FindObjectOfType<PlayerController>();
         rb = GetComponent<Rigidbody2D>();
@@ -48,7 +48,7 @@ public class PlayerHealthManager : MonoBehaviour {
 
     private void OnTriggerExit2D(Collider2D collision) {
 
-        if (gameManager.IsQuitting() || levelManager.IsLevelCleared()) return; // to prevent errors
+        if (gameCore.IsQuitting()) return; // to prevent errors
 
         // player falls out of map
         if (collision.CompareTag("Map"))
@@ -79,10 +79,10 @@ public class PlayerHealthManager : MonoBehaviour {
 
         health = 0f;
 
-        playerController.ResetPlayer(); // reset player
+        playerController.ResetPlayer(); // reset player & camera (mainly for if player is rotated)
 
         // clear all player claims
-        List<PlayerClaim> playerClaims = levelManager.GetPlayerClaims();
+        List<PlayerClaim> playerClaims = gameManager.GetPlayerClaims();
 
         foreach (PlayerClaim claim in playerClaims)
             Destroy(claim);
@@ -99,7 +99,7 @@ public class PlayerHealthManager : MonoBehaviour {
         yield return new WaitForSeconds(respawnTime);
 
         SetHealth(maxHealth); // restore health
-        transform.position = levelManager.GetPlayerSpawn(); // respawn at level spawn
+        transform.position = gameManager.GetPlayerSpawn(); // respawn at level spawn
         uiController.UpdateClaimablesHUD(); // update ui
 
         isDead = false;

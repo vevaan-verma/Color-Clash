@@ -8,7 +8,7 @@ public class MenuManager : MonoBehaviour {
     private static bool firstLoadCompleted;
 
     [Header("Constant Prefabs")]
-    [SerializeField] private GameManager gameManagerPrefab;
+    [SerializeField] private GameCore gameCorePrefab;
     [SerializeField] private MenuAudioManager audioManagerPrefab;
 
     [Header("Music")]
@@ -17,10 +17,10 @@ public class MenuManager : MonoBehaviour {
     private void Awake() {
 
         // destroy all game managers
-        foreach (GameManager gameManager in FindObjectsOfType<GameManager>())
-            Destroy(gameManager.gameObject);
+        foreach (GameCore gameCore in FindObjectsOfType<GameCore>())
+            Destroy(gameCore.gameObject);
 
-        Instantiate(gameManagerPrefab); // instantiate game manager
+        Instantiate(gameCorePrefab); // instantiate game manager
 
         Instantiate(audioManagerPrefab).Initialize(); // instantiate audio manager
 

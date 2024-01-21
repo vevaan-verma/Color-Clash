@@ -14,14 +14,14 @@ public class PlayerClaim : EntityClaim {
         this.claimColor = claimColor;
         this.effectType = effectType;
         this.multiplierAddition = GetComponent<Claimable>().GetMultiplierAddition();
-        levelManager.AddClaim(this);
+        gameManager.AddClaim(this);
 
     }
 
     private void OnDestroy() {
 
         GetComponent<Claimable>().OnClaimDestroy(this); // trigger destroy event
-        levelManager.RemoveClaim(this); // remove claim
+        gameManager.RemoveClaim(this); // remove claim
 
     }
 

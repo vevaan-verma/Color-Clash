@@ -43,47 +43,48 @@ public class PlayerGunManager : MonoBehaviour {
 
     private void Update() {
 
-        if (!playerController.HasControl()) return; // don't let player do anything if they don't have control
+        if (playerController.IsMechanicEnabled(MechanicType.Guns)) {  // don't return if false to allow for more code to be added to this method later
 
-        // shooting
-        if (Input.GetMouseButton(0)) {
+            // shooting
+            if (Input.GetMouseButton(0)) {
 
-            StartCoroutine(guns[currGunIndex].Shoot(EntityType.Player, shootableMask, colorManager.GetCurrentPlayerColor().GetEffectType() == EffectType.Damage ? effectManager.GetEffectMultiplier(EffectType.Damage) : 1f)); // if player has the damage color equipped, add multiplier
-            uiController.UpdateGunHUD(guns[currGunIndex], currGunIndex);
+                StartCoroutine(guns[currGunIndex].Shoot(EntityType.Player, shootableMask, colorManager.GetCurrentPlayerColor().GetEffectType() == EffectType.Damage ? effectManager.GetEffectMultiplier(EffectType.Damage) : 1f)); // if player has the damage color equipped, add multiplier
+                uiController.UpdateGunHUD(guns[currGunIndex], currGunIndex);
+
+            }
+
+            // gun cycling
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+                CycleToGun(0);
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+                CycleToGun(1);
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+                CycleToGun(2);
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+                CycleToGun(3);
+            if (Input.GetKeyDown(KeyCode.Alpha5))
+                CycleToGun(4);
+            if (Input.GetKeyDown(KeyCode.Alpha6))
+                CycleToGun(5);
+            if (Input.GetKeyDown(KeyCode.Alpha7))
+                CycleToGun(6);
+            if (Input.GetKeyDown(KeyCode.Alpha8))
+                CycleToGun(7);
+            if (Input.GetKeyDown(KeyCode.Alpha9))
+                CycleToGun(8);
+
+            float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+
+            if (scrollInput > 0f)
+                CyclePreviousGun();
+            else if (scrollInput < 0f)
+                CycleNextGun();
+
+            // gun reloading
+            if (Input.GetKeyDown(reloadKey))
+                StartCoroutine(guns[currGunIndex].Reload());
 
         }
-
-        // gun cycling
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-            CycleToGun(0);
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-            CycleToGun(1);
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-            CycleToGun(2);
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-            CycleToGun(3);
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-            CycleToGun(4);
-        if (Input.GetKeyDown(KeyCode.Alpha6))
-            CycleToGun(5);
-        if (Input.GetKeyDown(KeyCode.Alpha7))
-            CycleToGun(6);
-        if (Input.GetKeyDown(KeyCode.Alpha8))
-            CycleToGun(7);
-        if (Input.GetKeyDown(KeyCode.Alpha9))
-            CycleToGun(8);
-
-        float scrollInput = Input.GetAxis("Mouse ScrollWheel");
-
-        if (scrollInput > 0f)
-            CyclePreviousGun();
-        else if (scrollInput < 0f)
-            CycleNextGun();
-
-        // gun reloading
-        if (Input.GetKeyDown(reloadKey))
-            StartCoroutine(guns[currGunIndex].Reload());
-
     }
 
     private void AddGun(Gun gun) {

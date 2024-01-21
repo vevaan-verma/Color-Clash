@@ -32,12 +32,13 @@ public class PlayerColorManager : MonoBehaviour {
 
     private void Update() {
 
-        if (!playerController.HasControl()) return; // don't let player do anything if they don't have control
+        if (playerController.IsMechanicEnabled(MechanicType.ColorCycling)) { // don't return if false to allow for more code to be added to this method later
 
-        // color switching
-        if (Input.GetKeyDown(colorSwitchKey))
-            CycleColor();
+            // color switching
+            if (Input.GetKeyDown(colorSwitchKey))
+                CycleColor();
 
+        }
     }
 
     private void CycleColor() {

@@ -7,13 +7,13 @@ using UnityEngine;
 public class CameraController : MonoBehaviour {
 
     [Header("References")]
-    private GameManager gameManager;
+    private GameCore gameCore;
     private new Camera camera;
 
     [Header("Follow")]
     [SerializeField] private float followSmoothing;
     private Transform target;
-    private Vector3 offset;
+    private float zOffset;
 
     [Header("Bounds")]
     [SerializeField] private BoxCollider2D mapBounds;
@@ -26,11 +26,11 @@ public class CameraController : MonoBehaviour {
 
     private void Start() {
 
-        gameManager = FindObjectOfType<GameManager>();
+        gameCore = FindObjectOfType<GameCore>();
         target = FindObjectOfType<PlayerController>().transform;
         camera = GetComponent<Camera>();
 
-        offset = transform.position - target.position;
+        zOffset = transform.position.z - target.position.z;
 
         xMin = mapBounds.bounds.min.x;
         yMin = mapBounds.bounds.min.y;
@@ -44,7 +44,7 @@ public class CameraController : MonoBehaviour {
 
     private void LateUpdate() {
 
-        transform.position = Vector3.Lerp(transform.position, new Vector3(Mathf.Clamp(target.position.x, xMin + camRatio, xMax - camRatio), Mathf.Clamp(target.position.y, yMin + camSize, yMax - camSize), 0f) + offset, followSmoothing * Time.deltaTime); // z value of vector3 should be zero because offset is being added after
+        transform.position = Vector3.Lerp(transform.position, new Vector3(Mathf.Clamp(target.position.x, xMin + camRatio, xMax - camRatio), Mathf.Clamp(target.position.y, yMin + camSize, yMax - camSize), zOffset), followSmoothing * Time.deltaTime); // z value of vector3 should be zero because offset is being added after
 
     }
 
@@ -60,7 +60,7 @@ public class CameraController : MonoBehaviour {
     public void ResetCamera() {
 
         rotationTweener.Kill();
-        gameManager.ResetGravity();
+        gameCore.ResetGravity();
         camera.transform.rotation = Quaternion.identity;
 
     }

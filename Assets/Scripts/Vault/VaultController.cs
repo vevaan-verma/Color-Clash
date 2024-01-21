@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VaultController : MonoBehaviour {
+public class VaultController : Interactable {
 
     [Header("References")]
     private UIController uiController;
@@ -29,17 +29,9 @@ public class VaultController : MonoBehaviour {
 
     }
 
-    private void OnCollisionEnter2D(Collision2D collision) {
+    public override void Interact() {
 
-        if (collision.transform.CompareTag("Player")) // collider is player
-            uiController.OpenCodeHUD();
-
-    }
-
-    private void OnCollisionExit2D(Collision2D collision) {
-
-        if (collision.transform.CompareTag("Player")) // collider is player
-            uiController.CloseCodeHUD();
+        uiController.OpenCodeHUD();
 
     }
 

@@ -1,87 +1,174 @@
-using DG.Tweening;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
-public class GameManager : MonoBehaviour {
+public abstract class GameManager : MonoBehaviour {
 
-    [Header("Levels")]
-    [SerializeField] private Level[] levels;
-    private AsyncOperation levelLoad;
-    private AsyncOperation menuLoad;
+    [Header("References")]
+    protected PlayerController playerController;
+    protected PlayerClaimManager claimManager;
+    protected UIController uiController;
+    private CameraController cameraController;
 
-    [Header("Gravity")]
-    private Vector2 startGravity;
+    [Header("Constant Prefabs")]
+    [SerializeField] private PlayerController playerPrefab;
+    [SerializeField] private GameCore gameCorePrefab;
+    [SerializeField] private LevelAudioManager audioManagerPrefab;
+    [SerializeField] private UIController canvasPrefab;
+    [SerializeField] private EventSystem eventSystemPrefab;
 
-    [Header("Quitting")]
-    private bool isQuitting;
+    [Header("Level")]
+    [SerializeField] protected Level level;
 
-    private void Start() {
+    [Header("Checkpoints")]
+    [SerializeField] private Transform playerSpawn;
+    [SerializeField] private Transform checkpointsParent;
+    protected Checkpoint[] checkpoints;
+    protected int currCheckpointIndex;
 
-        startGravity = Physics2D.gravity;
+    [Header("Claims")]
+    protected List<Claimable> levelClaimables;
+    protected List<PlayerClaim> playerClaims;
+    protected List<PhantomClaim> enemyClaims;
+    protected int levelCurrClaimables; // for teleporter
 
-    }
+    [Header("Subtitles")]
+    [SerializeField] private string firstSubtitle;
 
-    private void OnApplicationQuit() {
+    [Header("Teleporter")]
+    [SerializeField] protected Teleporter teleporter;
 
-        isQuitting = true;
-        DOTween.KillAll();
+    protected void Awake() {
 
-    }
+        // add all claimables to list
+        levelClaimables = new List<Claimable>();
 
-    public void StartLoadMainMenuAsync() {
+        foreach (Claimable claimable in FindObjectsOfType<Claimable>())
+            levelClaimables.Add(claimable);
 
-        menuLoad = SceneManager.LoadSceneAsync(0); // main menu has build index of 0
-        menuLoad.allowSceneActivation = false; // allow the loading screen to fully fade in before activating scene
+        // destroy all game cores
+        foreach (GameCore gameCore in FindObjectsOfType<GameCore>())
+            Destroy(gameCore.gameObject);
 
-    }
+        Instantiate(gameCorePrefab); // instantiate game core
+        Instantiate(audioManagerPrefab).Initialize(); // instantiate audio manager
 
-    public void FinishMainMenuLoad() {
+        // checkpoints
+        SpawnPlayer(); // IMPORTANT: spawn before canvas and event system
 
-        if (menuLoad == null) return;
+        if (checkpointsParent != null) { // having checkpoints is optional, so make sure level has them
 
-        menuLoad.allowSceneActivation = true;
+            checkpoints = checkpointsParent.GetComponentsInChildren<Checkpoint>();
 
-    }
-
-    public bool StartLoadLevelAsync(int levelIndex) { // parameter is LEVEL index NOT scene index (PASSING -1 RELOADS CURRENT LEVEL) | returns if level was loaded
-
-        if (levelIndex == -1) {
-
-            levelLoad = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex); // reload level
-            levelLoad.allowSceneActivation = false; // allow the loading screen to fully fade in before activating scene
-            return true;
+            for (int i = 1; i < checkpoints.Length; i++) // disable all checkpoints except first
+                checkpoints[i].gameObject.SetActive(false);
 
         }
 
-        if (levels.Length == 0 || levelIndex >= levels.Length - 1) return false; // make sure levels array is not empty and level index is valid
-        // TODO: don't show loading screen if level is invalid
+        // destroy all canvases
+        foreach (UIController canvas in FindObjectsOfType<UIController>()) // IMPORTANT: make sure type is UIController and not Canvas
+            Destroy(canvas.gameObject);
 
-        levelLoad = SceneManager.LoadSceneAsync(levels[levelIndex].GetSceneBuildIndex());
-        levelLoad.allowSceneActivation = false; // allow the loading screen to fully fade in before activating scene
-        return true;
+        // destroy all event systems
+        foreach (EventSystem eventSystem in FindObjectsOfType<EventSystem>())
+            Destroy(eventSystem.gameObject);
 
-    }
+        uiController = Instantiate(canvasPrefab); // instantiate canvas
+        uiController.Initialize();
 
-    public void FinishLevelLoad() {
+        playerController.Initialize(uiController); // initialize player controller
 
-        if (levelLoad == null) return;
+        Instantiate(eventSystemPrefab); // instantiate event system
 
-        levelLoad.allowSceneActivation = true;
+        // claims
+        claimManager = FindObjectOfType<PlayerClaimManager>();
+        claimManager.transform.position = playerSpawn.position;
 
-    }
-
-    public void FlipGravity() {
-
-        Physics2D.gravity = new Vector2(Physics2D.gravity.x, -Physics2D.gravity.y); // flip gravity here because it is constant throughout scenes
-
-    }
-
-    public void ResetGravity() {
-
-        Physics2D.gravity = startGravity;
+        playerClaims = new List<PlayerClaim>();
+        enemyClaims = new List<PhantomClaim>();
 
     }
 
-    public bool IsQuitting() { return isQuitting; }
+    protected void Start() {
+
+        SpawnEnemies(); // to allow enemy spawn class to run awake method first
+
+        uiController.SetSubtitleText(firstSubtitle); // update subtitle text
+
+        Initialize();
+
+    }
+
+    protected abstract void Initialize();
+
+    protected void SpawnPlayer() {
+
+        // destroy existing players in scene
+        foreach (PlayerController obj in FindObjectsOfType<PlayerController>())
+            Destroy(obj.gameObject);
+
+        cameraController = FindObjectOfType<CameraController>(); // IMPORTANT: SET THIS AFTER PLAYERS ARE DESTROYED
+        playerController = Instantiate(playerPrefab, playerSpawn.position + new Vector3(0f, playerPrefab.transform.localScale.y / 2f, 0f), Quaternion.identity);
+        cameraController.SetTarget(playerController.transform); // spawn player
+
+        foreach (Interactable interactable in FindObjectsOfType<Interactable>())
+            interactable.SetPlayerController(playerController); // set player controller for all interactables (IMPORTANT: DO THIS AFTER PLAYER IS SPAWNED)
+
+    }
+
+    protected void SpawnEnemies() {
+
+        // destroy existing enemies in scene
+        foreach (PhantomController obj in FindObjectsOfType<PhantomController>())
+            Destroy(obj.gameObject);
+
+        foreach (PhantomSpawn enemySpawn in FindObjectsOfType<PhantomSpawn>())
+            enemySpawn.SpawnEnemy(); // spawn enemy
+
+    }
+
+    public void UpdateCheckpoints() {
+
+        // enable next checkpoint
+        for (int i = 0; i < checkpoints.Length; i++)
+            if (i == currCheckpointIndex + 1)
+                checkpoints[i].gameObject.SetActive(true); // enable checkpoint
+
+        currCheckpointIndex++; // increment checkpoint index
+
+        // update teleporter because some track checkpoints
+        if (level.HasTeleporter())
+            teleporter.UpdateTeleporter();
+
+    }
+
+    public abstract void AddClaim(EntityClaim claim);
+
+    public abstract void RemoveClaim(EntityClaim claim);
+
+    public abstract bool IsLevelCleared();
+
+    public int GetLevelIndex() { return level.GetLevelIndex(); }
+
+    public Vector3 GetPlayerSpawn() { return playerSpawn.position; }
+
+    public void SetPlayerSpawn(Vector3 playerSpawn) { this.playerSpawn.position = playerSpawn; }
+
+    public AudioClip GetBackgroundMusic() { return level.GetBackgroundMusic(); }
+
+    public int GetLevelTotalCheckpoints() { return checkpoints.Length; }
+
+    public int GetLevelCurrentCheckpoints() { return currCheckpointIndex + 1; }
+
+    public List<PlayerClaim> GetPlayerClaims() { return playerClaims; }
+
+    public List<PhantomClaim> GetEnemyClaims() { return enemyClaims; }
+
+    public int GetLevelTotalClaimables() { return levelClaimables.Count; }
+
+    public int GetLevelCurrentClaimables() { return levelCurrClaimables; }
+
+    public bool LevelHasCode() { return level.HasCode(); }
 
 }

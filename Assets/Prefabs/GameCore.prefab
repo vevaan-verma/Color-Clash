@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1260784321741811536}
   - component: {fileID: 7112976225191570231}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: GameCore
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,3 +47,5 @@ MonoBehaviour:
   levels:
   - {fileID: 11400000, guid: 6ccccfd5853e73f46811a4f47d5a1434, type: 2}
   - {fileID: 11400000, guid: 53eae523cf804414ca0457579fb2d26b, type: 2}
+  mainMenuBuildIndex: 0
+  ignoredScenes: 1

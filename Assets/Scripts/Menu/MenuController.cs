@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class MenuController : MonoBehaviour {
 
     [Header("References")]
-    private GameManager gameManager;
+    private GameCore gameCore;
     private MenuManager menuManager;
 
     [Header("Menu")]
@@ -14,6 +14,7 @@ public class MenuController : MonoBehaviour {
     [SerializeField] private float menuScreenFadeDuration;
     [SerializeField] private RectTransform menuButtonsLayout;
     [SerializeField] private Button playButton;
+    [SerializeField] private Button tutorialButton;
     [SerializeField] private Button instructionsButton;
     [SerializeField] private Button quitButton;
 
@@ -31,11 +32,12 @@ public class MenuController : MonoBehaviour {
 
     private void Start() {
 
-        gameManager = FindObjectOfType<GameManager>();
+        gameCore = FindObjectOfType<GameCore>();
         menuManager = FindObjectOfType<MenuManager>();
 
         // menu
         playButton.onClick.AddListener(Play);
+        tutorialButton.onClick.AddListener(PlayTutorial);
         instructionsButton.onClick.AddListener(ShowInstructions);
         quitButton.onClick.AddListener(Quit);
 
@@ -69,14 +71,25 @@ public class MenuController : MonoBehaviour {
         loadingScreen.gameObject.SetActive(true);
         loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishLevelLoad());
         //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
-        gameManager.StartLoadLevelAsync(0); // load first level
+        gameCore.StartLoadLevelAsync(1); // load first level (level index 0 is tutorial)
+
+    }
+
+    private void PlayTutorial() {
+
+        menuScreen.gameObject.SetActive(false);
+
+        loadingScreen.gameObject.SetActive(true);
+        loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishLevelLoad());
+        //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
+        gameCore.StartLoadLevelAsync(0); // load tutorial (level index 0 is tutorial)
 
     }
 
     private void FinishLevelLoad() {
 
         //StopCoroutine(loadingTextCoroutine); // IMPORTANT TO PREVENT COROUTINE FROM CYCLING INFINITELY
-        gameManager.FinishLevelLoad();
+        gameCore.FinishLevelLoad();
 
     }
 

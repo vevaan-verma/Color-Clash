@@ -32,15 +32,18 @@ public class PlayerClaimManager : MonoBehaviour {
 
     private void Update() {
 
-        // if player is standing on something, claim it
-        Collider2D leftCollider = Physics2D.OverlapCircle(playerController.GetLeftFoot().position, claimCheckRadius, playerController.GetEnvironmentMask());
-        Collider2D rightCollider = Physics2D.OverlapCircle(playerController.GetRightFoot().position, claimCheckRadius, playerController.GetEnvironmentMask());
+        if (playerController.IsMechanicEnabled(MechanicType.Claiming)) { // don't return if false to allow for more code to be added to this method later
 
-        if (leftCollider)
-            leftCollider.GetComponent<Claimable>()?.Claim(EntityType.Player, colorManager.GetCurrentPlayerColor().GetClaimColor(), colorManager.GetCurrentPlayerColor().GetEffectType());
-        if (rightCollider)
-            rightCollider.GetComponent<Claimable>()?.Claim(EntityType.Player, colorManager.GetCurrentPlayerColor().GetClaimColor(), colorManager.GetCurrentPlayerColor().GetEffectType());
+            // if player is standing on something, claim it
+            Collider2D leftCollider = Physics2D.OverlapCircle(playerController.GetLeftFoot().position, claimCheckRadius, playerController.GetEnvironmentMask());
+            Collider2D rightCollider = Physics2D.OverlapCircle(playerController.GetRightFoot().position, claimCheckRadius, playerController.GetEnvironmentMask());
 
+            if (leftCollider)
+                leftCollider.GetComponent<Claimable>()?.Claim(EntityType.Player, colorManager.GetCurrentPlayerColor().GetClaimColor(), colorManager.GetCurrentPlayerColor().GetEffectType());
+            if (rightCollider)
+                rightCollider.GetComponent<Claimable>()?.Claim(EntityType.Player, colorManager.GetCurrentPlayerColor().GetClaimColor(), colorManager.GetCurrentPlayerColor().GetEffectType());
+
+        }
     }
 
     public void AddClaimable(Color claimColor, EffectType effectType, float addedMultiplier) {

@@ -10,7 +10,7 @@ public class PhantomHealthManager : MonoBehaviour {
 
     [Header("References")]
     private PhantomController phantomController;
-    private LevelManager levelManager;
+    private GameManager gameManager;
     private SpriteRenderer spriteRenderer;
 
     [Header("Health")]
@@ -30,13 +30,14 @@ public class PhantomHealthManager : MonoBehaviour {
     private void Start() {
 
         phantomController = GetComponent<PhantomController>();
-        levelManager = FindObjectOfType<LevelManager>();
+        gameManager = FindObjectOfType<GameManager>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         // set health & health slider values
         health = maxHealth;
         healthSlider.maxValue = health;
         healthSlider.value = healthSlider.maxValue;
+        healthText.text = Mathf.CeilToInt(healthSlider.value) + ""; // health text is health rounded up
 
     }
 
@@ -64,7 +65,7 @@ public class PhantomHealthManager : MonoBehaviour {
         pm.startColor = spriteRenderer.color; // change particle color based on phantom color
 
         // clear all phantom claims
-        List<PhantomClaim> phantomClaims = levelManager.GetEnemyClaims();
+        List<PhantomClaim> phantomClaims = gameManager.GetEnemyClaims();
 
         foreach (PhantomClaim claim in phantomClaims)
             Destroy(claim);
@@ -91,7 +92,7 @@ public class PhantomHealthManager : MonoBehaviour {
 
             currentTime += Time.deltaTime;
             healthSlider.value = Mathf.Lerp(startHealth, targetHealth, currentTime / duration);
-            healthText.text = Mathf.Ceil(healthSlider.value) + ""; // health text is health rounded up
+            healthText.text = Mathf.CeilToInt(healthSlider.value) + ""; // health text is health rounded up
             sliderFill.color = healthGradient.Evaluate(healthSlider.normalizedValue); // normalizedValue returns the value between 0 and 1 (can't use DoTween here because of this line)
             yield return null;
 

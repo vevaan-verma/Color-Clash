@@ -7,6 +7,7 @@ public class PhantomSpawn : MonoBehaviour {
     [Header("Spawn")]
     [SerializeField] private PhantomController phantomPrefab;
     [SerializeField] private Gun gun;
+    private PhantomController currPhantom;
     private bool isFlipped;
 
     [Header("Patrol")]
@@ -29,7 +30,8 @@ public class PhantomSpawn : MonoBehaviour {
 
     public void SpawnEnemy() {
 
-        Instantiate(phantomPrefab, transform.position + new Vector3(0f, phantomPrefab.transform.localScale.y / 2f, 0f), isFlipped ? Quaternion.Euler(0f, 180f, 0f) : Quaternion.identity).Initialize(this, gun, isFlipped, patrolRoute.GetPatrolPoints());
+        currPhantom = Instantiate(phantomPrefab, transform.position + new Vector3(0f, phantomPrefab.transform.localScale.y / 2f, 0f), isFlipped ? Quaternion.Euler(0f, 180f, 0f) : Quaternion.identity);
+        currPhantom.Initialize(this, gun, isFlipped, patrolRoute.GetPatrolPoints());
 
     }
 
@@ -51,6 +53,8 @@ public class PhantomSpawn : MonoBehaviour {
         SpawnEnemy();
 
     }
+
+    public bool IsPhantomAlive() { return currPhantom != null; }
 
     public bool IsFlipped() { return isFlipped; }
 

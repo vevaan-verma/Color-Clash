@@ -5,13 +5,13 @@ using UnityEngine.UI;
 public class Teleporter : Interactable {
 
     [Header("References")]
+    private GameCore gameCore;
     private GameManager gameManager;
-    private LevelManager levelManager;
     private UIController uiController;
 
     [Header("Progress")]
+    [SerializeField] private ProgressType progressType;
     [SerializeField] private Slider teleporterProgressSlider;
-    [SerializeField] private Slider teleporterUseSlider;
 
     [Header("Usage")]
     [SerializeField] private float progressLerpDuration;
@@ -19,42 +19,33 @@ public class Teleporter : Interactable {
 
     private void Start() {
 
+        gameCore = FindObjectOfType<GameCore>();
         gameManager = FindObjectOfType<GameManager>();
-        levelManager = FindObjectOfType<LevelManager>();
         uiController = FindObjectOfType<UIController>();
 
         // progress
-        teleporterProgressSlider.maxValue = levelManager.GetLevelTotalClaimables();
+        if (progressType == ProgressType.Checkpoints)
+            teleporterProgressSlider.maxValue = gameManager.GetLevelTotalCheckpoints();
+        else if (progressType == ProgressType.Claimables)
+            teleporterProgressSlider.maxValue = gameManager.GetLevelTotalClaimables();
 
     }
 
-    private void Update() {
+    public override void Interact() {
 
-        if (levelManager.IsLevelCleared() && Vector3.Distance(transform.position, playerController.transform.position) <= interactDistance) { // interactable is in distance and can interact
-
-            interactKeyIcon.SetActive(true); // show interact key icon
-
-            if (Input.GetKeyDown(KeyCode.E))
-                Interact();
-
-        } else {
-
-            interactKeyIcon.SetActive(false); // hide interact key icon
-
-        }
-    }
-
-    protected override void Interact() {
-
-        UseTeleporter();
+        if (gameManager.IsLevelCleared())
+            UseTeleporter();
 
     }
 
     public void UpdateTeleporter() {
 
-        if (gameManager.IsQuitting()) return;
+        if (gameCore.IsQuitting()) return;
 
-        teleporterProgressSlider.DOValue(levelManager.GetLevelCurrentClaimables(), progressLerpDuration);
+        if (progressType == ProgressType.Checkpoints)
+            teleporterProgressSlider.DOValue(gameManager.GetLevelCurrentCheckpoints(), progressLerpDuration);
+        else if (progressType == ProgressType.Claimables)
+            teleporterProgressSlider.DOValue(gameManager.GetLevelCurrentClaimables(), progressLerpDuration);
 
     }
 

@@ -1,12 +1,8 @@
 using DG.Tweening;
-using DG.Tweening.Core.Easing;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
@@ -16,18 +12,41 @@ public class UIController : MonoBehaviour {
     private PlayerController playerController;
     private PlayerGunManager gunManager;
     private PlayerHealthManager healthManager;
+    private GameCore gameCore;
     private GameManager gameManager;
-    private LevelManager levelManager;
     private CodeManager codeManager;
 
     [Header("HUD")]
     [SerializeField] private CanvasGroup playerHUD;
     [SerializeField] private float playerHUDFadeDuration;
 
+    [Header("Subtitles")]
+    [SerializeField] private TMP_Text subtitleText;
+    [SerializeField] private float subtitleTypeDuration;
+    private Coroutine subtitleCycleCoroutine;
+
     [Header("Claimables")]
-    [SerializeField] private Transform claimableInfoParent;
-    [SerializeField] private ClaimableInfo claimableInfoPrefab;
-    private List<ClaimableInfo> claimableInfos;
+    [SerializeField] private Transform claimablesInfoParent;
+    [SerializeField] private ClaimableInfo claimablesInfoPrefab;
+    private List<ClaimableInfo> claimablesInfo;
+
+    [Header("Weapon HUD")]
+    [SerializeField] private TMP_Text ammoText;
+
+    [Header("Gun Cycle")]
+    [SerializeField] private GameObject gunCycleParent;
+    [SerializeField] private Image gunIconTop;
+    [SerializeField] private Image gunIconMiddle;
+    [SerializeField] private Image gunIconBottom;
+    [SerializeField] private Sprite blankGunSprite;
+
+    [Header("Health")]
+    [SerializeField] private GameObject healthBarParent;
+    [SerializeField] private Slider healthSlider;
+    [SerializeField] private Image sliderFill;
+    [SerializeField] private float healthLerpDuration;
+    [SerializeField] private Gradient healthGradient;
+    private Coroutine healthLerpCoroutine;
 
     [Header("Code")]
     [SerializeField] private CanvasGroup codeHUD;
@@ -35,22 +54,6 @@ public class UIController : MonoBehaviour {
     [SerializeField] private TMP_InputField codeInput;
     [SerializeField] private Button codeHUDCloseButton;
     private VaultController vaultController;
-
-    [Header("Health")]
-    [SerializeField] private Slider healthSlider;
-    [SerializeField] private Image sliderFill;
-    [SerializeField] private float healthLerpDuration;
-    [SerializeField] private Gradient healthGradient;
-    private Coroutine healthLerpCoroutine;
-
-    [Header("Weapon HUD")]
-    [SerializeField] private TMP_Text ammoText;
-
-    [Header("Gun Cycle")]
-    [SerializeField] private Image gunIconTop;
-    [SerializeField] private Image gunIconMiddle;
-    [SerializeField] private Image gunIconBottom;
-    [SerializeField] private Sprite blankGunSprite;
 
     [Header("Loading")]
     [SerializeField] private CanvasGroup loadingScreen;
@@ -66,40 +69,42 @@ public class UIController : MonoBehaviour {
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button nextLevelButton;
 
-    private void Awake() {
+    public void Initialize() {
 
         claimManager = FindObjectOfType<PlayerClaimManager>();
         playerController = FindObjectOfType<PlayerController>();
         gunManager = FindObjectOfType<PlayerGunManager>();
         healthManager = FindObjectOfType<PlayerHealthManager>();
+        gameCore = FindObjectOfType<GameCore>();
         gameManager = FindObjectOfType<GameManager>();
-        levelManager = FindObjectOfType<LevelManager>();
 
         // player HUD
         playerHUD.alpha = 0f; // reset alpha for fade
         playerHUD.gameObject.SetActive(true);
         playerHUD.DOFade(1f, playerHUDFadeDuration).SetEase(Ease.InCirc);
 
+        claimablesInfoParent.gameObject.SetActive(true); // enabled by default
+        gunCycleParent.SetActive(true); // enabled by default
+        healthBarParent.SetActive(true); // enabled by default
+
         // set health slider values
         healthSlider.maxValue = healthManager.GetMaxHealth();
         healthSlider.value = healthSlider.maxValue;
 
-        //Cursor.visible = false;
-
         // claimable info
-        claimableInfos = new List<ClaimableInfo>();
+        claimablesInfo = new List<ClaimableInfo>();
 
         Dictionary<Color, int> claimables = claimManager.GetClaims();
 
         foreach (KeyValuePair<Color, int> pair in claimables) {
 
-            claimableInfos.Add(Instantiate(claimableInfoPrefab, claimableInfoParent)); // add to list
-            claimableInfos[claimableInfos.Count - 1].UpdateInfo(pair.Key, pair.Value); // update info
+            claimablesInfo.Add(Instantiate(claimablesInfoPrefab, claimablesInfoParent)); // add to list
+            claimablesInfo[claimablesInfo.Count - 1].UpdateInfo(pair.Key, pair.Value); // update info
 
         }
 
         // code
-        if (levelManager.LevelHasCode()) { // make sure level has code to avoid null errors
+        if (gameManager is LevelManager && ((LevelManager) gameManager).LevelHasCode()) { // make sure level has code to avoid null errors  (make sure game manager is level manager)
 
             codeManager = FindObjectOfType<CodeManager>();
             vaultController = FindObjectOfType<VaultController>();
@@ -132,14 +137,14 @@ public class UIController : MonoBehaviour {
 
         Dictionary<Color, int> claimables = claimManager.GetClaims();
 
-        foreach (ClaimableInfo info in claimableInfos)
+        foreach (ClaimableInfo info in claimablesInfo)
             info.UpdateInfo(claimables[info.GetColor()]); // update info
 
     }
 
     public void OpenCodeHUD() {
 
-        playerController.SetHasControl(false); // disable player controls
+        playerController.DisableAllMechanics(); // disable all mechanics
         codeHUD.gameObject.SetActive(true);
         codeHUD.DOFade(1f, codeHUDFadeDuration); // disable loading screen on complete & reset loading text
         codeInput.text = ""; // clear input
@@ -151,7 +156,7 @@ public class UIController : MonoBehaviour {
 
         codeHUD.gameObject.SetActive(true);
         codeHUD.DOFade(0f, codeHUDFadeDuration).OnComplete(() => codeHUD.gameObject.SetActive(false)); // disable loading screen on complete & reset loading text
-        playerController.SetHasControl(true); // enable player controls
+        playerController.EnableAllMechanics(); // enable all mechanics
 
     }
 
@@ -236,7 +241,15 @@ public class UIController : MonoBehaviour {
 
     public void OnLevelCleared() {
 
-        playerController.SetHasControl(false); // disable player control
+        // disable subtitles
+        if (subtitleCycleCoroutine != null)
+            StopCoroutine(subtitleCycleCoroutine);
+
+        SetSubtitleText("");
+
+        // disable player control
+        playerController.DisableAllMechanics();
+
         levelClearedScreen.gameObject.SetActive(true);
         levelClearedScreen.DOFade(1f, levelClearedFadeDuration);
         LayoutRebuilder.ForceRebuildLayoutImmediate(levelClearedScreen.GetComponent<RectTransform>()); // rebuild level cleared screen layout
@@ -250,7 +263,7 @@ public class UIController : MonoBehaviour {
         loadingScreen.gameObject.SetActive(true);
         loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishLevelLoad());
         //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
-        gameManager.StartLoadLevelAsync(-1); // pass -1 to reload level
+        gameCore.StartLoadLevelAsync(-1); // pass -1 to reload level
 
     }
 
@@ -260,21 +273,21 @@ public class UIController : MonoBehaviour {
         loadingScreen.gameObject.SetActive(true);
         loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishMainMenuLoad());
         //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
-        gameManager.StartLoadMainMenuAsync(); // load first level
+        gameCore.StartLoadMainMenuAsync(); // load first level
 
     }
 
     private void FinishMainMenuLoad() {
 
         //StopCoroutine(loadingTextCoroutine); // IMPORTANT TO PREVENT COROUTINE FROM CYCLING INFINITELY
-        gameManager.FinishMainMenuLoad();
+        gameCore.FinishMainMenuLoad();
 
     }
 
     private void FinishLevelLoad() {
 
         //StopCoroutine(loadingTextCoroutine); // IMPORTANT TO PREVENT COROUTINE FROM CYCLING INFINITELY
-        gameManager.FinishLevelLoad();
+        gameCore.FinishLevelLoad();
 
     }
 
@@ -322,7 +335,7 @@ public class UIController : MonoBehaviour {
 
     private void LoadNextLevel() {
 
-        if (gameManager.StartLoadLevelAsync(levelManager.GetLevelSceneBuildIndex())) { // make sure level loads
+        if (gameCore.StartLoadLevelAsync(gameManager.GetLevelIndex() + 1)) { // make sure level loads
 
             levelClearedScreen.gameObject.SetActive(false);
             loadingScreen.gameObject.SetActive(true);
@@ -332,9 +345,70 @@ public class UIController : MonoBehaviour {
         }
     }
 
+    public void SetSubtitleText(string text, bool stopCycle = true) {
+
+        if (text == null || text == "") { // if text is empty, hide subtitle text
+
+            HideSubtitleText();
+            return;
+
+        }
+
+        if (stopCycle && subtitleCycleCoroutine != null) // stop cycle coroutine if it's running
+            StopCoroutine(subtitleCycleCoroutine);
+
+        subtitleText.gameObject.SetActive(true);
+        DOVirtual.Int(0, text.Length, subtitleTypeDuration, (x) => subtitleText.text = text.Substring(0, x)).SetEase(Ease.Linear);
+
+    }
+
+    public void CycleSubtitleTexts(string[] subtitleTexts, float duration) {
+
+        if (subtitleCycleCoroutine != null) // stop cycle coroutine if it's running
+            StopCoroutine(subtitleCycleCoroutine);
+
+        subtitleCycleCoroutine = StartCoroutine(StartCycleSubtitleTexts(subtitleTexts, duration));
+
+    }
+
+    private IEnumerator StartCycleSubtitleTexts(string[] subtitleTexts, float duration) {
+
+        if (duration == 0f)
+            Debug.LogWarning("Subtitle cycle duration is 0f! Please raise this value to increase performance.");
+
+        while (true) {
+
+            foreach (string subtitleText in subtitleTexts) {
+
+                SetSubtitleText(subtitleText, false); // update subtitle text
+                yield return new WaitForSeconds(duration); // wait for duration
+
+            }
+        }
+    }
+
+    public void HideSubtitleText() {
+
+        subtitleText.gameObject.SetActive(false);
+
+    }
+
     public void SetLoadingText(string text) {
 
         loadingText.text = text;
 
     }
+
+    public void EnableClaimablesInfoHUD() { claimablesInfoParent.gameObject.SetActive(true); }
+
+    public void DisableClaimablesInfoHUD() { claimablesInfoParent.gameObject.SetActive(false); }
+
+    public void EnableGunCycleHUD() { gunCycleParent.SetActive(true); }
+
+    public void DisableGunCycleHUD() { gunCycleParent.SetActive(false); }
+
+    public void EnableHealthBarHUD() { healthBarParent.SetActive(true); }
+
+    public void DisableHealthBarHUD() { healthBarParent.SetActive(false); }
+
 }
