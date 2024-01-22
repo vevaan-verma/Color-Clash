@@ -16,7 +16,7 @@ ScriptedImporter:
   textureImporterSettings:
     alphaSource: 1
     mipMapMode: 0
-    enableMipMap: 0
+    enableMipMap: 1
     fadeOut: 0
     borderMipMap: 0
     mipMapsPreserveCoverage: 0
@@ -108,9 +108,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 768
+      width: 501
       height: 1080
-    spriteID: ea4119df48037b04c9256a5fc231e525
+    spriteID: 85e3eeb550625024c98594917fac5c0f
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -118,8 +118,8 @@ ScriptedImporter:
     indices: 
     edges: []
     tessellationDetail: 0
-    uvTransform: {x: -51, y: 4}
-    spritePosition: {x: 139, y: 0}
+    uvTransform: {x: 2, y: 4}
+    spritePosition: {x: 152, y: 0}
   - name: PauseMenuLine
     originalName: 
     pivot: {x: 0.5, y: 0.5}
@@ -131,7 +131,7 @@ ScriptedImporter:
       y: 1092
       width: 1920
       height: 176
-    spriteID: 7a9f634195ec5014791d15e959b57264
+    spriteID: 005db544505c3df4f81a6359e7fd85a2
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -239,8 +239,8 @@ ScriptedImporter:
     spriteName: MenuButtonsLine
     isGroup: 0
     parentIndex: -1
-    spriteID: ea4119df48037b04c9256a5fc231e525
-    layerID: 11
+    spriteID: 85e3eeb550625024c98594917fac5c0f
+    layerID: 18
     mosaicPosition: {x: 4, y: 4}
     flatten: 0
     isImported: 1
@@ -249,7 +249,7 @@ ScriptedImporter:
     spriteName: PauseMenuLine
     isGroup: 0
     parentIndex: -1
-    spriteID: 7a9f634195ec5014791d15e959b57264
+    spriteID: 005db544505c3df4f81a6359e7fd85a2
     layerID: 8
     mosaicPosition: {x: 4, y: 1092}
     flatten: 0
@@ -258,7 +258,7 @@ ScriptedImporter:
   sharedRigPSDLayers: []
   pSDLayerImportSetting: []
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638414430105409390
+  platformSettingsDirtyTick: 638414634663497852
   spriteSizeExpandChanged: 0
   generateGOHierarchy: 0
   textureAssetName: 

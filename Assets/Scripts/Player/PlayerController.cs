@@ -221,6 +221,10 @@ public class PlayerController : MonoBehaviour {
                 uiController.DisableClaimablesInfoHUD();
                 break;
 
+            case MechanicType.Movement:
+                animator.SetBool("isRunning", false); // stop running animation
+                break;
+
         }
     }
 
@@ -229,6 +233,8 @@ public class PlayerController : MonoBehaviour {
         // set all mechanics in dictionary to false
         foreach (MechanicType mechanicType in mechanicStatuses.Keys.ToList()) // use ToList() to avoid InvalidOperationException
             mechanicStatuses[mechanicType] = false;
+
+        animator.SetBool("isRunning", false); // stop running animation
 
         // disable all mechanics related UI
         uiController.DisableClaimablesInfoHUD();

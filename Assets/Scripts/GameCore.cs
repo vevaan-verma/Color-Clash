@@ -29,7 +29,6 @@ public class GameCore : MonoBehaviour {
     private void OnApplicationQuit() {
 
         isQuitting = true;
-        DOTween.KillAll();
 
     }
 
