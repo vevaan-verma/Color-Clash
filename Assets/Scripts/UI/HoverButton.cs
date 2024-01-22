@@ -20,19 +20,19 @@ public class HoverButton : CustomButton {
 
         // remove hover effects if this has overlays
         if (hasOverlays)
-            text.DOColor(startColor, hoverFadeDuration);
+            text.DOColor(startColor, hoverFadeDuration).SetUpdate(true); // set update to true to ignore timescale
 
     }
 
     protected override void OnPointerEnter(PointerEventData eventData) {
 
-        text.DOColor(hoverColor, hoverFadeDuration); // color transition
+        text.DOColor(hoverColor, hoverFadeDuration).SetUpdate(true); // color transition (set update to true to ignore timescale)
 
     }
 
     protected override void OnPointerExit(PointerEventData eventData) {
 
-        text.DOColor(startColor, hoverFadeDuration); // color transition
+        text.DOColor(startColor, hoverFadeDuration).SetUpdate(true); // color transition (set update to true to ignore timescale)
 
     }
 }

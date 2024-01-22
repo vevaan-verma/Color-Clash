@@ -14,6 +14,9 @@ public class GameCore : MonoBehaviour {
     [Header("Gravity")]
     private Vector2 startGravity;
 
+    [Header("Pausing")]
+    private bool isPaused;
+
     [Header("Quitting")]
     private bool isQuitting;
 
@@ -93,4 +96,23 @@ public class GameCore : MonoBehaviour {
 
     public bool IsQuitting() { return isQuitting; }
 
+    public bool IsPaused() { return isPaused; }
+
+    public void PauseGame() {
+
+        if (isPaused) return; // make sure game is not paused before pausing
+
+        Time.timeScale = 0f; // pause time scale
+        isPaused = true;
+
+    }
+
+    public void UnpauseGame() {
+
+        if (!isPaused) return; // make sure game is paused before unpausing
+
+        Time.timeScale = 1f; // set time scale to normal
+        isPaused = false;
+
+    }
 }

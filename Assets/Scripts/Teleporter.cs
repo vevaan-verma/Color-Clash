@@ -29,6 +29,8 @@ public class Teleporter : Interactable {
         else if (progressType == ProgressType.Claimables)
             teleporterProgressSlider.maxValue = gameManager.GetLevelTotalClaimables();
 
+        teleporterProgressSlider.value = 0f;
+
     }
 
     public override void Interact() {

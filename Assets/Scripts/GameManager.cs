@@ -96,11 +96,9 @@ public abstract class GameManager : MonoBehaviour {
 
         uiController.SetSubtitleText(firstSubtitle); // update subtitle text
 
-        Initialize();
-
     }
 
-    protected abstract void Initialize();
+    public abstract void Initialize();
 
     protected void SpawnPlayer() {
 
@@ -159,7 +157,7 @@ public abstract class GameManager : MonoBehaviour {
 
     public int GetLevelTotalCheckpoints() { return checkpoints.Length; }
 
-    public int GetLevelCurrentCheckpoints() { return currCheckpointIndex + 1; }
+    public int GetLevelCurrentCheckpoints() { return currCheckpointIndex; }
 
     public List<PlayerClaim> GetPlayerClaims() { return playerClaims; }
 

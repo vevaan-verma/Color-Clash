@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("Keybinds")]
     [SerializeField] private KeyCode jumpKey;
+    [SerializeField] private KeyCode pauseKey;
 
     /*
     IMPORTANT:
@@ -62,7 +63,7 @@ public class PlayerController : MonoBehaviour {
         // add all mechanic types to dictionary
         foreach (MechanicType mechanicType in mechanics)
             if (mechanicType != MechanicType.None) // ignore none mechanic type
-                mechanicStatuses.Add(mechanicType, true); // set all mechanics to true by default
+                mechanicStatuses.Add(mechanicType, false); // set all mechanics to false by default
 
     }
 
@@ -99,6 +100,11 @@ public class PlayerController : MonoBehaviour {
                 rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
 
         }
+
+        // pausing
+        if (Input.GetKeyDown(pauseKey))
+            uiController.TogglePause();
+
     }
 
     private void FixedUpdate() {

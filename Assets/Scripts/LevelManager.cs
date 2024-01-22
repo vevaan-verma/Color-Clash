@@ -5,10 +5,14 @@ using UnityEngine.EventSystems;
 
 public class LevelManager : GameManager {
 
-    protected override void Initialize() {
+    public override void Initialize() {
 
         playerController.EnableAllMechanics(); // enable all player controls
 
+        // enable all UI
+        uiController.EnableClaimablesInfoHUD();
+        uiController.EnableGunCycleHUD();
+        uiController.EnableHealthBarHUD();
     }
 
     public override void AddClaim(EntityClaim claim) {

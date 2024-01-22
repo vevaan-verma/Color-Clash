@@ -20,19 +20,19 @@ public class UnderlineButton : CustomButton {
     private void OnDisable() {
 
         // remove underlines
-        underline.DOValue(0f, underlineDuration).SetEase(Ease.OutFlash);
+        underline.DOValue(0f, underlineDuration).SetEase(Ease.OutFlash).SetUpdate(true); // set update to true to ignore timescale
 
     }
 
     protected override void OnPointerEnter(PointerEventData eventData) {
 
-        underline.DOValue(underline.maxValue, underlineDuration).SetEase(Ease.InFlash); // underline
+        underline.DOValue(underline.maxValue, underlineDuration).SetEase(Ease.InFlash).SetUpdate(true); // underline  (set update to true to ignore timescale)
 
     }
 
     protected override void OnPointerExit(PointerEventData eventData) {
 
-        underline.DOValue(0f, underlineDuration).SetEase(Ease.OutFlash); // underline
+        underline.DOValue(0f, underlineDuration).SetEase(Ease.OutFlash).SetUpdate(true); // underline (set update to true to ignore timescale)
 
     }
 }

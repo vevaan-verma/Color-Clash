@@ -840,12 +840,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowRenderer: {fileID: 576680396}
   mechanicToUnlock: 0
+  errorColor: {r: 0.8039216, g: 0, b: 0, a: 1}
+  errorDisplayDuration: 0.5
   subtitleTexts:
   - Now, kill the phantoms on the platform ahead. Be careful, one of them is upgraded!
   subtitleDisplayDuration: 0
   destroyFadeDuration: 0.5
   phantomSpawns:
   - {fileID: 464878636}
+  checkForDeath: 1
 --- !u!1001 &327277550
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1066,8 +1069,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   phantomPrefab: {fileID: 6859380561351407757, guid: 9fa58d84adaa1ab42bb1c14aaa701861, type: 3}
   gun: {fileID: -6807907351907170449, guid: e45a4f862c9e5fe4088f657da1eb804b, type: 3}
-  respawnEnabled: 0
-  respawnWaitDuration: 7
+  respawnEnabled: 1
+  respawnWaitDuration: 4
   claimablePlatform: {fileID: 2019967667}
 --- !u!1 &432833483
 GameObject:
@@ -1820,7 +1823,7 @@ MonoBehaviour:
   level: {fileID: 11400000, guid: 86c32700e91df7a48ad7ec55f2e1a8fb, type: 2}
   playerSpawn: {fileID: 182894585}
   checkpointsParent: {fileID: 1407175400}
-  firstSubtitle: Use [A] & [D] to walk to the end of the platform...
+  firstSubtitle: Use [A] & [D] to move to the end of the platform.
   teleporter: {fileID: 2129890664}
 --- !u!1 &576680393
 GameObject:
@@ -2074,8 +2077,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowRenderer: {fileID: 2103128424}
   mechanicToUnlock: 0
+  errorColor: {r: 0.8018868, g: 0, b: 0, a: 1}
+  errorDisplayDuration: 0.5
   subtitleTexts:
-  - If you hold [SPACE] for longer after jumping, you can jump higher.
+  - If you jump into the side of a platform and either jump again or hold jump, you
+    will perform a mantle action.
   subtitleDisplayDuration: 0
   destroyFadeDuration: 0.5
 --- !u!1 &610313951
@@ -2563,8 +2569,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowRenderer: {fileID: 1893680349}
   mechanicToUnlock: 2
+  errorColor: {r: 0.8018868, g: 0, b: 0, a: 1}
+  errorDisplayDuration: 0.5
   subtitleTexts:
-  - Use [A] & [D] to move to the end of the platform.
+  - Use [SPACE] to jump to the next platform.
   subtitleDisplayDuration: 0
   destroyFadeDuration: 0.5
 --- !u!1 &699558640
@@ -2616,6 +2624,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowRenderer: {fileID: 443510834}
   mechanicToUnlock: 4
+  errorColor: {r: 0.8039216, g: 0, b: 0, a: 1}
+  errorDisplayDuration: 0.5
   subtitleTexts:
   - You might've noticed that the platform under you changed colors. This is due
     to a system called claiming.
@@ -2628,6 +2638,7 @@ MonoBehaviour:
   phantomSpawns:
   - {fileID: 432833486}
   - {fileID: 1254071661}
+  checkForDeath: 1
 --- !u!61 &699558643
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2774,21 +2785,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowRenderer: {fileID: 1146941646}
   mechanicToUnlock: 5
+  errorColor: {r: 0.8039216, g: 0, b: 0, a: 1}
+  errorDisplayDuration: 0.5
   subtitleTexts:
   - There are a variety of interactables that can appear in any level.
   - An icon will appear above them, letting you know that you can interact with them.
-    Use [E] to interact.
   - They have a variety of different purposes, some are easter eggs and others will
     change game mechanics.
   - The most important one is the teleporter. Teleporters are generally how you can
     finish a level.
   - They have a progress bar on them that slowly fills up as you complete level objectives.
     Once full, you can interact with it when in range and complete the level.
-  - When finished, interact with the teleporter to complete the tutorial. Thanks
-    for playing!
+  - When finished, use [E] to interact with the teleporter to complete the tutorial.
+    Thanks for playing!
   subtitleDisplayDuration: 8
   destroyFadeDuration: 0.5
-  phantomSpawns: []
+  phantomSpawns:
+  - {fileID: 330747603}
+  - {fileID: 2066721470}
+  checkForDeath: 0
 --- !u!61 &713903409
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3158,12 +3173,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowRenderer: {fileID: 1145010538}
   mechanicToUnlock: 3
+  errorColor: {r: 0.8018868, g: 0, b: 0, a: 1}
+  errorDisplayDuration: 0.5
   subtitleTexts:
   - Use [LEFT CLICK] to shoot, [R] to reload, and [SCROLL WHEEL] or [NUM KEYS] to
     cycle through weapons.
   - When phantoms see you, a danger marker will appear above their head and they
-    will turn around. Phantoms generally have more vision in front than behind, and
-    their reaction times vary. Kill the phantom on the platform ahead.
+    will turn around.
+  - Phantoms generally have more vision in front than behind, and their reaction
+    times vary. Kill the phantom on the platform ahead.
   subtitleDisplayDuration: 6
   destroyFadeDuration: 0.5
 --- !u!1 &746327603
@@ -4625,8 +4643,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowRenderer: {fileID: 822133275}
   mechanicToUnlock: 0
+  errorColor: {r: 0.8018868, g: 0, b: 0, a: 1}
+  errorDisplayDuration: 0.5
   subtitleTexts:
-  - Use [SPACE] to jump to the next platform.
+  - If you hold [SPACE] for longer after jumping, you can jump higher and further.
   subtitleDisplayDuration: 0
   destroyFadeDuration: 0.5
 --- !u!1 &1254071658
@@ -5538,16 +5558,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowRenderer: {fileID: 1677486890}
   mechanicToUnlock: 5
+  errorColor: {r: 0.8039216, g: 0, b: 0, a: 1}
+  errorDisplayDuration: 0.5
   subtitleTexts:
   - You might be wondering what the benefit of claiming a platform is.
   - 'Your character can cycle through a variety of colors, each having its own unique
     multiplier: red -> attack, blue -> defense, green -> regeneration.'
   - Claiming a platform will claim it with your character's current color and increase
     your multiplier of that specific color. These colors are just the default ones,
-    you can unlock more colors as you play. Keep in mind that you lose all your claims
-    when you die.
+    you can unlock more colors as you play.
   - Use [LEFT CONTROL] to cycle between colors. To gain the multiplier of a color,
-    you must be cycled to it.
+    you must be cycled to it. Keep in mind that you lose all your claims when you
+    die.
   - Feel free to mess around with your current colors and multipliers on the platform
     ahead. The current platform has an increased multiplier, so choose the color
     with which you claim the platform wisely. The phantoms will respawn, hit the
@@ -5558,6 +5580,7 @@ MonoBehaviour:
   - {fileID: 510664998}
   - {fileID: 936195708}
   - {fileID: 1849927953}
+  checkForDeath: 1
 --- !u!61 &1743324883
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6712,8 +6735,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   phantomPrefab: {fileID: 6859380561351407757, guid: dfa883c81466b2242a3135214690147e, type: 3}
   gun: {fileID: -6807907351907170449, guid: e45a4f862c9e5fe4088f657da1eb804b, type: 3}
-  respawnEnabled: 0
-  respawnWaitDuration: 7
+  respawnEnabled: 1
+  respawnWaitDuration: 4
   claimablePlatform: {fileID: 2019967667}
 --- !u!1 &2078795017
 GameObject:
@@ -6902,14 +6925,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1381897657215658227, guid: 9a79780436091fe498caafc330f6955b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2295719724790480268, guid: 9a79780436091fe498caafc330f6955b, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2295719724790480268, guid: 9a79780436091fe498caafc330f6955b, type: 3}
-      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4042897745627337857, guid: 9a79780436091fe498caafc330f6955b, type: 3}

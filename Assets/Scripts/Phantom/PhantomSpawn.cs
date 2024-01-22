@@ -50,7 +50,8 @@ public class PhantomSpawn : MonoBehaviour {
             while (claimablePlatform.GetClaimer() == EntityType.Player) // don't respawn enemy if claimed by player
                 yield return null;
 
-        SpawnEnemy();
+        if (respawnEnabled) // check again in case respawn was disabled while waiting
+            SpawnEnemy();
 
     }
 
@@ -61,6 +62,8 @@ public class PhantomSpawn : MonoBehaviour {
     public Transform[] GetPatrolPoints() { return patrolRoute.GetPatrolPoints(); }
 
     public bool IsRespawnEnabled() { return respawnEnabled; }
+
+    public void SetRespawnEnabled(bool respawnEnabled) { this.respawnEnabled = respawnEnabled; }
 
     public float GetRespawnWaitDuration() { return respawnWaitDuration; }
 

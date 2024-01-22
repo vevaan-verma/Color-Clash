@@ -421,6 +421,7 @@ MonoBehaviour:
     m_Bits: 4416
   groundCheckRadius: 0.1
   jumpKey: 32
+  pauseKey: 27
 --- !u!114 &4725347144615699786
 MonoBehaviour:
   m_ObjectHideFlags: 0

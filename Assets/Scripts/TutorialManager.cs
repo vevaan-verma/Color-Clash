@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class TutorialManager : GameManager {
 
-    protected override void Initialize() {
+    public override void Initialize() {
 
         // set mechanics defaults
         // only allow movement at beginning

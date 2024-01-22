@@ -2,6 +2,8 @@ using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public abstract class Checkpoint : MonoBehaviour {
 
@@ -15,6 +17,8 @@ public abstract class Checkpoint : MonoBehaviour {
     [SerializeField] private MechanicType mechanicToUnlock;
 
     [Header("Color")]
+    [SerializeField] private Color errorColor;
+    [SerializeField] private float errorDisplayDuration;
     private Color startColor;
     private Color startArrowColor;
 
@@ -44,23 +48,34 @@ public abstract class Checkpoint : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision) {
 
-        if (collision.CompareTag("Player") && CheckRequirements()) { // collider is player and requirements are met
+        if (collision.CompareTag("Player")) { // collider is player
 
-            if (subtitleTexts.Length > 1) // if there is more than one subtitle text, cycle through them
-                uiController.CycleSubtitleTexts(subtitleTexts, subtitleDisplayDuration); // start subtitle cycle
-            else
-                uiController.SetSubtitleText(subtitleTexts[0]); // set subtitle text
+            if (CheckRequirements()) { // requirements are met
 
-            collision.GetComponent<PlayerController>().EnableMechanic(mechanicToUnlock); // unlock mechanic associated with checkpoint
+                if (subtitleTexts.Length > 1) // if there is more than one subtitle text, cycle through them
+                    uiController.CycleSubtitleTexts(subtitleTexts, subtitleDisplayDuration); // start subtitle cycle
+                else
+                    uiController.SetSubtitleText(subtitleTexts[0]); // set subtitle text
 
-            spriteRenderer.DOColor(Color.clear, destroyFadeDuration).OnComplete(() => gameObject.SetActive(false)); // fade out and disable
-            arrowRenderer.DOColor(Color.clear, destroyFadeDuration); // fade out arrow
+                collision.GetComponent<PlayerController>().EnableMechanic(mechanicToUnlock); // unlock mechanic associated with checkpoint
 
-            gameManager.SetPlayerSpawn(transform.position); // update player spawn
-            gameManager.UpdateCheckpoints(); // update checkpoints
+                OnCheckpointDisable(); // allow subclasses to do something when checkpoint is disabled
+                spriteRenderer.DOColor(Color.clear, destroyFadeDuration).OnComplete(() => gameObject.SetActive(false)); // fade out and disable
+                arrowRenderer.DOColor(Color.clear, destroyFadeDuration); // fade out arrow
 
+                gameManager.SetPlayerSpawn(transform.position); // update player spawn
+                gameManager.UpdateCheckpoints(); // update checkpoints
+
+            } else {
+
+                spriteRenderer.DOColor(errorColor, errorDisplayDuration / 2f).OnComplete(() => spriteRenderer.DOColor(startColor, errorDisplayDuration / 2f)); // flash error color
+                arrowRenderer.DOColor(errorColor, errorDisplayDuration / 2f).OnComplete(() => arrowRenderer.DOColor(startColor, errorDisplayDuration / 2f)); // flash error color
+
+            }
         }
     }
+
+    protected abstract void OnCheckpointDisable();
 
     protected abstract bool CheckRequirements();
 

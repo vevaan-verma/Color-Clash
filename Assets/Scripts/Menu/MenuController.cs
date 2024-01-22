@@ -71,6 +71,7 @@ public class MenuController : MonoBehaviour {
         loadingScreen.gameObject.SetActive(true);
         loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishLevelLoad());
         //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
+        gameCore.UnpauseGame(); // make sure game is unpaused before loading level
         gameCore.StartLoadLevelAsync(1); // load first level (level index 0 is tutorial)
 
     }
@@ -82,6 +83,7 @@ public class MenuController : MonoBehaviour {
         loadingScreen.gameObject.SetActive(true);
         loadingScreen.DOFade(1f, loadingScreenFadeDuration).SetEase(Ease.InCirc).OnComplete(() => FinishLevelLoad());
         //loadingTextCoroutine = StartCoroutine(UpdateLoadingText()); // REMEMBER TO STOP THIS COROUTINE BEFORE NEW SCENE LOADS
+        gameCore.UnpauseGame(); // make sure game is unpaused before loading level
         gameCore.StartLoadLevelAsync(0); // load tutorial (level index 0 is tutorial)
 
     }
