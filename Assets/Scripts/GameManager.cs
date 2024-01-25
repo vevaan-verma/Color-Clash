@@ -145,7 +145,7 @@ public abstract class GameManager : MonoBehaviour {
 
     public abstract void RemoveClaim(EntityClaim claim);
 
-    public abstract bool IsLevelCleared();
+    public abstract bool IsLevelObjectiveCompleted(); // doesn't mean level is completed, just that the objective has been reached
 
     public int GetLevelIndex() { return level.GetLevelIndex(); }
 

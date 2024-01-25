@@ -7,6 +7,7 @@ public class PlayerColorManager : MonoBehaviour {
 
     [Header("References")]
     private PlayerController playerController;
+    private UIController uiController;
 
     [Header("Color Cycling")]
     [SerializeField] private PlayerColor[] playerColors;
@@ -21,10 +22,13 @@ public class PlayerColorManager : MonoBehaviour {
     private void Start() {
 
         playerController = GetComponent<PlayerController>();
+        uiController = FindObjectOfType<UIController>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         currColorIndex = 0;
         spriteRenderer.color = playerColors[currColorIndex].GetSpriteColor();
+
+        uiController.UpdateEffectText(playerColors[currColorIndex]); // update effect text
 
         canColorCycle = true;
 
@@ -32,13 +36,11 @@ public class PlayerColorManager : MonoBehaviour {
 
     private void Update() {
 
-        if (playerController.IsMechanicEnabled(MechanicType.ColorCycling)) { // don't return if false to allow for more code to be added to this method later
-
-            // color switching
+        // color switching
+        if (playerController.IsMechanicEnabled(MechanicType.ColorCycling)) // don't return if false to allow for more code to be added to this method later
             if (Input.GetKeyDown(colorSwitchKey))
                 CycleColor();
 
-        }
     }
 
     private void CycleColor() {
@@ -52,6 +54,8 @@ public class PlayerColorManager : MonoBehaviour {
             currColorIndex = 0;
 
         spriteRenderer.color = playerColors[currColorIndex].GetSpriteColor();
+
+        uiController.UpdateEffectText(playerColors[currColorIndex]); // update effect text
 
         // start cooldown
         canColorCycle = false;

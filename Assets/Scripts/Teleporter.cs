@@ -35,7 +35,7 @@ public class Teleporter : Interactable {
 
     public override void Interact() {
 
-        if (gameManager.IsLevelCleared())
+        if (gameManager.IsLevelObjectiveCompleted())
             UseTeleporter();
 
     }

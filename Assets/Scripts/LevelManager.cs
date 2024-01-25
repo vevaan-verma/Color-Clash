@@ -59,7 +59,7 @@ public class LevelManager : GameManager {
         }
     }
 
-    public override bool IsLevelCleared() {
+    public override bool IsLevelObjectiveCompleted() {
 
         // make sure player has all claimables claimed
         bool found;

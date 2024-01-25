@@ -38,6 +38,9 @@ public class UIController : MonoBehaviour {
     [SerializeField] private Image gunIconBottom;
     [SerializeField] private Sprite blankGunSprite;
 
+    [Header("Effects")]
+    [SerializeField] private TMP_Text effectText;
+
     [Header("Health")]
     [SerializeField] private CanvasGroup healthBarParent;
     [SerializeField] private float healthBarFadeDuration;
@@ -49,6 +52,7 @@ public class UIController : MonoBehaviour {
 
     [Header("Subtitles")]
     [SerializeField] private TMP_Text subtitleText;
+    [SerializeField] private GameObject subtitleArrow;
     [SerializeField] private float subtitleTypeDuration;
     private Coroutine subtitleCycleCoroutine;
     private bool subtitleVisible;
@@ -117,6 +121,9 @@ public class UIController : MonoBehaviour {
             claimablesInfo[claimablesInfo.Count - 1].UpdateInfo(pair.Key, pair.Value); // update info
 
         }
+
+        // subtitles
+        subtitleArrow.SetActive(false); // hide arrow by default
 
         // pause menu
         pauseMenu.gameObject.SetActive(false);
@@ -214,6 +221,13 @@ public class UIController : MonoBehaviour {
         }
     }
 
+    public void UpdateEffectText(PlayerColor playerColor) {
+
+        effectText.text = playerColor.GetEffectType().ToString(); // update effect text
+        effectText.color = playerColor.GetSpriteColor(); // update effect text color
+
+    }
+
     public void UpdateHealth() {
 
         if (healthLerpCoroutine != null)
@@ -244,7 +258,7 @@ public class UIController : MonoBehaviour {
 
     public void TogglePause() {
 
-        if (loadingScreenVisible || gameManager.IsLevelCleared()) return; // can't pause while loading or while level is completed
+        if (loadingScreenVisible || gameManager.IsLevelObjectiveCompleted()) return; // can't pause while loading or while level is completed
 
         CloseCodeHUD(); // close code HUD if it's open
 
@@ -334,8 +348,12 @@ public class UIController : MonoBehaviour {
     public void OnLevelCleared() {
 
         // disable subtitles
-        if (subtitleCycleCoroutine != null)
+        if (subtitleCycleCoroutine != null) {
+
+            subtitleArrow.SetActive(false); // hide arrow after subtitles are done cycling
             StopCoroutine(subtitleCycleCoroutine);
+
+        }
 
         SetSubtitleText("");
 
@@ -454,8 +472,12 @@ public class UIController : MonoBehaviour {
 
         }
 
-        if (stopCycle && subtitleCycleCoroutine != null) // stop cycle coroutine if it's running
+        if (stopCycle && subtitleCycleCoroutine != null) { // stop cycle coroutine if it's running and boolean is true
+
+            subtitleArrow.SetActive(false); // hide arrow after subtitles are done cycling
             StopCoroutine(subtitleCycleCoroutine);
+
+        }
 
         subtitleText.gameObject.SetActive(true);
         DOVirtual.Int(0, text.Length, subtitleTypeDuration, (x) => subtitleText.text = text.Substring(0, x)).SetEase(Ease.Linear);
@@ -463,19 +485,25 @@ public class UIController : MonoBehaviour {
 
     }
 
-    public void CycleSubtitleTexts(string[] subtitleTexts, float duration) {
+    public void StartCycleSubtitleTexts(string[] subtitleTexts, float duration) {
 
-        if (subtitleCycleCoroutine != null) // stop cycle coroutine if it's running
+        if (subtitleCycleCoroutine != null) { // stop cycle coroutine if it's running
+
+            subtitleArrow.SetActive(false); // hide arrow after subtitles are done cycling
             StopCoroutine(subtitleCycleCoroutine);
 
-        subtitleCycleCoroutine = StartCoroutine(StartCycleSubtitleTexts(subtitleTexts, duration));
+        }
+
+        subtitleCycleCoroutine = StartCoroutine(CycleSubtitleTexts(subtitleTexts, duration));
 
     }
 
-    private IEnumerator StartCycleSubtitleTexts(string[] subtitleTexts, float duration) {
+    private IEnumerator CycleSubtitleTexts(string[] subtitleTexts, float duration) {
 
         if (duration == 0f)
             Debug.LogWarning("Subtitle cycle duration is 0f! Please raise this value to increase performance.");
+
+        subtitleArrow.SetActive(true); // show arrow because there is more than one subtitle text
 
         while (true) {
 
@@ -491,6 +519,7 @@ public class UIController : MonoBehaviour {
     public void HideSubtitleText() { // IMPORTANT: use this to disable subtitle text
 
         subtitleVisible = false;
+        subtitleArrow.SetActive(false); // hide arrow
         subtitleText.gameObject.SetActive(false);
 
     }

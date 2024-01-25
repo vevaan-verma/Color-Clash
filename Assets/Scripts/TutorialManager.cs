@@ -51,7 +51,7 @@ public class TutorialManager : GameManager {
         }
     }
 
-    public override bool IsLevelCleared() {
+    public override bool IsLevelObjectiveCompleted() {
 
         // make sure all checkpoints have been reached
         if (currCheckpointIndex == checkpoints.Length) // don't use length - 1 because checkpoint index is incremented after player reaches it

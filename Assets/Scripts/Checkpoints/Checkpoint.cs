@@ -53,7 +53,7 @@ public abstract class Checkpoint : MonoBehaviour {
             if (CheckRequirements()) { // requirements are met
 
                 if (subtitleTexts.Length > 1) // if there is more than one subtitle text, cycle through them
-                    uiController.CycleSubtitleTexts(subtitleTexts, subtitleDisplayDuration); // start subtitle cycle
+                    uiController.StartCycleSubtitleTexts(subtitleTexts, subtitleDisplayDuration); // start subtitle cycle
                 else
                     uiController.SetSubtitleText(subtitleTexts[0]); // set subtitle text
 
