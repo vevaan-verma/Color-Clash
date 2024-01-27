@@ -39,8 +39,6 @@ public class Claimable : MonoBehaviour {
         PlayerClaim playerClaim = GetComponent<PlayerClaim>();
         PhantomClaim phantomClaim = GetComponent<PhantomClaim>();
 
-        if (gameManager is LevelManager && ((LevelManager) gameManager).IsLevelObjectiveCompleted()) return; // no resetting after level is cleared (make sure game manager is level manager)
-
         if ((entityType == EntityType.Player && ((playerClaim && playerClaim.GetEffectType() == effectType) || playerColorCoroutine != null || healthManager.IsDead())) || (entityType == EntityType.Enemy && (phantomClaim || phantomColorCoroutine != null))) // already claimed by entity (player done this way to make sure if effect types are different, they are still replaced)
             return;
 

@@ -46,6 +46,7 @@ public class UIController : MonoBehaviour {
     [SerializeField] private float healthBarFadeDuration;
     [SerializeField] private Slider healthSlider;
     [SerializeField] private Image sliderFill;
+    [SerializeField] private TMP_Text healthText;
     [SerializeField] private float healthLerpDuration;
     [SerializeField] private Gradient healthGradient;
     private Coroutine healthLerpCoroutine;
@@ -246,6 +247,7 @@ public class UIController : MonoBehaviour {
 
             currentTime += Time.deltaTime;
             healthSlider.value = Mathf.Lerp(startHealth, targetHealth, currentTime / duration);
+            healthText.text = Mathf.CeilToInt(healthSlider.value) + ""; // health text is health rounded up
             sliderFill.color = healthGradient.Evaluate(healthSlider.normalizedValue); // normalizedValue returns the value between 0 and 1 (can't use DoTween here because of this line)
             yield return null;
 
@@ -258,7 +260,14 @@ public class UIController : MonoBehaviour {
 
     public void TogglePause() {
 
-        if (loadingScreenVisible || gameManager.IsLevelObjectiveCompleted()) return; // can't pause while loading or while level is completed
+        if (loadingScreenVisible || gameManager.IsLevelCompleted()) return; // can't pause while loading or while level is completed
+
+        if (codeHUDVisible) { // close code HUD if it's open
+
+            CloseCodeHUD();
+            return;
+
+        }
 
         CloseCodeHUD(); // close code HUD if it's open
 
@@ -280,16 +289,14 @@ public class UIController : MonoBehaviour {
         gameCore.PauseGame();
         playerController.DisableAllMechanics(); // disable all mechanics
 
-        pauseMenu.gameObject.SetActive(true);
-        pauseMenu.DOFade(1f, animator.GetCurrentAnimatorStateInfo(0).length).SetUpdate(true); // fade in pause menu with animation length (set update to true to ignore timescale)
-        animator.SetTrigger("openPauseMenu");
+        pauseMenuCoroutine = StartCoroutine(EnablePauseMenu()); // enable pause menu & handle animations
 
     }
 
     private void ClosePauseMenu() {
 
-        animator.SetTrigger("closePauseMenu"); // animation should disable pause menu on complete
-        pauseMenu.DOFade(0f, animator.GetCurrentAnimatorStateInfo(0).length).SetUpdate(true); // fade out pause menu with animation length (set update to true to ignore timescale)
+        if (pauseMenuCoroutine != null) // stop coroutine if it's running
+            StopCoroutine(pauseMenuCoroutine);
 
         if (subtitleVisible)
             subtitleText.gameObject.SetActive(true); // show subtitle text if it was visible before
@@ -302,7 +309,21 @@ public class UIController : MonoBehaviour {
 
     }
 
+    private IEnumerator EnablePauseMenu() {
+
+        pauseMenu.gameObject.SetActive(true);
+
+        animator.SetTrigger("openPauseMenu");
+        yield return new WaitForEndOfFrame(); // wait for end of frame to make sure animation is playing
+        pauseMenu.DOFade(1f, animator.GetCurrentAnimatorStateInfo(0).length).SetUpdate(true); // fade in pause menu with animation length (set update to true to ignore timescale)
+
+    }
+
     private IEnumerator DisablePauseMenu(float waitDuration) { // for disabling pause menu after animation
+
+        animator.SetTrigger("closePauseMenu"); // animation should disable pause menu on complete
+        yield return new WaitForEndOfFrame(); // wait for end of frame to make sure animation is playing
+        pauseMenu.DOFade(0f, animator.GetCurrentAnimatorStateInfo(0).length).SetUpdate(true); // fade out pause menu with animation length (set update to true to ignore timescale)
 
         yield return new WaitForSecondsRealtime(waitDuration); // realtime to ignore timescale
         pauseMenu.gameObject.SetActive(false);
@@ -357,8 +378,7 @@ public class UIController : MonoBehaviour {
 
         SetSubtitleText("");
 
-        // disable player control
-        playerController.DisableAllMechanics();
+        playerController.DisableAllMechanics(); // disable player mechanics
 
         levelClearedScreen.gameObject.SetActive(true);
         levelClearedScreen.DOFade(1f, levelClearedFadeDuration);

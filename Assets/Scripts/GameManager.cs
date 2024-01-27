@@ -33,6 +33,9 @@ public abstract class GameManager : MonoBehaviour {
     protected List<PhantomClaim> enemyClaims;
     protected int levelCurrClaimables; // for teleporter
 
+    [Header("Level Completion")]
+    protected bool levelCompleted;
+
     [Header("Subtitles")]
     [SerializeField] private string firstSubtitle;
 
@@ -146,6 +149,8 @@ public abstract class GameManager : MonoBehaviour {
     public abstract void RemoveClaim(EntityClaim claim);
 
     public abstract bool IsLevelObjectiveCompleted(); // doesn't mean level is completed, just that the objective has been reached
+
+    public bool IsLevelCompleted() { return levelCompleted; }
 
     public int GetLevelIndex() { return level.GetLevelIndex(); }
 

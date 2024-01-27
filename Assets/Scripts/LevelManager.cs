@@ -87,6 +87,7 @@ public class LevelManager : GameManager {
         if (FindObjectsOfType<PhantomController>().Length != 0)
             return false;
 
+        levelCompleted = true;
         return true;
 
     }

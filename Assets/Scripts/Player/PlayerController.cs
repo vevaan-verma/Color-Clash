@@ -181,11 +181,13 @@ public class PlayerController : MonoBehaviour {
         switch (mechanicType) {
 
             case MechanicType.Guns:
+
                 uiController.EnableGunCycleHUD();
                 uiController.EnableHealthBarHUD();
                 break;
 
             case MechanicType.Claiming:
+
                 uiController.EnableClaimablesInfoHUD();
                 break;
 
@@ -213,15 +215,18 @@ public class PlayerController : MonoBehaviour {
         switch (mechanicType) {
 
             case MechanicType.Guns:
+
                 uiController.DisableGunCycleHUD();
                 uiController.DisableHealthBarHUD();
                 break;
 
             case MechanicType.Claiming:
+
                 uiController.DisableClaimablesInfoHUD();
                 break;
 
             case MechanicType.Movement:
+
                 animator.SetBool("isRunning", false); // stop running animation
                 break;
 
