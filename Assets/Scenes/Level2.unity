@@ -2608,7 +2608,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 937013735
   m_SortingLayer: -1
-  m_SortingOrder: -1
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 1efc14524702f8c4694fc4697517592f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -6229,19 +6229,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerHUD: {fileID: 168938496}
   playerHUDFadeDuration: 0.5
-  subtitleText: {fileID: 0}
-  subtitleTypeDuration: 0
   claimablesInfoParent: {fileID: 0}
+  claimablesInfoFadeDuration: 0
   claimablesInfoPrefab: {fileID: 0}
+  multipliersInfoParent: {fileID: 0}
+  multipliersInfoFadeDuration: 0
+  multipliersInfoPrefab: {fileID: 0}
   ammoText: {fileID: 633509989}
   gunCycleParent: {fileID: 0}
+  gunCycleFadeDuration: 0
   gunIconTop: {fileID: 1849498060}
   gunIconMiddle: {fileID: 1216135220}
   gunIconBottom: {fileID: 1196860268}
   blankGunSprite: {fileID: 21300000, guid: c999d03e99115534f9d838e8cc4c701c, type: 3}
+  effectText: {fileID: 0}
   healthBarParent: {fileID: 0}
+  healthBarFadeDuration: 0
   healthSlider: {fileID: 600531947}
   sliderFill: {fileID: 690640456}
+  healthText: {fileID: 0}
   healthLerpDuration: 0.1
   healthGradient:
     serializedVersion: 2
@@ -6273,6 +6279,13 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
+  subtitleText: {fileID: 0}
+  subtitleArrow: {fileID: 0}
+  subtitleTypeDuration: 0
+  pauseMenu: {fileID: 0}
+  pauseResumeButton: {fileID: 0}
+  pauseRestartButton: {fileID: 0}
+  pauseMainMenuButton: {fileID: 0}
   codeHUD: {fileID: 583638594}
   codeHUDFadeDuration: 0.25
   codeInput: {fileID: 1896552742}

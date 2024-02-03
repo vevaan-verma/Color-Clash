@@ -39,6 +39,11 @@ public class PlayerController : MonoBehaviour {
     [Header("Rotation")]
     private bool isRotated;
 
+    [Header("Underwater")]
+    [SerializeField] private Transform breatheParticlesSpawn;
+    [SerializeField] private ParticleSystem breatheParticlesPrefab;
+    [SerializeField] private float breatheWaitDuration;
+
     [Header("Keybinds")]
     [SerializeField] private KeyCode jumpKey;
     [SerializeField] private KeyCode pauseKey;
@@ -48,9 +53,14 @@ public class PlayerController : MonoBehaviour {
         - PLAYER MUST START FACING RIGHT
     */
 
-    public void Initialize(UIController uiController) { // to initialize ui controller
+    public void Initialize(UIController uiController, float speedModifier, float jumpModifier, bool isLevelUnderwater) { // to initialize ui controller
 
         this.uiController = uiController;
+        this.moveSpeed *= speedModifier;
+        this.jumpForce *= jumpModifier;
+
+        if (isLevelUnderwater)
+            InvokeRepeating("SpawnBreatheParticles", 0f, breatheWaitDuration);
 
     }
 
@@ -245,6 +255,12 @@ public class PlayerController : MonoBehaviour {
         uiController.DisableClaimablesInfoHUD();
         uiController.DisableGunCycleHUD();
         uiController.DisableHealthBarHUD();
+
+    }
+
+    private void SpawnBreatheParticles() {
+
+        Instantiate(breatheParticlesPrefab, breatheParticlesSpawn.position, Quaternion.Euler(0f, 90f, 0f), transform);
 
     }
 }

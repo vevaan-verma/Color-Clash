@@ -29,6 +29,7 @@ public class PlayerColorManager : MonoBehaviour {
         spriteRenderer.color = playerColors[currColorIndex].GetSpriteColor();
 
         uiController.UpdateEffectText(playerColors[currColorIndex]); // update effect text
+        uiController.UpdateClaimablesHUD(); // update claimables HUD (for selected indicator)
 
         canColorCycle = true;
 
@@ -56,6 +57,7 @@ public class PlayerColorManager : MonoBehaviour {
         spriteRenderer.color = playerColors[currColorIndex].GetSpriteColor();
 
         uiController.UpdateEffectText(playerColors[currColorIndex]); // update effect text
+        uiController.UpdateClaimablesHUD(); // update claimables HUD (for selected indicator)
 
         // start cooldown
         canColorCycle = false;

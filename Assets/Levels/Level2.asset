@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Level2
   m_EditorClassIdentifier: 
   name: Level 2
-  levelIndex: 2
+  levelNumber: 2
   backgroundMusic: {fileID: 8300000, guid: be5eb11bf472c5c45acd77e031371165, type: 3}
+  speedModifier: 1
+  jumpModifier: 1
+  gravityModifier: 1
   hasCode: 0
   hasTeleporter: 1
-  isCameraRotated: 0

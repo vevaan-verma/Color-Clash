@@ -10,57 +10,52 @@ public class PlayerEffectManager : MonoBehaviour {
     private UIController uiController;
 
     [Header("Effects")]
-    [SerializeField] private List<EffectValue> effectValues;
-    private Dictionary<EffectType, float> effectMultipliers;
+    [SerializeField] private List<EffectData> effectMultipliers; // declare all default effect multipliers
 
     private void Start() {
 
         uiController = FindObjectOfType<UIController>();
 
-        // effects
-        effectMultipliers = new Dictionary<EffectType, float>();
-        Array effects = Enum.GetValues(typeof(EffectType)); // get all effect type values
+    }
 
-        bool added;
+    public float GetEffectMultiplier(EffectType effectType) {
 
-        // auto populate dictionary with all effect types
-        foreach (EffectType effectType in effects) {
+        foreach (EffectData effectData in effectMultipliers)
+            if (effectData.GetEffectType() == effectType)
+                return effectData.GetEffectMultiplier();
 
-            added = false;
+        return 0f;
 
-            // check for predefined multiplier
-            for (int j = 0; j < effectValues.Count; j++) {
-
-                // predefined multiplier is given
-                if (effectValues[j].GetEffectType() == effectType) {
-
-                    effectMultipliers.Add(effectType, effectValues[j].GetEffectMultiplier()); // add with multiplier
-                    added = true;
-                    break;
-
-                }
-            }
-
-            if (!added)
-                effectMultipliers.Add(effectType, 1f); // add with default value of 1 because no predefined multiplier was given
-
-        }
     }
 
     public void AddEffectMultiplier(EffectType effectType, float multiplier) {
 
-        effectMultipliers[effectType] += multiplier;
-        uiController.UpdateClaimablesHUD(); // update ui
+        foreach (EffectData effectData in effectMultipliers) {
 
+            if (effectData.GetEffectType() == effectType) {
+
+                effectData.AddEffectMultiplier(multiplier);
+                uiController.UpdateClaimablesHUD(); // update ui
+                return;
+
+            }
+        }
     }
 
     public void RemoveEffectMultiplier(EffectType effectType, float multiplier) {
 
-        effectMultipliers[effectType] -= multiplier;
-        uiController.UpdateClaimablesHUD(); // update ui
+        foreach (EffectData effectData in effectMultipliers) {
 
+            if (effectData.GetEffectType() == effectType) {
+
+                effectData.RemoveEffectMultiplier(multiplier);
+                uiController.UpdateClaimablesHUD(); // update ui
+                return;
+
+            }
+        }
     }
 
-    public float GetEffectMultiplier(EffectType effectType) { return effectMultipliers[effectType]; }
+    public List<EffectData> GetEffectMultipliers() { return effectMultipliers; }
 
 }

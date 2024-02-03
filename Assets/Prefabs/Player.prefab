@@ -95,7 +95,7 @@ Transform:
   - {fileID: 8452729173501358224}
   m_Father: {fileID: 1761575009889257618}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &5970266215851672976
+--- !u!1 &5349020398552472312
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -103,24 +103,24 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 311432245456568987}
+  - component: {fileID: 7809599099049302648}
   m_Layer: 7
-  m_Name: GameObject
+  m_Name: BreatheParticles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &311432245456568987
+--- !u!4 &7809599099049302648
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5970266215851672976}
+  m_GameObject: {fileID: 5349020398552472312}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.2, y: 0.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -273,7 +273,7 @@ Transform:
   - {fileID: 8770193713029372868}
   - {fileID: 7819015865006615343}
   - {fileID: 1507701810672531826}
-  - {fileID: 311432245456568987}
+  - {fileID: 7809599099049302648}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8680503193642501014
@@ -316,7 +316,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_Sprite: {fileID: 21300000, guid: 8a4d22a7c8c82ea43bb79ee02db3428b, type: 3}
   m_Color: {r: 0.8627451, g: 0, b: 0, a: 1}
   m_FlipX: 0
@@ -420,6 +420,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4416
   groundCheckRadius: 0.1
+  breatheParticlesSpawn: {fileID: 7809599099049302648}
+  breatheParticlesPrefab: {fileID: 6866412577018748432, guid: 1fe594ed9a236df43b228b4005045198, type: 3}
+  breatheWaitDuration: 2
   jumpKey: 32
   pauseKey: 27
 --- !u!114 &4725347144615699786
@@ -471,13 +474,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddc1cd702785a8a489607cf693a7f6e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectValues:
+  effectMultipliers:
   - effectType: 0
     effectMultiplier: 1
+    effectIcon: {fileID: 21300000, guid: de8a9c404cd87f149bae3ad5ddd7c383, type: 3}
   - effectType: 1
     effectMultiplier: 3
+    effectIcon: {fileID: 21300000, guid: 5f5a2659c00d78f468e3553b7716e1b9, type: 3}
   - effectType: 2
     effectMultiplier: 8
+    effectIcon: {fileID: 21300000, guid: c9fdc062e38ef544a9ad1404145c7c0c, type: 3}
 --- !u!114 &5938639835511817533
 MonoBehaviour:
   m_ObjectHideFlags: 0

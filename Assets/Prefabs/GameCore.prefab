@@ -47,5 +47,6 @@ MonoBehaviour:
   levels:
   - {fileID: 11400000, guid: 6ccccfd5853e73f46811a4f47d5a1434, type: 2}
   - {fileID: 11400000, guid: 53eae523cf804414ca0457579fb2d26b, type: 2}
+  - {fileID: 11400000, guid: 7416866cca218434c9d05d5e5b93d68d, type: 2}
   mainMenuBuildIndex: 0
   ignoredScenes: 1

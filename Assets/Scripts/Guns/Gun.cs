@@ -48,6 +48,8 @@ public class Gun : MonoBehaviour {
 
     public IEnumerator Shoot(EntityType shooterType, LayerMask shootableMask, float multiplier = 1f) {
 
+        if (isReloading || !shotReady) yield break; // don't check if ammo is greater than 0 because reload is handled after this
+
         // reload if out of ammo
         if (currAmmo == 0) {
 
@@ -55,8 +57,6 @@ public class Gun : MonoBehaviour {
             yield break;
 
         }
-
-        if (!CanShoot()) yield break;
 
         shotReady = false;
 
@@ -150,12 +150,6 @@ public class Gun : MonoBehaviour {
 
         if (entityType == EntityType.Player) // player is reloading
             uiController.UpdateGunHUD(this, gunIndex); // update ui
-
-    }
-
-    private bool CanShoot() {
-
-        return !isReloading && currAmmo > 0 && shotReady;
 
     }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 public class VaultReward : MonoBehaviour {
 
     [Header("Effect")]
-    [SerializeField] private EffectValue effectValue;
+    [SerializeField] private EffectData effectValue;
 
     private void OnTriggerEnter2D(Collider2D collision) {
 

@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e99654d627bdbcc46ae5b1eaba0466d4, type: 3}
-  m_Name: Tutorial
+  m_Name: Level3
   m_EditorClassIdentifier: 
-  name: Tutorial
-  levelNumber: 0
+  name: Level 3
+  levelNumber: 3
   backgroundMusic: {fileID: 8300000, guid: be5eb11bf472c5c45acd77e031371165, type: 3}
-  speedModifier: 1
-  jumpModifier: 1
-  gravityModifier: 1
+  speedModifier: 0.3
+  jumpModifier: 0.4
+  gravityModifier: 0.4
   hasCode: 0
   hasTeleporter: 1
+  isUnderwater: 1

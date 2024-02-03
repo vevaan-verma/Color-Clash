@@ -9,7 +9,9 @@ public class UIController : MonoBehaviour {
 
     [Header("References")]
     private PlayerClaimManager claimManager;
+    private PlayerColorManager colorManager;
     private PlayerController playerController;
+    private PlayerEffectManager effectManager;
     private PlayerGunManager gunManager;
     private PlayerHealthManager healthManager;
     private GameCore gameCore;
@@ -26,6 +28,12 @@ public class UIController : MonoBehaviour {
     [SerializeField] private float claimablesInfoFadeDuration;
     [SerializeField] private ClaimableInfo claimablesInfoPrefab;
     private List<ClaimableInfo> claimablesInfo;
+
+    [Header("Multipliers")]
+    [SerializeField] private CanvasGroup multipliersInfoParent;
+    [SerializeField] private float multipliersInfoFadeDuration;
+    [SerializeField] private MultiplierInfo multipliersInfoPrefab;
+    private List<MultiplierInfo> multipliersInfo;
 
     [Header("Weapon HUD")]
     [SerializeField] private TMP_Text ammoText;
@@ -91,7 +99,9 @@ public class UIController : MonoBehaviour {
     public void Initialize() {
 
         claimManager = FindObjectOfType<PlayerClaimManager>();
+        colorManager = FindObjectOfType<PlayerColorManager>();
         playerController = FindObjectOfType<PlayerController>();
+        effectManager = FindObjectOfType<PlayerEffectManager>();
         gunManager = FindObjectOfType<PlayerGunManager>();
         healthManager = FindObjectOfType<PlayerHealthManager>();
         gameCore = FindObjectOfType<GameCore>();
@@ -119,9 +129,27 @@ public class UIController : MonoBehaviour {
         foreach (KeyValuePair<Color, int> pair in claimables) {
 
             claimablesInfo.Add(Instantiate(claimablesInfoPrefab, claimablesInfoParent.transform)); // add to list
-            claimablesInfo[claimablesInfo.Count - 1].UpdateInfo(pair.Key, pair.Value); // update info
+            claimablesInfo[claimablesInfo.Count - 1].UpdateInfo(pair.Key, pair.Value, pair.Key == colorManager.GetCurrentPlayerColor().GetClaimColor()); // update info (select if claimable color is current claim color)
 
         }
+
+        foreach (LayoutGroup layout in claimablesInfoParent.GetComponentsInChildren<LayoutGroup>())
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>()); // force rebuild layout to prevent UI bugs (for children too, includes parent)
+
+        // multiplier info
+        multipliersInfo = new List<MultiplierInfo>();
+
+        List<EffectData> multipliers = effectManager.GetEffectMultipliers();
+
+        foreach (EffectData data in multipliers) {
+
+            multipliersInfo.Add(Instantiate(multipliersInfoPrefab, multipliersInfoParent.transform)); // add to list
+            multipliersInfo[multipliersInfo.Count - 1].UpdateInfo(data.GetEffectIcon(), data.GetEffectMultiplier()); // update info (select if claimable color is current claim color)
+
+        }
+
+        foreach (LayoutGroup layout in multipliersInfoParent.GetComponentsInChildren<LayoutGroup>())
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>()); // force rebuild layout to prevent UI bugs (for children too, includes parent)
 
         // subtitles
         subtitleArrow.SetActive(false); // hide arrow by default
@@ -174,10 +202,25 @@ public class UIController : MonoBehaviour {
 
     public void UpdateClaimablesHUD() {
 
+        if (gameCore.IsQuitting()) return; // don't update claimables & multipliers HUD if game is quitting
+
+        // claimables HUD
         Dictionary<Color, int> claimables = claimManager.GetClaims();
 
         foreach (ClaimableInfo info in claimablesInfo)
-            info.UpdateInfo(claimables[info.GetColor()]); // update info
+            info.UpdateInfo(claimables[info.GetColor()], info.GetColor() == colorManager.GetCurrentPlayerColor().GetClaimColor()); // update info (select if claimable color is current claim color)
+
+        foreach (LayoutGroup layout in claimablesInfoParent.GetComponentsInChildren<LayoutGroup>())
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>()); // force rebuild layout to prevent UI bugs (for children too, includes parent)
+
+        // multipliers HUD
+        List<EffectData> multipliers = effectManager.GetEffectMultipliers();
+
+        for (int i = 0; i < multipliersInfo.Count; i++)
+            multipliersInfo[i].UpdateInfo(multipliers[i].GetEffectIcon(), multipliers[i].GetEffectMultiplier()); // update info (select if claimable color is current claim color)
+
+        foreach (LayoutGroup layout in multipliersInfoParent.GetComponentsInChildren<LayoutGroup>())
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>()); // force rebuild layout to prevent UI bugs (for children too, includes parent)
 
     }
 
@@ -220,6 +263,10 @@ public class UIController : MonoBehaviour {
             gunIconBottom.sprite = guns[currGunIndex + 1].GetIcon(); // bottom gun is next gun
 
         }
+
+        foreach (LayoutGroup layout in gunCycleParent.GetComponentsInChildren<LayoutGroup>())
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>()); // force rebuild layout to prevent UI bugs (for children too, includes parent)
+
     }
 
     public void UpdateEffectText(PlayerColor playerColor) {

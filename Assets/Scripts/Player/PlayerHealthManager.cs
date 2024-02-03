@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerController))]
@@ -84,11 +85,11 @@ public class PlayerHealthManager : MonoBehaviour {
         // clear all player claims
         List<PlayerClaim> playerClaims = gameManager.GetPlayerClaims();
 
-        foreach (PlayerClaim claim in playerClaims)
+        foreach (PlayerClaim claim in playerClaims.ToList())
             Destroy(claim);
 
         // reload all weapons
-        foreach (Gun gun in gunManager.GetGuns())
+        foreach (Gun gun in gunManager.GetGuns().ToList())
             gun.InstantReload(EntityType.Player);
 
         rb.velocity = Vector2.zero; // reset velocity

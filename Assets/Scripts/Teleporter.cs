@@ -35,7 +35,7 @@ public class Teleporter : Interactable {
 
     public override void Interact() {
 
-        if (gameManager.IsLevelObjectiveCompleted())
+        if (teleporterProgressSlider.value == teleporterProgressSlider.maxValue) // teleporter is full
             UseTeleporter();
 
     }

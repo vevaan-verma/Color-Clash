@@ -10,7 +10,7 @@ public class PhantomClaim : EntityClaim {
 
     }
 
-    private void OnDestroy() {
+    private void OnDisable() {
 
         GetComponent<Claimable>().OnClaimDestroy(this); // trigger destroy event
         gameManager.RemoveClaim(this); // remove claim

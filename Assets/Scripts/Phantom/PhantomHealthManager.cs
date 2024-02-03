@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -67,7 +68,7 @@ public class PhantomHealthManager : MonoBehaviour {
         // clear all phantom claims
         List<PhantomClaim> phantomClaims = gameManager.GetEnemyClaims();
 
-        foreach (PhantomClaim claim in phantomClaims)
+        foreach (PhantomClaim claim in phantomClaims.ToList()) // use ToList() to avoid InvalidOperationException
             Destroy(claim);
 
         phantomController.GetEnemySpawn().OnEnemyDeath(); // tell phantom spawn to respawn phantom if enabled

@@ -80,7 +80,7 @@ public abstract class GameManager : MonoBehaviour {
         uiController = Instantiate(canvasPrefab); // instantiate canvas
         uiController.Initialize();
 
-        playerController.Initialize(uiController); // initialize player controller
+        playerController.Initialize(uiController, level.GetSpeedModifier(), level.GetJumpModifier(), level.IsUnderwater()); // initialize player controller
 
         Instantiate(eventSystemPrefab); // instantiate event system
 
@@ -96,6 +96,9 @@ public abstract class GameManager : MonoBehaviour {
     protected void Start() {
 
         SpawnEnemies(); // to allow enemy spawn class to run awake method first
+
+        print(Physics2D.gravity.y * level.GetGravityModifier());
+        SetGravity(Physics2D.gravity.y * level.GetGravityModifier());
 
         uiController.SetSubtitleText(firstSubtitle); // update subtitle text
 
@@ -152,7 +155,7 @@ public abstract class GameManager : MonoBehaviour {
 
     public bool IsLevelCompleted() { return levelCompleted; }
 
-    public int GetLevelIndex() { return level.GetLevelIndex(); }
+    public int GetLevelIndex() { return level.GetLevelNumber(); }
 
     public Vector3 GetPlayerSpawn() { return playerSpawn.position; }
 
@@ -173,5 +176,7 @@ public abstract class GameManager : MonoBehaviour {
     public int GetLevelCurrentClaimables() { return levelCurrClaimables; }
 
     public bool LevelHasCode() { return level.HasCode(); }
+
+    public void SetGravity(float gravityModifier) { Physics2D.gravity = new Vector2(Physics2D.gravity.x, gravityModifier); }
 
 }
