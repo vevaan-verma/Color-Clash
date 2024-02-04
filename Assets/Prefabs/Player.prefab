@@ -398,7 +398,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.625, y: 1}
   m_EdgeRadius: 0
 --- !u!114 &5021947070130016683
 MonoBehaviour:
@@ -497,7 +497,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   starterGuns:
-  - {fileID: -6807907351907170449, guid: e45a4f862c9e5fe4088f657da1eb804b, type: 3}
   - {fileID: -7252344389506710391, guid: ea128f21d0afba14f9371e2ce5316cef, type: 3}
   - {fileID: 7837060837916375440, guid: a042358fb58fb644a8ca434a8b19717f, type: 3}
   gunSlot: {fileID: 8770193713029372868}

@@ -10,6 +10,7 @@ using UnityEditor.SceneManagement; // import only in editor
 public class PhantomStateManager : MonoBehaviour {
 
     [Header("References")]
+    private GameCore gameCore;
     private PhantomController phantomController;
     private PhantomGunManager gunManager;
     private PhantomHealthManager healthManager;
@@ -27,6 +28,7 @@ public class PhantomStateManager : MonoBehaviour {
     [SerializeField] private Vector2 visionOffset;
     [SerializeField] private Vector2 visionSize;
     [SerializeField] private GameObject dangerIcon;
+    private float frontVisionRange;
     private BoxCollider2D visionCollider;
     private bool playerInVision;
 
@@ -54,6 +56,7 @@ public class PhantomStateManager : MonoBehaviour {
 
     private IEnumerator Start() {
 
+        gameCore = FindObjectOfType<GameCore>();
         phantomController = GetComponent<PhantomController>();
         gunManager = GetComponent<PhantomGunManager>();
         healthManager = GetComponent<PhantomHealthManager>();
@@ -67,6 +70,8 @@ public class PhantomStateManager : MonoBehaviour {
         visionCollider.offset = visionOffset;
         visionCollider.size = visionSize;
         visionCollider.isTrigger = true;
+
+        frontVisionRange = ((int) visionSize.x / 2) + visionOffset.x; // formula for range (uses integer division to round down)
 
         dangerIcon.SetActive(false); // disable danger icon
 
@@ -107,14 +112,47 @@ public class PhantomStateManager : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision) {
 
+        //if (collision.transform.CompareTag("Player")) { // collider is player
+
+        //    playerInVision = true;
+
+        //    // play danger animation
+        //    dangerIcon.SetActive(true);
+        //    animator.SetBool("playerInVision", true);
+
+        //}
+
         if (collision.transform.CompareTag("Player")) { // collider is player
 
-            playerInVision = true;
+            RaycastHit2D obstacleHit = Physics2D.Raycast(visionObj.transform.position, visionObj.transform.right, frontVisionRange, gameCore.GetEnvironmentMask()); // for checking if an obstacle is in the way
 
-            // play danger animation
-            dangerIcon.SetActive(true);
-            animator.SetBool("playerInVision", true);
+            if (!obstacleHit || Vector2.Distance(visionObj.transform.position, obstacleHit.point) > Vector2.Distance(visionObj.transform.position, player.position)) { // obstacle is not in the way
 
+                playerInVision = true;
+
+                // play danger animation
+                dangerIcon.SetActive(true);
+                animator.SetBool("playerInVision", true);
+
+            }
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision) {
+
+        if (collision.transform.CompareTag("Player")) { // collider is player
+
+            RaycastHit2D obstacleHit = Physics2D.Raycast(visionObj.transform.position, visionObj.transform.right, frontVisionRange, gameCore.GetEnvironmentMask()); // for checking if an obstacle is in the way
+
+            if (!obstacleHit || Vector2.Distance(visionObj.transform.position, obstacleHit.point) > Vector2.Distance(visionObj.transform.position, player.position)) { // obstacle is not in the way
+
+                playerInVision = true;
+
+                // play danger animation
+                dangerIcon.SetActive(true);
+                animator.SetBool("playerInVision", true);
+
+            }
         }
     }
 

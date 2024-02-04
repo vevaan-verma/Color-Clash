@@ -2613,6 +2613,14 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8384790298835611893, guid: 9fa58d84adaa1ab42bb1c14aaa701861, type: 3}
+      propertyPath: visionSize.x
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8384790298835611893, guid: 9fa58d84adaa1ab42bb1c14aaa701861, type: 3}
+      propertyPath: visionOffset.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8533119955212523519, guid: 9fa58d84adaa1ab42bb1c14aaa701861, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0

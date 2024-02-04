@@ -73,10 +73,10 @@ public class Gun : MonoBehaviour {
 
         if (gunData.UsesRaycastShooting()) {
 
-            RaycastHit2D shootableHit = Physics2D.Raycast(muzzle.position, muzzle.right, gunData.GetMaxRange(), shootableMask); // for seeing if a shootable is hit
+            RaycastHit2D shootableHit = Physics2D.Raycast(muzzle.position, muzzle.right, gunData.GetMaxRange(), shootableMask); // for checking if a shootable is hit
             RaycastHit2D obstacleHit = Physics2D.Raycast(muzzle.position, muzzle.right, gunData.GetMaxRange(), gameCore.GetEnvironmentMask()); // for checking if an obstacle is in the way
 
-            if (obstacleHit && (Vector2.Distance(transform.position, obstacleHit.point) <= Vector2.Distance(transform.position, shootableHit.point) || !shootableHit)) { // obstacle in the way or shot didn't hit shootable, but hit obstacle
+            if (obstacleHit && (Vector2.Distance(muzzle.position, obstacleHit.point) <= Vector2.Distance(muzzle.position, shootableHit.point) || !shootableHit)) { // obstacle in the way or shot didn't hit shootable, but hit obstacle
 
                 // impact effect
                 Instantiate(impactEffect, obstacleHit.point, Quaternion.identity);

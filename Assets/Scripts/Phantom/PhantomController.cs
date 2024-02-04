@@ -25,7 +25,6 @@ public class PhantomController : MonoBehaviour {
     private PhantomSpawn phantomSpawn;
 
     [Header("Movement")]
-    private bool isFlipped;
     private bool isFacingRight;
 
     [Header("Ground Check")]
@@ -54,7 +53,6 @@ public class PhantomController : MonoBehaviour {
 
         gunManager.SetGun(gun);
 
-        this.isFlipped = isFlipped;
         isFacingRight = !isFlipped;
 
         stateManager.Initialize(patrolPoints, isFlipped);
@@ -76,8 +74,8 @@ public class PhantomController : MonoBehaviour {
 
     public void CheckFlip() {
 
-        if ((isFacingRight && rb.velocity.x < 0f) // player is going left while facing right
-            || (!isFacingRight && rb.velocity.x > 0f)) // player is going right while facing left
+        if ((isFacingRight && rb.velocity.x < 0f) // phantom is going left while facing right
+            || (!isFacingRight && rb.velocity.x > 0f)) // phantom is going right while facing left
             Flip();
 
     }

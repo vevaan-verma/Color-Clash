@@ -350,9 +350,6 @@ MonoBehaviour:
   shootableMask:
     serializedVersion: 2
     m_Bits: 1088
-  antiSelfMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &1872744803731554657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,6 +412,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 1152
   visionObj: {fileID: 2529694425881020967}
   visionOffset: {x: 1.5, y: 0}
   visionSize: {x: 6, y: 0.1}

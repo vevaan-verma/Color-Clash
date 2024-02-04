@@ -107,12 +107,6 @@ public abstract class GameManager : MonoBehaviour {
 
     }
 
-    private void OnApplicationQuit() {
-
-        Destroy(FindObjectOfType<DOTweenComponent>());
-
-    }
-
     public abstract void Initialize();
 
     protected void SpawnPlayer() {
