@@ -34,7 +34,7 @@ public class GravityFlipper : MonoBehaviour {
         if (!canRotate) return;
 
         gameCore.FlipGravity();
-        playerController.FlipPlayer(rotationDuration);
+        playerController.GravityFlip(rotationDuration);
         canRotate = false;
 
         Invoke("ResetRotateCooldown", rotationCooldown);

@@ -48,7 +48,7 @@ public class PlayerGunManager : MonoBehaviour {
             // shooting
             if (Input.GetMouseButton(0)) {
 
-                StartCoroutine(guns[currGunIndex].Shoot(EntityType.Player, shootableMask, colorManager.GetCurrentPlayerColor().GetEffectType() == EffectType.Damage ? effectManager.GetEffectMultiplier(EffectType.Damage) : 1f)); // if player has the damage color equipped, add multiplier
+                StartCoroutine(guns[currGunIndex].Shoot(colorManager.GetCurrentPlayerColor().GetEffectType() == EffectType.Damage ? effectManager.GetEffectMultiplier(EffectType.Damage) : 1f)); // if player has the damage color equipped, add multiplier
                 uiController.UpdateGunHUD(guns[currGunIndex], currGunIndex);
 
             }
@@ -90,7 +90,7 @@ public class PlayerGunManager : MonoBehaviour {
     private void AddGun(Gun gun) {
 
         Gun newGun = Instantiate(gun, gunSlot); // add gun under gunSlot
-        newGun.Initialize(collider, guns.Count); // index of new gun will be guns.Count
+        newGun.Initialize(EntityType.Player, shootableMask, collider, guns.Count); // index of new gun will be guns.Count
         guns.Add(newGun);
 
     }

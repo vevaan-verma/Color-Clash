@@ -1,5 +1,5 @@
 public enum EntityType {
 
-    None, Player, Enemy
+    None, Player, Phantom
 
 }

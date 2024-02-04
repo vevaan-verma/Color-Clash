@@ -10,7 +10,7 @@ public class BuoyancyOrb : MonoBehaviour {
     [Header("References")]
     private SpriteRenderer spriteRenderer;
     private new Collider2D collider;
-    private GameManager gameManager;
+    private GameCore gameCore;
 
     [Header("Buoyancy")]
     [SerializeField] private float buoyancyMultiplier;
@@ -20,7 +20,7 @@ public class BuoyancyOrb : MonoBehaviour {
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         collider = GetComponent<Collider2D>();
-        gameManager = FindObjectOfType<GameManager>();
+        gameCore = FindObjectOfType<GameCore>();
 
     }
 
@@ -28,7 +28,7 @@ public class BuoyancyOrb : MonoBehaviour {
 
         if (collision.CompareTag("Player")) { // collider is player
 
-            gameManager.SetGravity(Physics2D.gravity.y / buoyancyMultiplier);
+            gameCore.ModifyGravity(1 / buoyancyMultiplier);
             collider.enabled = false; // disable collider
             spriteRenderer.DOColor(Color.clear, destroyFadeDuration).OnComplete(() => Destroy(gameObject)); // fade out and destroy
 

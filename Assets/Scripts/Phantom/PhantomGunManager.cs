@@ -14,15 +14,15 @@ public class PhantomGunManager : MonoBehaviour {
 
         // guns
         this.gun = Instantiate(gun, gunSlot);
-        this.gun.Initialize(GetComponent<Collider2D>(), 0);
+        this.gun.Initialize(EntityType.Phantom, shootableMask, GetComponent<Collider2D>(), 0);
 
     }
 
     public void Shoot() {
 
         // gun shooting & reloading
-        StartCoroutine(gun.Shoot(EntityType.Enemy, shootableMask));
-        gun.InstantReload(EntityType.Enemy);
+        StartCoroutine(gun.Shoot());
+        gun.InstantReload();
 
     }
 }

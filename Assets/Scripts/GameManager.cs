@@ -1,3 +1,4 @@
+using DG.Tweening.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine.EventSystems;
 public abstract class GameManager : MonoBehaviour {
 
     [Header("References")]
+    private GameCore gameCore;
     protected PlayerController playerController;
     protected PlayerClaimManager claimManager;
     protected UIController uiController;
@@ -50,11 +52,12 @@ public abstract class GameManager : MonoBehaviour {
         foreach (Claimable claimable in FindObjectsOfType<Claimable>())
             levelClaimables.Add(claimable);
 
-        // destroy all game cores
-        foreach (GameCore gameCore in FindObjectsOfType<GameCore>())
-            Destroy(gameCore.gameObject);
+        gameCore = FindObjectOfType<GameCore>();
 
-        Instantiate(gameCorePrefab); // instantiate game core
+        // instantiate new game core if it doesn't exist
+        if (gameCore == null)
+            gameCore = Instantiate(gameCorePrefab);
+
         Instantiate(audioManagerPrefab).Initialize(); // instantiate audio manager
 
         // checkpoints
@@ -97,10 +100,16 @@ public abstract class GameManager : MonoBehaviour {
 
         SpawnEnemies(); // to allow enemy spawn class to run awake method first
 
-        print(Physics2D.gravity.y * level.GetGravityModifier());
-        SetGravity(Physics2D.gravity.y * level.GetGravityModifier());
+        gameCore.ResetGravity(); // reset gravity to modify original gravity, not current one
+        gameCore.ModifyGravity(level.GetGravityModifier());
 
         uiController.SetSubtitleText(firstSubtitle); // update subtitle text
+
+    }
+
+    private void OnApplicationQuit() {
+
+        Destroy(FindObjectOfType<DOTweenComponent>());
 
     }
 
@@ -176,7 +185,5 @@ public abstract class GameManager : MonoBehaviour {
     public int GetLevelCurrentClaimables() { return levelCurrClaimables; }
 
     public bool LevelHasCode() { return level.HasCode(); }
-
-    public void SetGravity(float gravityModifier) { Physics2D.gravity = new Vector2(Physics2D.gravity.x, gravityModifier); }
 
 }

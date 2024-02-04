@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 
 public class GameCore : MonoBehaviour {
 
+    [Header("Environment")]
+    [SerializeField] private LayerMask environmentMask;
+
     [Header("Levels")]
     [SerializeField] private Level[] levels;
     [SerializeField] private int mainMenuBuildIndex;
@@ -20,9 +23,17 @@ public class GameCore : MonoBehaviour {
     [Header("Quitting")]
     private bool isQuitting;
 
-    private void Start() {
+    private void Awake() {
 
+        DontDestroyOnLoad(gameObject); // make sure game manager persists through scenes
         startGravity = Physics2D.gravity;
+
+    }
+
+    // start function for each new scene
+    private void OnLevelWasLoaded(int level) {
+
+        isQuitting = false;
 
     }
 
@@ -81,17 +92,12 @@ public class GameCore : MonoBehaviour {
 
     }
 
-    public void FlipGravity() {
+    // handle gravity here because it is constant throughout scenes
+    public void ModifyGravity(float gravityModifier) { Physics2D.gravity = new Vector2(Physics2D.gravity.x, Physics2D.gravity.y * gravityModifier); }
 
-        Physics2D.gravity = new Vector2(Physics2D.gravity.x, -Physics2D.gravity.y); // flip gravity here because it is constant throughout scenes
+    public void FlipGravity() { Physics2D.gravity = new Vector2(Physics2D.gravity.x, -Physics2D.gravity.y); }
 
-    }
-
-    public void ResetGravity() {
-
-        Physics2D.gravity = startGravity;
-
-    }
+    public void ResetGravity() { Physics2D.gravity = startGravity; }
 
     public bool IsQuitting() { return isQuitting; }
 
@@ -114,4 +120,7 @@ public class GameCore : MonoBehaviour {
         isPaused = false;
 
     }
+
+    public LayerMask GetEnvironmentMask() { return environmentMask; }
+
 }

@@ -48,7 +48,7 @@ public class Bullet : MonoBehaviour {
 
         if (shooterType == EntityType.Player)
             deathCaused = collision.transform.GetComponent<PhantomHealthManager>()?.TakeDamage(damage); // damage phantom if player is shooter
-        else if (shooterType == EntityType.Enemy)
+        else if (shooterType == EntityType.Phantom)
             deathCaused = collision.transform.GetComponent<PlayerHealthManager>()?.TakeDamage(damage); // damage player if phantom is shooter
 
         if (deathCaused != null && !(bool) deathCaused)

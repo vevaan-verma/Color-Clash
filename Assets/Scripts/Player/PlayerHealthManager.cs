@@ -90,7 +90,7 @@ public class PlayerHealthManager : MonoBehaviour {
 
         // reload all weapons
         foreach (Gun gun in gunManager.GetGuns().ToList())
-            gun.InstantReload(EntityType.Player);
+            gun.InstantReload();
 
         rb.velocity = Vector2.zero; // reset velocity
 

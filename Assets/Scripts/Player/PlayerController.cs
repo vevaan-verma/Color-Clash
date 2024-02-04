@@ -13,6 +13,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     [Header("References")]
+    private GameCore gameCore;
     private CameraController cameraController;
     private UIController uiController;
     private Animator animator;
@@ -32,7 +33,7 @@ public class PlayerController : MonoBehaviour {
     [Header("Ground Check")]
     [SerializeField] private Transform leftFoot;
     [SerializeField] private Transform rightFoot;
-    [SerializeField] private LayerMask environmentMask;
+    [SerializeField] private LayerMask phantomMask;
     [SerializeField] private float groundCheckRadius;
     private bool isGrounded;
 
@@ -79,6 +80,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Start() {
 
+        gameCore = FindObjectOfType<GameCore>();
         cameraController = FindObjectOfType<CameraController>();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
@@ -90,7 +92,7 @@ public class PlayerController : MonoBehaviour {
     private void Update() {
 
         // ground check
-        isGrounded = Physics2D.OverlapCircle(leftFoot.position, groundCheckRadius, environmentMask) != null || Physics2D.OverlapCircle(rightFoot.position, groundCheckRadius, environmentMask) != null; // check both feet for ground check (overlap circle allows for mantle mechanic)
+        isGrounded = Physics2D.OverlapCircle(leftFoot.position, groundCheckRadius, gameCore.GetEnvironmentMask()) != null || Physics2D.OverlapCircle(leftFoot.position, groundCheckRadius, phantomMask) || Physics2D.OverlapCircle(rightFoot.position, groundCheckRadius, gameCore.GetEnvironmentMask()) != null || Physics2D.OverlapCircle(rightFoot.position, groundCheckRadius, phantomMask) != null; // check both feet for ground check & check for separate phantom mask too (overlap circle allows for mantle mechanic | phantom shouldn't be included in environment mask)
 
         // movement
         if (IsMechanicEnabled(MechanicType.Movement)) {
@@ -147,7 +149,7 @@ public class PlayerController : MonoBehaviour {
 
     }
 
-    public void FlipPlayer(float rotationDuration) {
+    public void GravityFlip(float rotationDuration) {
 
         if (isRotated)
             transform.rotation = Quaternion.identity;
@@ -171,8 +173,6 @@ public class PlayerController : MonoBehaviour {
     public Transform GetLeftFoot() { return leftFoot; }
 
     public Transform GetRightFoot() { return rightFoot; }
-
-    public LayerMask GetEnvironmentMask() { return environmentMask; }
 
     public bool IsMechanicEnabled(MechanicType mechanicType) {
 

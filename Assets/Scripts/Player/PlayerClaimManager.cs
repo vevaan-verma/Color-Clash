@@ -7,6 +7,7 @@ using UnityEngine;
 public class PlayerClaimManager : MonoBehaviour {
 
     [Header("References")]
+    private GameCore gameCore;
     private PlayerController playerController;
     private PlayerColorManager colorManager;
     private PlayerEffectManager effectManager;
@@ -17,6 +18,7 @@ public class PlayerClaimManager : MonoBehaviour {
 
     private void Awake() {
 
+        gameCore = FindObjectOfType<GameCore>();
         playerController = GetComponent<PlayerController>();
         colorManager = GetComponent<PlayerColorManager>();
         effectManager = GetComponent<PlayerEffectManager>();
@@ -35,8 +37,8 @@ public class PlayerClaimManager : MonoBehaviour {
         if (playerController.IsMechanicEnabled(MechanicType.Claiming)) { // don't return if false to allow for more code to be added to this method later
 
             // if player is standing on something, claim it
-            Collider2D leftCollider = Physics2D.OverlapCircle(playerController.GetLeftFoot().position, claimCheckRadius, playerController.GetEnvironmentMask());
-            Collider2D rightCollider = Physics2D.OverlapCircle(playerController.GetRightFoot().position, claimCheckRadius, playerController.GetEnvironmentMask());
+            Collider2D leftCollider = Physics2D.OverlapCircle(playerController.GetLeftFoot().position, claimCheckRadius, gameCore.GetEnvironmentMask());
+            Collider2D rightCollider = Physics2D.OverlapCircle(playerController.GetRightFoot().position, claimCheckRadius, gameCore.GetEnvironmentMask());
 
             if (leftCollider)
                 leftCollider.GetComponent<Claimable>()?.Claim(EntityType.Player, colorManager.GetCurrentPlayerColor().GetClaimColor(), colorManager.GetCurrentPlayerColor().GetEffectType());

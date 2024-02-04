@@ -6,8 +6,8 @@ using UnityEngine;
 public class BackgroundScroller : MonoBehaviour {
 
     [Header("Scrolling")]
-    [SerializeField][Range(-1f, 1f)] private float xScrollSpeed;
-    [SerializeField][Range(-1f, 1f)] private float yScrollSpeed;
+    [SerializeField] private float xScrollSpeed;
+    [SerializeField] private float yScrollSpeed;
     private float xOffset;
     private float yOffset;
     private Material material;

@@ -39,7 +39,7 @@ public class Claimable : MonoBehaviour {
         PlayerClaim playerClaim = GetComponent<PlayerClaim>();
         PhantomClaim phantomClaim = GetComponent<PhantomClaim>();
 
-        if ((entityType == EntityType.Player && ((playerClaim && playerClaim.GetEffectType() == effectType) || playerColorCoroutine != null || healthManager.IsDead())) || (entityType == EntityType.Enemy && (phantomClaim || phantomColorCoroutine != null))) // already claimed by entity (player done this way to make sure if effect types are different, they are still replaced)
+        if ((entityType == EntityType.Player && ((playerClaim && playerClaim.GetEffectType() == effectType) || playerColorCoroutine != null || healthManager.IsDead())) || (entityType == EntityType.Phantom && (phantomClaim || phantomColorCoroutine != null))) // already claimed by entity (player done this way to make sure if effect types are different, they are still replaced)
             return;
 
         if (resetCoroutine != null)
@@ -47,7 +47,7 @@ public class Claimable : MonoBehaviour {
 
         if (entityType == EntityType.Player)
             playerColorCoroutine = StartCoroutine(StartClaim(entityType, effectType, claimColor, claimDuration));
-        if (entityType == EntityType.Enemy)
+        if (entityType == EntityType.Phantom)
             phantomColorCoroutine = StartCoroutine(StartClaim(entityType, effectType, claimColor, claimDuration));
 
     }
@@ -70,7 +70,7 @@ public class Claimable : MonoBehaviour {
 
         if (entityType == EntityType.Player)
             playerColorCoroutine = null;
-        if (entityType == EntityType.Enemy)
+        if (entityType == EntityType.Phantom)
             phantomColorCoroutine = null;
 
     }
@@ -88,7 +88,7 @@ public class Claimable : MonoBehaviour {
 
             gameObject.AddComponent<PlayerClaim>().Claim(this, claimColor, (EffectType) effectType); // claim for player
 
-        } else if (entityType == EntityType.Enemy) {
+        } else if (entityType == EntityType.Phantom) {
 
             // destroy any existing claims
             foreach (PlayerClaim claim in GetComponents<PlayerClaim>())
